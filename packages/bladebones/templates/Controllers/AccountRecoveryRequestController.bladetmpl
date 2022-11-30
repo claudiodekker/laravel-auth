@@ -29,7 +29,9 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+@if (!$withoutRateLimiting)
 use Illuminate\Validation\ValidationException;
+@endif
 
 class AccountRecoveryRequestController extends BaseController
 {

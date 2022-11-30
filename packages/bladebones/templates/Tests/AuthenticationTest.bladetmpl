@@ -5,11 +5,11 @@
 @endphp
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\{{ $verificationTrait }};
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\{{ $flavorTrait }};
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;

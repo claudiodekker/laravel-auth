@@ -71,11 +71,11 @@ class GenerateCommandTest extends TestCase
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -169,11 +169,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -255,11 +255,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -340,11 +340,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -426,11 +426,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -512,11 +512,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -597,11 +597,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -683,11 +683,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
@@ -784,11 +784,11 @@ EOF;
 
 namespace Tests\Feature;
 
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\UsernameBased;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
 use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;

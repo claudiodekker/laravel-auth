@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\AccountRecoveryController;
 use App\Http\Controllers\Auth\AccountRecoveryRequestController;
 use App\Http\Controllers\Auth\Challenges\AccountRecoveryChallengeController;
 use App\Http\Controllers\Auth\Challenges\MultiFactorChallengeController;
