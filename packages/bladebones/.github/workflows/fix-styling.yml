@@ -3,7 +3,7 @@ name: Check & fix styling
 on: push
 
 jobs:
-  laravel-pint:
+  pint:
     runs-on: ubuntu-latest
 
     steps:
