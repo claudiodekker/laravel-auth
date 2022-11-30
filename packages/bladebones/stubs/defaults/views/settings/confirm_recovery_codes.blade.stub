@@ -1,0 +1,24 @@
+<h1>Confirm Account Recovery Codes</h1>
+
+<p>
+  To prevent you from getting locked out of your account, as well as to make sure you have the correct codes, please confirm one of them below.
+</p>
+
+@if ($errors->any())
+  <ul>
+    @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+    @endforeach
+  </ul>
+@endif
+
+<form method="POST" action="{{ route('auth.settings.generate_recovery.store') }}">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+  <label>
+    <span hidden>Confirm one of your recovery codes</span>
+    <input name="code" placeholder="A1B2C-3D4E5" minlength="10" maxlength="11" pattern="[a-zA-Z0-9]{5}-?[a-zA-Z0-9]{5}" autofocus required />
+  </label>
+  <button type="submit">
+    Confirm
+  </button>
+</form>

@@ -1,0 +1,131 @@
+
+namespace App\Http\Controllers\Auth\Challenges;
+
+use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\AccountRecoveryChallengeController as BaseController;
+@if ($withoutRateLimiting)
+use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;
+@endif
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+class AccountRecoveryChallengeController extends BaseController
+{
+@php
+    $uses = [];
+    if ($withoutRateLimiting) {
+        $uses[] = "WithoutRateLimiting";
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
+    /**
+     * Handle an incoming request to view the account recovery challenge page.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  string  $token
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function create(Request $request, string $token): View
+    {
+        return parent::create($request, $token);
+    }
+
+    /**
+     * Handle an incoming account recovery challenge response.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  string  $token
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request, string $token): RedirectResponse
+    {
+        return parent::store($request, $token);
+    }
+
+    /**
+     * Sends a response that displays the account recovery challenge page.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  string  $token
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    protected function sendChallengePageResponse(Request $request, string $token): View
+    {
+        return view('auth.challenges.recovery', [
+            'token' => $token,
+        ]);
+    }
+
+    /**
+     * Sends a response indicating that the given recovery link is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function sendInvalidRecoveryLinkResponse(Request $request): void
+    {
+        abort(403, 'The given email and recovery token combination are invalid.');
+    }
+
+    /**
+     * Sends a response indicating that the given recovery code is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendInvalidRecoveryCodeResponse(Request $request): void
+    {
+        throw ValidationException::withMessages([
+            'code' => __('laravel-auth::auth.challenge.recovery'),
+        ]);
+    }
+
+    /**
+     * Sends a response indicating that the user's account has been recovered.
+     *
+     * Typically, you'd want this response to redirect the user to their account's security settings page,
+     * where they can adjust whatever is causing them to be unable to authenticate using normal means.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendAccountRecoveredResponse(Request $request, Authenticatable $user): RedirectResponse
+    {
+        return redirect()->route('auth.settings');
+    }
+@if (!$withoutRateLimiting)
+
+    /**
+     * Sends a response indicating that the user's requests have been rate limited.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  int  $availableInSeconds
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendRateLimitedResponse(Request $request, int $availableInSeconds): void
+    {
+        throw ValidationException::withMessages([
+            'code' => __('laravel-auth::auth.challenge.throttle', [
+                'seconds' => $availableInSeconds,
+                'minutes' => ceil($availableInSeconds / 60),
+            ]),
+        ]);
+    }
+@endif
+}

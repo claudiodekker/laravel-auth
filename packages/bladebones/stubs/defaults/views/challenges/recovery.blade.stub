@@ -1,0 +1,22 @@
+<h1>Account Recovery</h1>
+<h2>Recovery code</h2>
+
+@if ($errors->any())
+  <ul>
+    @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+    @endforeach
+  </ul>
+@endif
+
+<form method="POST" action="{{ route('recover-account.challenge', ['token' => $token]) }}">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+  <input type="hidden" name="email" value="{{ request()->input('email') }}" />
+  <label>
+    <span>Recovery Code</span>
+    <input type="text" name="code" placeholder="XXXXX-XXXXX" minlength="10" maxlength="10" required />
+  </label>
+  <button type="submit">
+    Verify
+  </button>
+</form>

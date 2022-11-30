@@ -1,0 +1,37 @@
+<div style="border: 5px solid #FF0000; padding: 4px;">
+  <h2>You are using the barebones authentication views.</h2>
+  <p>
+    Don't worry, you didn't forget to run <i>npm run dev</i> or some other build process, and the installation of laravel-auth finished successfully.<br>
+    These views are intentionally kept extremely basic, to make it easier for you to understand the bare minimum required code, and to customize it to your own liking, without having to remove a bunch of default styling first.<br /><br />
+
+    If you want prettier default views, you can require and install a view-preset package (such as <a href="https://github.com/claudiodekker/laravel-auth-inertia" rel="noreferrer noopener" target="_blank">the inertia one</a>, which internally extends the laravel-auth package) instead.
+  </p>
+</div>
+
+@if (session('status'))
+  <strong>{{ session('status') }}</strong>
+@endif
+
+<h1>Recover Account</h1>
+<a href="{{ route('login') }}">Log in</a>
+<br /><br />
+
+@if ($errors->any())
+  <ul>
+    @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+    @endforeach
+  </ul>
+@endif
+
+<form method="POST" action="{{ route('recover-account') }}">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+  <input type="hidden" name="_method" value="POST" />
+  <label>
+    <span>Email</span>
+    <input type="email" name="email" required autocomplete="email" value="{{ old('email') }}" />
+  </label>
+  <button type="submit">
+    Email Account Recovery Link
+  </button>
+</form>

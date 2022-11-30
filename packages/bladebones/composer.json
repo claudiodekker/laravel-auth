@@ -1,0 +1,59 @@
+{
+    "name": "claudiodekker/laravel-auth-bladebones",
+    "description": "Rich (yet bare) authentication scaffolding for any blade-based Laravel application.",
+    "keywords": [
+        "laravel",
+        "auth",
+        "authentication",
+        "scaffolding",
+        "blade",
+        "barebones",
+        "template"
+    ],
+    "homepage": "https://github.com/claudiodekker/laravel-auth-bladebones",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Claudio Dekker",
+            "email": "claudio@ubient.net",
+            "homepage": "https://ubient.net",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "~8.1.0",
+        "ext-json": "*",
+        "laravel/framework": "^9.0",
+        "claudiodekker/laravel-auth": "^0.1"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "orchestra/testbench": "^6.5|^7.0",
+        "phpunit/phpunit": "^8.4|^9.5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuthBladebones\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuthBladebones\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ClaudioDekker\\LaravelAuthBladebones\\LaravelAuthBladebonesServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

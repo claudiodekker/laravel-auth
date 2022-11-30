@@ -1,0 +1,366 @@
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+  const BLADE_INJECTED_VARIABLES = {{ Illuminate\Support\Js::from([
+    'can_use_password' => $canUsePassword,
+    "endpoint" => route("auth.sudo_mode"),
+    "headers" => [
+        "X-CSRF-TOKEN" => csrf_token(),
+    ],
+    "options" => $options,
+  ]) }};
+</script>
+
+<h1>Confirm sudo access</h1>
+<p>
+  You are entering <strong>sudo</strong> mode. We won't ask you to confirm your credentials again for at least the next 15 minutes.
+  Every sudo-protected action you take will reset this 15 minute timer.
+</p>
+
+<!-- Error Messages Component -->
+<script type="text/x-template" id="error-messages">
+  <div v-if="hasErrors">
+    An error has occurred.
+    <ul>
+      <li v-for="error in messages">@{{ error }}</li>
+    </ul>
+  </div>
+</script>
+<script>
+const errorMessages = {
+  template: '#error-messages',
+  props: {
+    errors: {
+      required: true,
+    },
+  },
+  computed: {
+    hasErrors() {
+      return Object.keys(this.errors || {}).length > 0
+    },
+    messages() {
+      if (! this.hasErrors) {
+        return []
+      }
+
+      return Object.values(this.errors.errors || {}).reduce((carry, field) => carry.concat(field), [])
+    },
+  },
+}
+</script>
+
+<!-- Security Key Component -->
+<script type="text/x-template" id="security-key-form">
+  <template v-if="state === 'waiting'">
+    <h3>Waiting for security key</h3>
+    <span>Please follow your browser's instructions to confirm sudo-mode.</span>
+  </template>
+  <template v-else-if="state === 'submitting'">
+    <h3>Please wait...</h3>
+    <span>We're attempting to confirm sudo-mode.</span>
+  </template>
+  <template v-else-if="state === 'failed'">
+    <h3>Security Key Authentication Failed</h3>
+
+    {{--    Note: This state this can instantly occur when you're on an "insecure" environment, without any logged errors.--}}
+
+    {{--    To solve this, make sure that the following things are set up correctly:--}}
+    {{--    - Your (local) environment is using a valid non-local domain name (e.g. my-laravel-app.test).--}}
+    {{--    - The connection to the page is 100% secure (e.g. no mixed content / no requests to http:// at all).--}}
+    {{--    - The relying_party configured in the app matches the domain name used.--}}
+
+    {{--    On a local environment, you can use a self-signed certificate to get this to work. If you're using--}}
+    {{--    Laravel Valet, you can easily configure one for this device by using the "valet secure" command.--}}
+
+    <form @submit.prevent="submit">
+      <button type="submit">
+        Retry security key
+      </button>
+    </form>
+  </template>
+  <template v-else>
+    <form @submit.prevent="submit">
+      <button type="submit">
+        Use security key
+      </button>
+    </form>
+  </template>
+</script>
+<script>
+  const securityKeyForm = {
+    template: '#security-key-form',
+    emits: ['errors'],
+    props: {
+      options: {
+        type: Object,
+        required: true,
+      },
+      endpoint: {
+        type: String,
+        required: true,
+      },
+      headers: {
+        type: Object,
+        default: () => ({}),
+      }
+    },
+    data: () => ({
+      state: 'default',
+    }),
+    computed: {
+      /**
+       * Determines whether the form is currently busy.
+       */
+      processing() {
+        return this.state === 'submitting'
+      },
+      /**
+       * Decodes the options object encoded by the server, so that any connected security keys can use it.
+       *
+       * @see https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
+       */
+      publicKeyRequestOptions() {
+        const fixPadding = input => input.length % 4 !== 0 ? input + "=".repeat(4 - input.length % 4) : input;
+        const normalizeBase64 = input => fixPadding(input.replace(/-/g, '+').replace(/_/g, '/'));
+        const base64Decode = input => atob(normalizeBase64(input));
+        const base64ToByteArray = input => Uint8Array.from([...base64Decode(input)].map(c => c.charCodeAt(0)))
+
+        const options = toRaw(this.options);
+
+        return {
+          ...options,
+          challenge: base64ToByteArray(options.challenge),
+          allowCredentials: (options.allowCredentials?.map(credential => ({
+            ... credential,
+            id: base64ToByteArray(credential.id),
+          })) || []),
+        }
+      }
+    },
+    methods: {
+      /**
+       * This function encodes the asserted credential (read: auth. signature), so that it can be used by the server.
+       *
+       * @see https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+       * @see https://www.w3.org/TR/webauthn-2/#ref-for-authenticatorresponse⑥
+       */
+      prepareAssertedCredential(credential) {
+        const arrayBufferToBase64 = input => btoa(String.fromCharCode(...new Uint8Array(input)))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '')
+
+        return {
+          id: credential.id,
+          rawId: arrayBufferToBase64(credential.rawId),
+          response: {
+            clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+            /** https://www.w3.org/TR/webauthn-2/#ref-for-authenticatorresponse⑥ */
+            authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
+            signature: arrayBufferToBase64(credential.response.signature),
+            ... (credential.response.userHandle ? { userHandle: arrayBufferToBase64(credential.response.userHandle) } : {}),
+          },
+          type: credential.type,
+        }
+      },
+      /**
+       * Attempts to obtain a WebAuthn credential.
+       */
+      async obtainWebauthnCredential() {
+        // Using the available options, we'll ask the browser to handle the rest of the creation process.
+        // If something goes wrong (e.g. the user reject the request), a promise rejection (error) will be thrown here.
+        const credential = await navigator.credentials.get({
+          publicKey: this.publicKeyRequestOptions,
+        })
+
+        // Now that the asserted credential is created, we'll prepare it for submission to the server.
+        return this.prepareAssertedCredential(credential);
+      },
+      /**
+       * Handles the public key based sudo-mode confirmation process when the user submits the form.
+       */
+      async submit() {
+        if (this.processing) {
+          return;
+        }
+
+        this.$emit('errors', null);
+        this.state = "waiting";
+
+        let credential;
+        try {
+          credential = await this.obtainWebauthnCredential();
+        } catch (e) {
+          console.error(e)
+          this.state = "failed";
+          return;
+        }
+
+        this.state = "submitting";
+
+        const response = await fetch(this.endpoint, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            ...this.headers,
+          },
+          body: JSON.stringify({
+            credential: credential,
+          }),
+        });
+
+        // When the session has expired, reload the page.
+        if (response.status === 419) {
+          window.location.reload()
+          return
+        }
+
+        // If the server returned a validation error, we'll want to display it to the user.
+        if (response.status === 422) {
+          this.$emit('errors', await response.json());
+          this.state = 'failed';
+          return;
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 200) {
+          this.state = 'failed';
+          throw new Error("Failed to authenticate (unexpected response from server)");
+        }
+
+        // Finally, we'll redirect the user to their destination.
+        window.location.href = (await response.json()).redirect_url;
+      },
+    }
+  }
+</script>
+
+<!-- Password Component -->
+<script type="text/x-template" id="password-form">
+  <template v-if="! showForm">
+    <a href="#" @click.prevent="toggleForm">Use your password</a>
+  </template>
+  <template v-else>
+    <form @submit.prevent="submit">
+    <label>
+      <span>Password</span>
+      <input type="password" name="password" v-model="form.password" ref="password" required autocomplete="current-password" autofocus />
+    </label>
+    <button type="submit">
+      Sign in
+    </button>
+  </form>
+  </template>
+</script>
+<script>
+  const passwordForm = {
+    template: '#password-form',
+    emits: ['errors'],
+    props: {
+      endpoint: {
+        type: String,
+        required: true,
+      },
+      headers: {
+        type: Object,
+        default: () => ({}),
+      }
+    },
+    data: () => ({
+      processing: false,
+      showForm: false,
+      form: {
+        password: '',
+      },
+    }),
+    methods: {
+      /**
+       * Enables the password form when the user clicks "Use your password".
+       */
+      toggleForm() {
+        this.showForm = true;
+        this.$nextTick(() => this.$refs.password.focus());
+      },
+      /**
+       * Handles the password-based sudo-mode confirmation process when the user submits the form.
+       */
+      async submit() {
+        if (this.processing) {
+          return;
+        }
+
+        this.$emit('errors', null);
+        this.processing = true;
+
+        const payload = {
+          password: this.form.password
+        }
+
+        this.form.password = "";
+
+        const response = await fetch(this.endpoint, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            ...this.headers,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        // When the session has expired, reload the page.
+        if (response.status === 419) {
+          window.location.reload()
+          return
+        }
+
+        // If the server returned a validation error, we'll want to display it to the user.
+        if (response.status === 422) {
+          this.$emit('errors', await response.json());
+          this.processing = false;
+          this.$nextTick(() => this.$refs.password.focus());
+          return;
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 200) {
+          this.processing = false;
+          this.$nextTick(() => this.$refs.password.focus());
+          throw new Error("Failed to authenticate (unexpected response from server)");
+        }
+
+        // Finally, we'll redirect the user to their destination.
+        window.location.href = (await response.json()).redirect_url;
+      },
+    }
+  }
+</script>
+
+<!-- Root Page Component -->
+<div id="app">JavaScript is required to confirm sudo-mode.</div>
+<script type="text/x-template" id="vue-sudo-root">
+  <error-messages :errors="errors" />
+  <security-key-form :options="bladeVariables.options" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @errors="handleErrors"  />
+  <password-form v-if="bladeVariables.can_use_password" :options="bladeVariables.options" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @errors="handleErrors" />
+</script>
+<script>
+  const { createApp, toRaw } = Vue;
+
+  createApp({
+    template: '#vue-sudo-root',
+    components: {
+      'error-messages': errorMessages,
+      'security-key-form': securityKeyForm,
+      'password-form': passwordForm,
+    },
+    data: () => ({
+      bladeVariables: BLADE_INJECTED_VARIABLES,
+      errors: null,
+    }),
+    methods: {
+      handleErrors(errors) {
+        this.errors = errors;
+      }
+    }
+  }).mount('#app');
+</script>

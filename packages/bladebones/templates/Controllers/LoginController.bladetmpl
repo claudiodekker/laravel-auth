@@ -1,0 +1,177 @@
+@php
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+@endphp
+
+namespace App\Http\Controllers\Auth;
+
+use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\Http\Controllers\LoginController as BaseController;
+@if ($flavor !== 'email-based')
+use ClaudioDekker\LaravelAuth\Http\Traits\{{ $flavorTrait }};
+@endif
+@if ($withoutRateLimiting)
+use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;
+@endif
+use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+class LoginController extends BaseController
+{
+@php
+    $uses = [];
+    if ($withoutRateLimiting) {
+        $uses[] = "WithoutRateLimiting";
+    }
+
+    if ($flavor !== 'email-based') {
+        $uses[] = $flavorTrait;
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
+    /**
+     * Display the login view.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function create(Request $request): View
+    {
+        return parent::create($request);
+    }
+
+    /**
+     * Handle an incoming authentication request.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        return parent::store($request);
+    }
+
+    /**
+     * Sign the user out of the application.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        return parent::destroy($request);
+    }
+
+    /**
+     * Sends a response that displays the login page.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    protected function sendLoginPageResponse(Request $request, PublicKeyCredentialRequestOptions $options): View
+    {
+        return view('auth.login', [
+            'options' => $options,
+        ]);
+    }
+
+    /**
+     * Sends a response indicating that the user has been authenticated successfully.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    protected function sendAuthenticatedResponse(Request $request, Authenticatable $user): JsonResponse
+    {
+        return new JsonResponse([
+            'redirect_url' => $this->intendedLocation($request),
+        ], 200);
+    }
+
+    /**
+     * Sends a response indicating that authentication has failed.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendAuthenticationFailedResponse(Request $request): void
+    {
+        throw ValidationException::withMessages([
+            $this->usernameField() => __('laravel-auth::auth.failed'),
+        ]);
+    }
+
+    /**
+     * Sends a response indicating that the user needs to confirm a 2FA challenge.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\CredentialType  $preferredMethod
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    protected function sendMultiFactorChallengeResponse(Request $request, CredentialType $preferredMethod): JsonResponse
+    {
+        return new JsonResponse([
+            'redirect_url' => route('login.challenge.multi_factor'),
+        ], 200);
+    }
+
+    /**
+     * Sends a response indicating that the passkey authentication state is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function sendInvalidPasskeyAuthenticationStateResponse(Request $request): void
+    {
+        abort(428, 'The current authentication state is invalid.');
+    }
+
+    /**
+     * Sends a response indicating that the user has been signed out.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendLoggedOutResponse(Request $request): RedirectResponse
+    {
+        return redirect()->route('login');
+    }
+@if (!$withoutRateLimiting)
+
+    /**
+     * Sends a response indicating that the user's requests have been rate limited.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  int  $availableInSeconds
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendRateLimitedResponse(Request $request, int $availableInSeconds): void
+    {
+        throw ValidationException::withMessages([
+            $this->usernameField() => __('laravel-auth::auth.throttle', [
+                'seconds' => $availableInSeconds,
+                'minutes' => ceil($availableInSeconds / 60),
+            ]),
+        ]);
+    }
+@endif
+}

@@ -1,0 +1,126 @@
+@php
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+
+    $traits = [];
+    if ($withoutEmailVerification) {
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail";
+    }
+
+    if ($flavor !== 'email-based') {
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\\" . $flavorTrait;
+    }
+
+    asort($traits);
+@endphp
+
+namespace App\Http\Controllers\Auth;
+
+use ClaudioDekker\LaravelAuth\Http\Controllers\RegisterController as BaseController;
+@if (count($traits) > 0)
+@foreach($traits as $trait)
+use {{ $trait }};
+@endforeach
+@endif
+use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+class RegisterController extends BaseController
+{
+@php
+    $uses = [];
+    if ($withoutEmailVerification) {
+        $uses[] = "WithoutVerificationEmail";
+    }
+
+    if ($flavor !== 'email-based') {
+        $uses[] = $flavorTrait;
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
+    /**
+     * Display the registration view.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function create(Request $request): View
+    {
+        return parent::create($request);
+    }
+
+    /**
+     * Handle an incoming registration request.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        return parent::store($request);
+    }
+
+    /**
+     * Sends a response indicating that the passkey-based registration process has been initialized.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    protected function sendPasskeyBasedRegistrationInitializedResponse(Request $request, PublicKeyCredentialCreationOptions $options): JsonResponse
+    {
+        return new JsonResponse($options);
+    }
+
+    /**
+     * Sends a response indicating that the passkey-based registration state is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function sendInvalidPasskeyRegistrationStateResponse(Request $request): void
+    {
+        abort(428, 'The current passkey registration state is invalid.');
+    }
+
+    /**
+     * Sends a response indicating that the signed passkey is not valid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendInvalidPasskeyResponse(Request $request): void
+    {
+        throw ValidationException::withMessages([
+            'credential' => 'The credential field is invalid.',
+        ]);
+    }
+
+    /**
+     * Sends a response indicating that the user has successfully registered.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * {!! '@' !!}return \Illuminate\Http\JsonResponse
+     */
+    protected function sendRegisteredResponse(Request $request, Authenticatable $user): JsonResponse
+    {
+        return new JsonResponse([
+            'redirect_url' => $this->redirectUrl($request, $user),
+        ], 201);
+    }
+}

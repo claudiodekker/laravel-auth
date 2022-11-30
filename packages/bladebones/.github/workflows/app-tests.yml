@@ -1,0 +1,79 @@
+name: App Tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 8.1 ]
+        laravel: [ 9 ]
+        stability: [ 'prefer-lowest', 'prefer-stable' ]
+        variants: [
+          '',
+          '--without-rate-limiting',
+          '--kind username-based',
+          '--kind username-based --without-rate-limiting'
+        ]
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} ${{ matrix.variants }} (w/ ${{ matrix.stability }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: ./package
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Create Laravel Project
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer create-project laravel/laravel app "${{ matrix.laravel }}.x" --remove-vcs --prefer-dist --no-interaction
+
+      - name: Set Laravel Environment
+        run: |
+          sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
+          sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=secret/" .env
+        working-directory: ./app
+
+      - name: Install Package
+        run: |
+          composer config repositories.package path ../package
+          composer require claudiodekker/laravel-auth-bladebones --${{ matrix.stability }}
+        working-directory: ./app
+
+      - name: Generate Auth Scaffolding
+        run: php artisan auth:generate --yes ${{ matrix.variants }}
+        working-directory: ./app
+
+      - name: Migrate Database
+        run: php artisan migrate
+        working-directory: ./app
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
+        working-directory: ./app
+
+    services:
+      mysql:
+        image: 'mysql:5.7'
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: laravel
+          MYSQL_ROOT_PASSWORD: secret

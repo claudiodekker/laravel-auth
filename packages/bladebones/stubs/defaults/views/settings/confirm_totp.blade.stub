@@ -1,0 +1,43 @@
+<h1>Register a new multi-factor authenticator</h1>
+
+<img src="{{ $qrImage }}" width="400" height="400" alt="Scannable QR Code" />
+
+<ol>
+  <li>
+    Download your preferred two-factor authenticator application.<br />
+    If you don't already have one, we recommend using a cloud-based TOTP app such as
+    <a href="https://support.1password.com/one-time-passwords/" target="_blank" rel="noopener">1Password</a>,
+    <a href="https://authy.com/features/setup/" target="_blank" rel="noopener">Authy</a>, or
+    <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app" target="_blank" rel="noopener">Microsoft Authenticator</a>.
+  </li>
+  <li>
+    Scan this QR-code with your two-factor authentication application.<br />
+    If you are unable to scan the QR code, please use this secret instead: {{ $secret }}
+  </li>
+  <li>
+    The application should now display a six-digit code. Please enter this code in the form below, and click "Confirm".
+  </li>
+</ol>
+
+@if ($errors->any())
+  <ul>
+    @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+    @endforeach
+  </ul>
+@endif
+
+<form method="POST" action="{{ route('auth.credentials.register_totp.confirm') }}">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+  <label>
+    <span>Authenticator Name</span>
+    <input type="text" name="name" value="{{ old('name', $randomName) }}" />
+  </label>
+  <label>
+    <span hidden>Confirm your one time password registration</span>
+    <input name="code" placeholder="six-digit code" minlength="6" maxlength="6" inputmode="numeric" pattern="[0-9]*" autofocus required />
+  </label>
+  <button type="submit">
+    Confirm
+  </button>
+</form>

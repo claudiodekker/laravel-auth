@@ -1,0 +1,146 @@
+@php
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+
+    $traits = [];
+    if ($withoutRateLimiting) {
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting";
+    }
+
+    if ($withoutEmailVerification) {
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail";
+    }
+
+    if ($flavor !== 'email-based') {
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\\" . $flavorTrait;
+    }
+
+    asort($traits);
+@endphp
+
+namespace App\Http\Controllers\Auth;
+
+use ClaudioDekker\LaravelAuth\Http\Controllers\AccountRecoveryRequestController as BaseController;
+@if (count($traits) > 0)
+@foreach($traits as $trait)
+use {{ $trait }};
+@endforeach
+@endif
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+class AccountRecoveryRequestController extends BaseController
+{
+@php
+    $uses = [];
+    if ($withoutRateLimiting) {
+        $uses[] = "WithoutRateLimiting";
+    }
+
+    if ($withoutEmailVerification) {
+        $uses[] = "WithoutVerificationEmail";
+    }
+
+    if ($flavor !== 'email-based') {
+        $uses[] = $flavorTrait;
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
+    /**
+     * Handle an incoming request to view the account recovery page.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function create(Request $request): View
+    {
+        return parent::create($request);
+    }
+
+    /**
+     * Handle an incoming request to receive an account recovery link.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        return parent::store($request);
+    }
+
+    /**
+     * Sends a response indicating that the recovery link has been sent.
+     *
+     * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method (by default)
+     * is also called when the user has not been found, and when the recovery has already been requested.
+     *
+     * {!! '@' !!}see sendNoSuchUserResponse
+     * {!! '@' !!}see sendRecoveryAlreadyRequestedResponse
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    public function sendRecoveryLinkSentResponse(Request $request): RedirectResponse
+    {
+        return redirect()->back()->with('status', __('laravel-auth::auth.recovery.sent'));
+    }
+
+    /**
+     * Handles the situation in which account recovery has already been requested.
+     *
+     * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
+     * indicate that recovery has already been requested. Instead, it should always return the same response.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendRecoveryAlreadyRequestedResponse(Request $request, Authenticatable $user): RedirectResponse
+    {
+        return $this->sendRecoveryLinkSentResponse($request);
+    }
+
+    /**
+     * Handles the situation in which the user has not been found.
+     *
+     * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
+     * indicate that the account was not found. Instead, it should always return the same response.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendNoSuchUserResponse(Request $request): RedirectResponse
+    {
+        return $this->sendRecoveryLinkSentResponse($request);
+    }
+@if (!$withoutRateLimiting)
+
+    /**
+     * Sends a response indicating that the user's requests have been rate limited.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  int  $availableInSeconds
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendRateLimitedResponse(Request $request, int $availableInSeconds): void
+    {
+        throw ValidationException::withMessages([
+            'email' => __('laravel-auth::auth.recovery.throttle', [
+                'seconds' => $availableInSeconds,
+                'minutes' => ceil($availableInSeconds / 60),
+            ]),
+        ]);
+    }
+@endif
+}

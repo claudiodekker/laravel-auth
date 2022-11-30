@@ -1,0 +1,44 @@
+<h1>Account Recovery Codes</h1>
+
+<p>
+  Treat your recovery codes with the same level of attention as you would your password!<br />
+  We recommend saving these in a password manager, or alternatively to print them out and keep them safe.<br />
+  <strong>If you lose your recovery codes, you will not be able to recover your account!</strong>
+</p>
+
+<ul style="font-family: monospace; width: 300px;">
+  @foreach ($codes as $code)
+    <li style="display: inline-block; width: 48%;">{{ $code }}</li>
+  @endforeach
+</ul>
+
+<a href="data:text/plain;charset=utf-8,{{ urlencode(implode("\n", $codes)) }}" download="recovery-codes.txt">Download recovery codes</a><br />
+<a href="#" onclick="printRecoveryCodes(); return false;">Print recovery codes</a><br />
+
+<hr />
+
+<form method="GET" action="{{ route('auth.settings.generate_recovery.confirm') }}">
+  <button type="submit">
+    Continue
+  </button>
+</form>
+
+<script>
+  function printRecoveryCodes() {
+    const codes = {{ Illuminate\Support\Js::from($codes) }};
+    const html = "<html><head><title>Recovery Codes</title></head><body>" + codes.join("<br>") + "</body></html>";
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const contentWindow = iframe.contentWindow;
+    contentWindow.document.open();
+    contentWindow.document.write(html);
+    contentWindow.document.close();
+    contentWindow.focus();
+    contentWindow.print();
+
+    document.body.removeChild(iframe);
+  }
+</script>

@@ -1,0 +1,236 @@
+<h1>Register a new security key</h1>
+
+<div id="security_key_registration_errors"></div>
+
+<form id="security_key_registration_form" method="POST" onsubmit="return interceptFormSubmission(event, registerSecurityKey)">
+  <div id="security_key_registration_default">
+    <label>
+      <span>Security Key Name</span>
+      <input type="text" name="name" value="{{ $randomName }}" />
+    </label>
+    <button type="submit">
+      Add
+    </button>
+  </div>
+  <div style="display:none;" id="security_key_registration_waiting">
+    <h2>Waiting for security key</h2>
+    <span>Please follow your browser's instructions to register your security key.</span>
+  </div>
+  <div style="display:none;" id="security_key_registration_submitting">
+    <h2>Please wait...</h2>
+    <span>
+      Your security key is being associated with your account.
+    </span>
+  </div>
+  <div style="display: none;" id="security_key_registration_failed">
+    <h2>Security key registration failed.</h2>
+    {{--
+      Note: This state this can instantly occur when you're on an "insecure" environment, without any logged errors.
+
+      To solve this, make sure that the following things are set up correctly:
+      - Your (local) environment is using a valid non-local domain name (e.g. my-laravel-app.test).
+      - The connection to the page is 100% secure (e.g. no mixed content / no requests to http:// at all).
+      - The relying_party configured in the app matches the domain name used.
+
+      On a local environment, you can use a self-signed certificate to get this to work. If you're using
+      Laravel Valet, you can easily configure one for this device by using the "valet secure" command.
+    --}}
+    <button type="submit">
+      Try again
+    </button>
+  </div>
+</form>
+<div style="display:none;" id="security_keys_unsupported">
+  <h2>Unsupported Browser</h2>
+  <span>This browser doesn't support security keys yet. Please try a different browser.</span>
+  {{-- https://caniuse.com/credential-management --}}
+</div>
+
+<script>
+  /**
+   * Determines whether WebAuthn / Public Key Credentials are supported by this browser.
+   */
+  const isWebAuthnSupported = () => typeof navigator.credentials !== "undefined" && typeof window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
+
+  /**
+   * This function prevents a <html> form from submitting, and instead calls the callback function.
+   */
+  const interceptFormSubmission = (event, callback) => {
+    // First, we'll instruct the browser to not actually submit the <form>.
+    event.preventDefault();
+
+    // Then, we'll call our callback.
+    callback();
+
+    // Finally, we'll also return false, as to stop the form submission event from firing any further.
+    // This is very similar to event.preventDefault(), but does other stuff as well.
+    return false;
+  }
+
+  /**
+   * This function updates our UI to display the state that the credential registration process is in to the user.
+   *
+   * In a JavaScript app that uses for example Vue or React, this will likely be handled for you reactively.
+   */
+  const showUserInterfaceState = (state, errors) => {
+    document.getElementById("security_key_registration_errors").innerText = "";
+    document.getElementById("security_key_registration_form").style.display = "block";
+    document.getElementById("security_key_registration_default").style.display = "none";
+    document.getElementById("security_key_registration_waiting").style.display = "none";
+    document.getElementById("security_key_registration_submitting").style.display = "none";
+    document.getElementById("security_key_registration_failed").style.display = "none";
+
+    if (state === "unsupported") {
+      document.getElementById("security_key_registration_form").style.display = "none";
+      document.getElementById("security_keys_unsupported").style.display = "block";
+      return;
+    }
+
+    if (state === "errors") {
+      document.getElementById("security_key_registration_default").style.display = "block";
+      document.getElementById("security_key_registration_errors").innerText = JSON.stringify(errors);
+      return;
+    }
+
+    document.getElementById("security_key_registration_" + state).style.display = "block";
+  }
+
+  /**
+   * Get the current value of the Form's "name" field.
+   *
+   * In a JavaScript app that uses for example Vue or React, this will likely be handled for you reactively.
+   */
+  const getNameValue = () => document.getElementById("security_key_registration_form").elements.name.value;
+
+  /**
+   * This function decodes the server-side encoded options object, so that any connected security keys can use it.
+   *
+   * @see https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
+   */
+  const preparePublicKeyCreationOptions = options => {
+    const fixPadding = input => input.length % 4 !== 0 ? input + "=".repeat(4 - input.length % 4) : input;
+    const normalizeBase64 = input => fixPadding(input.replace(/-/g, '+').replace(/_/g, '/'));
+    const base64Decode = input => window.atob(normalizeBase64(input));
+    const base64ToByteArray = input => Uint8Array.from([... base64Decode(input)].map(c => c.charCodeAt(0)))
+
+    return {
+      ... options,
+      challenge: base64ToByteArray(options.challenge),
+      user: {
+        ...options.user,
+        id: base64ToByteArray(options.user.id),
+      },
+      excludeCredentials: (options.excludeCredentials?.map(credential => ({
+        ... credential,
+        id: base64ToByteArray(credential.id),
+      })) || []),
+    }
+  };
+
+  /**
+   * This function encodes the attested credential (read: new credential), so that it can be used by the server.
+   *
+   * @see https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+   * @see https://www.w3.org/TR/webauthn-2/#authenticatorattestationresponse
+   */
+  const prepareAttestationCredential = credential => {
+    const arrayBufferToBase64 = input => window.btoa(String.fromCharCode(... new Uint8Array(input)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+
+    return {
+      id: credential.id,
+      rawId: arrayBufferToBase64(credential.rawId),
+      response: {
+        clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+        /** https://www.w3.org/TR/webauthn-2/#authenticatorattestationresponse */
+        attestationObject: arrayBufferToBase64(credential.response.attestationObject)
+      },
+      type: credential.type,
+    }
+  };
+
+  /**
+   * This function handles the process that generates an attestation credential (read: new credential).
+   */
+  const generateAttestationCredential = async () => {
+    // First, we'll prepare the options variable that we've received from the back-end.
+    // These options will be used by any connected security keys to request the creation of a credential.
+    const options = preparePublicKeyCreationOptions({{ Illuminate\Support\Js::from($options->jsonSerialize()) }});
+
+    // Now, with the options prepared, we'll ask the browser to handle the rest of the creation process.
+    // If something goes wrong (e.g. the user reject the request), a promise rejection (error) will be thrown here.
+    const credential = await navigator.credentials.create({
+      publicKey: options,
+    });
+
+    // Now that the attested credential is created, we'll prepare it for submission to the server.
+    return prepareAttestationCredential(credential);
+  }
+
+  /**
+   * This function handles the full security key registration flow.
+   */
+  const registerSecurityKey = async () => {
+    // First, we'll update the UI to show that we're waiting for the user to interact with their security key.
+    showUserInterfaceState("waiting");
+
+    // Then, we'll grab the credential name that the user has entered in the form.
+    const name = getNameValue();
+
+    try {
+      // Next, we'll actually generate the (attestation) credential, and prepare it for submission.
+      // Within the WebAuthn standard, an attested credential is a credential that has been created by a security key.
+      const credential = await generateAttestationCredential();
+
+      // Now that the credential has been created, we'll update our UI to show that we're submitting the credential.
+      showUserInterfaceState("submitting");
+
+      // Then, we'll actually submit the credential (and it's name) to the server.
+      const response = await fetch("{{ route("auth.credentials.register_public_key.store") }}", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-CSRF-TOKEN": "{{ csrf_token() }}",
+        },
+        body: JSON.stringify({
+          name: name,
+          credential: credential,
+        }),
+      });
+
+      // If we've hit 403, that likely means we've either been signed out, or that sudo-mode has expired.
+      // In either case, the easiest way to solve this is to reload the current page.
+      if (response.status === 403) {
+        window.location.reload();
+        return;
+      }
+
+      // If the server returned a validation error, we'll want to display it to the user.
+      if (response.status === 422) {
+        showUserInterfaceState("errors", await response.json());
+        return;
+      }
+
+      // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+      if (response.status !== 201) {
+        throw new Error("Failed to register security key (unexpected response from server)");
+      }
+
+      // If we've made it this far, we've successfully registered the security key.
+      // As such, we'll redirect the user back to the credentials overview.
+      window.location.href = "{{ route('auth.settings') }}";
+    } catch (e) {
+      // If at any point something failed, we'll log the error to the browser's console, and show the failed UI.
+      showUserInterfaceState("failed");
+      console.error(e)
+    }
+  };
+
+  // While defined last, this check will run as soon as the page is loaded.
+  if (! isWebAuthnSupported()) {
+    showUserInterfaceState("unsupported");
+  }
+</script>
