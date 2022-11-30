@@ -1,0 +1,62 @@
+{
+    "name": "claudiodekker/laravel-auth",
+    "description": "Rich authentication logic for your Laravel applications; not intended for direct use.",
+    "keywords": [
+        "laravel",
+        "auth",
+        "authentication",
+        "core"
+    ],
+    "homepage": "https://github.com/claudiodekker/laravel-auth",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Claudio Dekker",
+            "email": "claudio@ubient.net",
+            "homepage": "https://ubient.net",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "~8.1.0",
+        "ext-json": "*",
+        "bacon/bacon-qr-code": "^2.0",
+        "claudiodekker/word-generator": "^1.0",
+        "laravel/framework": "^9.0",
+        "nyholm/psr7": "^1.5",
+        "pragmarx/google2fa": "^8.0",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "web-auth/webauthn-lib": "^4.0"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-latest",
+        "orchestra/testbench": "^6.5|^7.0",
+        "phpunit/phpunit": "^8.4|^9.5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuth\\": "src/",
+            "ClaudioDekker\\LaravelAuth\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuth\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+              "ClaudioDekker\\LaravelAuth\\LaravelAuthServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
