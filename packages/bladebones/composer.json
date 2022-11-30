@@ -24,7 +24,7 @@
         "php": "~8.1.0",
         "ext-json": "*",
         "laravel/framework": "^9.0",
-        "claudiodekker/laravel-auth": "^0.1"
+        "claudiodekker/laravel-auth": "~0.1"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
