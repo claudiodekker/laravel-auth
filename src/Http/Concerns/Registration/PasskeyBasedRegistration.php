@@ -47,6 +47,14 @@ trait PasskeyBasedRegistration
     abstract protected function sendInvalidPasskeyResponse(Request $request);
 
     /**
+     * Sends a response indicating that the passkey-based registration process has been cancelled.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    abstract protected function sendPasskeyRegistrationCancelledResponse(Request $request);
+
+    /**
      * Handle a passkey based registration request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -111,6 +119,24 @@ trait PasskeyBasedRegistration
     }
 
     /**
+     * Cancel the passkey based registration process.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    protected function cancelPasskeyRegistration(Request $request)
+    {
+        if (! $options = $this->getPasskeyCreationOptions($request)) {
+            return $this->sendInvalidPasskeyRegistrationStateResponse($request);
+        }
+
+        $this->clearPasskeyCreationOptions($request);
+        $this->releaseClaimedPasswordlessUser($request, $options->user()->id());
+
+        return $this->sendPasskeyRegistrationCancelledResponse($request);
+    }
+
+    /**
      * Determine if the given request is a passkey-based registration confirmation request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -152,6 +178,18 @@ trait PasskeyBasedRegistration
             'password' => Hash::make(Str::uuid()),
             'has_password' => false,
         ]);
+    }
+
+    /**
+     * Releases (read: deletes) a passkey-based user account.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $userId
+     * @return bool
+     */
+    protected function releaseClaimedPasswordlessUser(Request $request, $userId)
+    {
+        return User::where('id', $userId)->firstOrFail()->delete();
     }
 
     /**
