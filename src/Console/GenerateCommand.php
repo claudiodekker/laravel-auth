@@ -5,6 +5,9 @@ namespace ClaudioDekker\LaravelAuth\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 abstract class GenerateCommand extends Command
 {
@@ -213,6 +216,39 @@ abstract class GenerateCommand extends Command
         $this->error("Failed to store generated file at [$path].");
 
         return false;
+    }
+
+    /**
+     * Execute the given command within the project's root directory.
+     *
+     * @param  string  $command
+     * @param  int  $expectedExitCode
+     * @return bool
+     */
+    protected function exec(string $command, int $expectedExitCode = 0): bool
+    {
+        $arguments = explode(' ', $command);
+
+        if (isset($arguments[0]) && $arguments[0] === 'php') {
+            $arguments[0] = (new PhpExecutableFinder())->find(false) ?: 'php';
+        }
+
+        $this->comment('Executing command: '.implode(' ', $arguments));
+        $this->comment(Str::repeat('-', 80));
+
+        $exitCode = (new Process($arguments, base_path()))
+            ->setTimeout(600)
+            ->run(fn ($type, $output) => $this->output->write($output));
+
+        if ($exitCode !== $expectedExitCode) {
+            $this->error("Command exited with unexpected code [$exitCode].");
+
+            return false;
+        }
+
+        $this->comment(Str::repeat('-', 37).' DONE '.Str::repeat('-', 37));
+
+        return true;
     }
 
     /**
