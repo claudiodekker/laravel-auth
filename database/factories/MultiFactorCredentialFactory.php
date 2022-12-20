@@ -30,7 +30,7 @@ class MultiFactorCredentialFactory extends Factory
             'name' => $this->faker->ean13(),
             'type' => fn () => Arr::random([CredentialType::TOTP, CredentialType::PUBLIC_KEY]),
             'secret' => 'super-secret-value',
-            'created_at' => $this->faker->dateTime,
+            'created_at' => $this->faker->dateTime(),
             'user_id' => fn () => User::factory(),
         ];
     }

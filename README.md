@@ -1,12 +1,12 @@
 # Laravel Auth (Core)
 Rich authentication logic for your Laravel applications; not intended for direct use.
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/claudiodekker/laravel-auth.svg?style=flat-square)](https://packagist.org/packages/claudiodekker/laravel-auth)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/claudiodekker/laravel-auth.svg)](https://packagist.org/packages/claudiodekker/laravel-auth)
 [![GitHub App Tests Action Status](https://github.com/claudiodekker/laravel-auth/actions/workflows/app-tests.yml/badge.svg)](https://github.com/claudiodekker/laravel-auth/actions/workflows/app-tests.yml)
 [![Github Package Tests Action Status](https://github.com/claudiodekker/laravel-auth/actions/workflows/package-tests.yml/badge.svg)](https://github.com/claudiodekker/laravel-auth/actions/workflows/package-tests.yml)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/claudiodekker/laravel-auth/Check%20&%20fix%20styling?label=code%20style)](https://github.com/claudiodekker/laravel-auth/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amaster)
-[![Code Quality Score](https://img.shields.io/scrutinizer/g/claudiodekker/laravel-auth.svg?style=flat-square)](https://scrutinizer-ci.com/g/claudiodekker/laravel-auth)
-[![Total Downloads](https://img.shields.io/packagist/dt/claudiodekker/laravel-auth.svg?style=flat-square)](https://packagist.org/packages/claudiodekker/laravel-auth)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/claudiodekker/laravel-auth/fix-styling.yml?label=code%20style&logo=github&branch=master)](https://github.com/claudiodekker/laravel-auth/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amaster)
+[![Code Quality Score](https://img.shields.io/scrutinizer/g/claudiodekker/laravel-auth.svg?logo=scrutinizer)](https://scrutinizer-ci.com/g/claudiodekker/laravel-auth)
+[![Total Downloads](https://img.shields.io/packagist/dt/claudiodekker/laravel-auth.svg)](https://packagist.org/packages/claudiodekker/laravel-auth)
 
 These days, most (web)applications no longer have just a simple username-password login form; they require you to think about password strength, two-factor authentication,
 the ability to recover your account with all of this set up, and as of more recently even the ability to log in without any password at all, using Passkeys.
