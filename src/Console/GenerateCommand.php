@@ -89,7 +89,7 @@ abstract class GenerateCommand extends Command
     protected function install(): void
     {
         $this->installRoutes();
-        $this->installJobs();
+        $this->installScheduledTasks();
         $this->installControllers();
         $this->installTests();
 
@@ -115,11 +115,11 @@ abstract class GenerateCommand extends Command
     abstract protected function installTests(): void;
 
     /**
-     * Installs the authentication-related jobs.
+     * Updates the scheduler to run authentication-related tasks.
      *
      * @return void
      */
-    protected function installJobs(): void
+    protected function installScheduledTasks(): void
     {
         $this->rawGenerate('Console.Kernel', app_path('Console/Kernel.php'));
         $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
