@@ -4,13 +4,9 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
-use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
-use ParagonIE\ConstantTime\Base64UrlSafe;
 
 trait CancelPasskeyBasedRegistrationTests
 {
