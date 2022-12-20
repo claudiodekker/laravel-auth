@@ -122,9 +122,7 @@ abstract class GenerateCommand extends Command
     protected function installJobs(): void
     {
         $this->rawGenerate('Console.Kernel', app_path('Console/Kernel.php'));
-
-        $this->rawGenerate('Jobs.PruneUnclaimedUsersJob', app_path('Jobs/PruneUnclaimedUsersJob.php'));
-        $this->rawGenerate('Tests.PruneUnclaimedUsersJobTest', base_path('tests/Unit/PruneUnclaimedUsersJobTest.php'));
+        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
     }
 
     /**

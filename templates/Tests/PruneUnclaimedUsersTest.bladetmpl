@@ -1,13 +1,12 @@
 namespace Tests\Unit;
 
-use App\Jobs\PruneUnclaimedUsersJob;
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
-class PruneUnclaimedUsersJobTest extends TestCase
+class PruneUnclaimedUsersTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -23,7 +22,7 @@ class PruneUnclaimedUsersJobTest extends TestCase
         $userD = User::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-01 01:00:01');
 
-        PruneUnclaimedUsersJob::dispatchSync();
+        $this->artisan('model:prune');
 
         $this->assertNull($userA->fresh());
         $this->assertNull($userB->fresh());
@@ -43,7 +42,7 @@ class PruneUnclaimedUsersJobTest extends TestCase
         $userC = User::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-02 01:00:02');
 
-        PruneUnclaimedUsersJob::dispatchSync();
+        $this->artisan('model:prune');
 
         $this->assertNotNull($userA->fresh());
         $this->assertNull($userB->fresh());
