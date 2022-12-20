@@ -89,6 +89,7 @@ abstract class GenerateCommand extends Command
     protected function install(): void
     {
         $this->installRoutes();
+        $this->installJobs();
         $this->installControllers();
         $this->installTests();
 
@@ -114,11 +115,17 @@ abstract class GenerateCommand extends Command
     abstract protected function installTests(): void;
 
     /**
-     * Installs the extending package's authentication views.
+     * Installs the authentication-related jobs.
      *
      * @return void
      */
-    abstract protected function installViews(): void;
+    protected function installJobs(): void
+    {
+        $this->rawGenerate('Console.Kernel', app_path('Console/Kernel.php'));
+
+        $this->rawGenerate('Jobs.PruneUnclaimedUsersJob', app_path('Jobs/PruneUnclaimedUsersJob.php'));
+        $this->rawGenerate('Tests.PruneUnclaimedUsersJobTest', base_path('tests/Unit/PruneUnclaimedUsersJobTest.php'));
+    }
 
     /**
      * Installs the extending package's authentication controllers.
@@ -140,6 +147,13 @@ abstract class GenerateCommand extends Command
         $this->generate('Controllers.Settings.RegisterPublicKeyCredentialController', app_path('Http/Controllers/Auth/Settings/RegisterPublicKeyCredentialController.php'));
         $this->generate('Controllers.Settings.RegisterTotpCredentialController', app_path('Http/Controllers/Auth/Settings/RegisterTotpCredentialController.php'));
     }
+
+    /**
+     * Installs the extending package's authentication views.
+     *
+     * @return void
+     */
+    abstract protected function installViews(): void;
 
     /**
      * Overrides some of the files in Laravel's application scaffolding with the core package's own versions.
