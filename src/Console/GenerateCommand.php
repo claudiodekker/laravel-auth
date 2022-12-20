@@ -115,6 +115,7 @@ abstract class GenerateCommand extends Command
     {
         $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
     }
+
     /**
      * Installs the extending package's authentication controllers.
      *
