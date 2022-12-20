@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "~8.1.0",
+        "php": "~8.1.0|~8.2.0",
         "ext-json": "*",
         "bacon/bacon-qr-code": "^2.0.3",
         "claudiodekker/word-generator": "^1.0",
