@@ -65,7 +65,7 @@ jobs:
       - name: Install Package
         run: |
           composer config repositories.package path ../package
-          composer require "claudiodekker/laravel-auth:dev-gh-actions-predictable-composer-branch as ${{ env.LATEST_RELEASE_VERSION }}" claudiodekker/laravel-auth-${{ matrix.adapter }} --${{ matrix.stability }} --ignore-platform-reqs
+          composer require "claudiodekker/laravel-auth:dev-gh-actions-predictable-composer-branch as ${{ env.LATEST_RELEASE_VERSION }}" claudiodekker/laravel-auth-${{ matrix.adapter }} --${{ matrix.stability }}
         working-directory: ./app
 
       - name: Generate Auth Scaffolding
