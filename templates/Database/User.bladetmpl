@@ -1,14 +1,16 @@
 namespace App\Models;
 
+use ClaudioDekker\LaravelAuth\HasMultiFactorCredentials;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, HasMultiFactorCredentials, Notifiable, Prunable;
 
     /**
      * The attributes that are mass assignable.
@@ -47,4 +49,18 @@ class User extends Authenticatable
         'has_password' => 'boolean',
         'recovery_codes' => 'array',
     ];
+
+    /**
+     * Get the prunable model query.
+     *
+     * {!! ! '@' !!}return \Illuminate\Database\Eloquent\Builder
+     */
+    public function prunable()
+    {
+        return static::query()
+          ->where('has_password', false)
+          ->where('created_at', '<', now()->subHour())
+          ->where('created_at', '>', now()->subDay())
+          ->doesntHave('multiFactorCredentials');
+    }
 }

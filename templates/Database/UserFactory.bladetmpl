@@ -41,4 +41,18 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    /**
+     * Indicate that the model's password field is not usable.
+     *
+     * {!! '@' !!}return static
+     */
+    public function passwordless()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'has_password' => false,
+            ];
+        });
+    }
 }
