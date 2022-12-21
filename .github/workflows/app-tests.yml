@@ -25,20 +25,25 @@ jobs:
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} ${{ matrix.variants }} (w/ ${{ matrix.stability }})
     steps:
-      - name: Determine latest release version
-        run: |
-          LATEST_RELEASE=`curl --silent -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest"`
-          LATEST_TAG_NAME=`echo $LATEST_RELEASE | jq -r '.tag_name // "v0.1.0"'`
-          echo "LATEST_RELEASE_VERSION=${LATEST_TAG_NAME}" >> $GITHUB_ENV
-
-      - name: Checkout code
+      - name: Checkout core
         uses: actions/checkout@v3
         with:
-          path: ./package
+          path: ./core
 
-      - name: Switch to predictable branch name (for Composer dev-branch versioning)
-        run: git checkout -b gh-actions-predictable-composer-branch
-        working-directory: ./package
+      - name: Checkout adapter
+        uses: actions/checkout@v3
+        with:
+          repository: "claudiodekker/laravel-auth-${{ matrix.adapter }}"
+          ref: '1.x'
+          path: ./adapter
+
+      - name: Core - Switch to predictable branch name
+        run: git checkout -b gh-actions-predictable-core-branch
+        working-directory: ./core
+
+      - name: Adapter - Switch to predictable branch name
+        run: git checkout -b gh-actions-predictable-adapter-branch
+        working-directory: ./adapter
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -64,8 +69,9 @@ jobs:
 
       - name: Install Package
         run: |
-          composer config repositories.package path ../package
-          composer require "claudiodekker/laravel-auth:dev-gh-actions-predictable-composer-branch as ${{ env.LATEST_RELEASE_VERSION }}" claudiodekker/laravel-auth-${{ matrix.adapter }} --${{ matrix.stability }}
+          composer config repositories.core path ../core
+          composer config repositories.adapter path ../adapter
+          composer require "claudiodekker/laravel-auth:dev-gh-actions-predictable-core-branch as 1.9999.0" "claudiodekker/laravel-auth-${{ matrix.adapter }}:dev-gh-actions-predictable-adapter-branch" --${{ matrix.stability }}
         working-directory: ./app
 
       - name: Generate Auth Scaffolding
