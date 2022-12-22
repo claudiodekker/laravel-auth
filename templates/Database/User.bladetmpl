@@ -1,6 +1,7 @@
 namespace App\Models;
 
-use ClaudioDekker\LaravelAuth\HasMultiFactorCredentials;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
+use ClaudioDekker\LaravelAuth\Support\AccountSecurityIndicator;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Prunable;
@@ -10,7 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, HasMultiFactorCredentials, Notifiable, Prunable;
+    use HasApiTokens, HasFactory, Notifiable, Prunable;
 
     /**
      * The attributes that are mass assignable.
@@ -51,9 +52,41 @@ class User extends Authenticatable
     ];
 
     /**
+     * Get all of the multi factor credentials for the user.
+     *
+     * {!! '@' !!}return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function multiFactorCredentials()
+    {
+        return $this->hasMany(LaravelAuth::multiFactorCredentialModel(), 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Determine the current account safety level.
+     *
+     * {!! '@' !!}return \ClaudioDekker\LaravelAuth\Support\AccountSecurityIndicator
+     */
+    public function accountSecurityIndicator(): AccountSecurityIndicator
+    {
+        if (! $this->recovery_codes && $this->multiFactorCredentials->isEmpty()) {
+            return AccountSecurityIndicator::NO_MFA_NO_RECOVERY_CODES;
+        }
+
+        if ($this->multiFactorCredentials->isEmpty()) {
+            return AccountSecurityIndicator::NO_MFA_HAS_RECOVERY_CODES;
+        }
+
+        if (! $this->recovery_codes) {
+            return AccountSecurityIndicator::HAS_MFA_NO_RECOVERY_CODES;
+        }
+
+        return AccountSecurityIndicator::HAS_MFA_HAS_RECOVERY_CODES;
+    }
+
+    /**
      * Get the prunable model query.
      *
-     * {!! ! '@' !!}return \Illuminate\Database\Eloquent\Builder
+     * {!! '@' !!}return \Illuminate\Database\Eloquent\Builder
      */
     public function prunable()
     {

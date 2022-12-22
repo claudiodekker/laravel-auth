@@ -114,6 +114,7 @@ abstract class GenerateCommand extends Command
     protected function installTests(): void
     {
         $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
+        $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
     }
 
     /**
