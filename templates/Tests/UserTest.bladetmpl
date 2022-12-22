@@ -18,7 +18,7 @@ class UserTest extends TestCase
 
         tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
             $this->assertFalse($indicator->hasIssues());
-            $this->assertSame("GREEN", $indicator->color());
+            $this->assertSame('green', $indicator->color());
             $this->assertSame(__('laravel-auth::auth.security-indicator.has-mfa-has-recovery-codes'), $indicator->message());
         });
     }
