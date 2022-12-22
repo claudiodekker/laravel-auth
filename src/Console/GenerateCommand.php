@@ -47,6 +47,20 @@ abstract class GenerateCommand extends Command
     abstract protected function determinePackagePath(): string;
 
     /**
+     * Installs the extending package's authentication routes.
+     *
+     * @return void
+     */
+    abstract protected function installRoutes(): void;
+
+    /**
+     * Installs the extending package's authentication views.
+     *
+     * @return void
+     */
+    abstract protected function installViews(): void;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -90,30 +104,13 @@ abstract class GenerateCommand extends Command
     {
         $this->installRoutes();
         $this->installControllers();
-        $this->installTests();
 
         if (! $this->determinedOptions['withoutViews']) {
             $this->installViews();
         }
 
         $this->installCoreOverrides();
-    }
-
-    /**
-     * Installs the extending package's authentication routes.
-     *
-     * @return void
-     */
-    abstract protected function installRoutes(): void;
-
-    /**
-     * Installs the extending package's authentication tests.
-     *
-     * @return void
-     */
-    protected function installTests(): void
-    {
-        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
+        $this->installTests();
     }
 
     /**
@@ -138,11 +135,15 @@ abstract class GenerateCommand extends Command
     }
 
     /**
-     * Installs the extending package's authentication views.
+     * Installs the extending package's authentication tests.
      *
      * @return void
      */
-    abstract protected function installViews(): void;
+    protected function installTests(): void
+    {
+        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
+        $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
+    }
 
     /**
      * Overrides some of the files in Laravel's application scaffolding with the core package's own versions.

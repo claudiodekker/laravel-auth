@@ -1,0 +1,62 @@
+namespace Tests\Unit;
+
+use App\Models\User;
+use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\Support\AccountSecurityIndicator;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\TestCase;
+
+class UserTest extends TestCase
+{
+    use DatabaseMigrations;
+
+    /** {!! '@' !!}test */
+    public function the_account_security_indicator_indicates_the_user_has_both_mfa_and_recovery_codes(): void
+    {
+        $user = User::factory()->create(['recovery_codes' => ['foo', 'bar']]);
+        MultiFactorCredential::factory()->forUser($user)->publicKey()->create();
+
+        tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
+            $this->assertFalse($indicator->hasIssues());
+            $this->assertSame("GREEN", $indicator->color());
+            $this->assertSame(__('laravel-auth::auth.security-indicator.has-mfa-has-recovery-codes'), $indicator->message());
+        });
+    }
+
+    /** {!! '@' !!}test */
+    public function the_account_security_indicator_indicates_the_user_has_no_mfa_and_no_recovery_codes(): void
+    {
+        $user = User::factory()->create();
+
+        tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
+            $this->assertTrue($indicator->hasIssues());
+            $this->assertSame("RED", $indicator->color());
+            $this->assertSame(__('laravel-auth::auth.security-indicator.no-mfa-no-recovery-codes'), $indicator->message());
+        });
+    }
+
+    /** {!! '@' !!}test */
+    public function the_account_security_indicator_indicates_the_user_has_no_mfa(): void
+    {
+        $user = User::factory()->create(['recovery_codes' => ['foo', 'bar']]);
+
+        tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
+            $this->assertTrue($indicator->hasIssues());
+            $this->assertSame("RED", $indicator->color());
+            $this->assertSame(__('laravel-auth::auth.security-indicator.no-mfa-has-recovery-codes'), $indicator->message());
+        });
+    }
+
+    /** {!! '@' !!}test */
+    public function the_account_security_indicator_indicates_the_user_has_mfa_but_no_recovery_codes(): void
+    {
+        $user = User::factory()->create();
+        MultiFactorCredential::factory()->forUser($user)->publicKey()->create();
+
+        tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
+            $this->assertTrue($indicator->hasIssues());
+            $this->assertSame("ORANGE", $indicator->color());
+            $this->assertSame(__('laravel-auth::auth.security-indicator.has-mfa-no-recovery-codes'), $indicator->message());
+        });
+    }
+}
