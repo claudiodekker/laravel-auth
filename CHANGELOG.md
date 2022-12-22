@@ -7,14 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/claudiodekker/laravel-auth/compare/v0.1.0...HEAD)
 
-## Added
+### Added
 
 - PHP 8.2 Support ([#6](https://github.com/claudiodekker/laravel-auth/pull/6))
 - The Passkey-based registration flow can now be cancelled, directly releasing the claimed user ([#7](https://github.com/claudiodekker/laravel-auth/pull/7))
 - `exec` generator method, providing an easy way to run cli commands ([#8](https://github.com/claudiodekker/laravel-auth/pull/8))
 - New Account Security Strength Indicator ([#11](https://github.com/claudiodekker/laravel-auth/pull/11))
 
-## Fixed
+### Changed
+
+- The recovery challenge will now be skipped when no codes have been configured ([#13](https://github.com/claudiodekker/laravel-auth/pull/13))
+
+### Fixed
 
 - fakerphp/faker 1.14: Accessing property "dateTime" is deprecated ([`ffd680a`](https://github.com/claudiodekker/laravel-auth/commit/ffd680a65746c8c0fe7384644979f1960242659e))
 - Removed unnecessary `composer.lock` file ([`ffd680a`](https://github.com/claudiodekker/laravel-auth/commit/ffd680a65746c8c0fe7384644979f1960242659e))
