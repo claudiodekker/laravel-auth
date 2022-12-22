@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: "claudiodekker/laravel-auth-bladebones"
-          ref: '1.x'
+          ref: 'security-indicator'
           path: ./adapter
 
       - name: Core - Switch to predictable branch name
