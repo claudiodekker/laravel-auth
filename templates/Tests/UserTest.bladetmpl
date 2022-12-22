@@ -18,7 +18,7 @@ class UserTest extends TestCase
 
         tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
             $this->assertFalse($indicator->hasIssues());
-            $this->assertSame('green', $indicator->color());
+            $this->assertSame('GREEN', $indicator->color());
             $this->assertSame(__('laravel-auth::auth.security-indicator.has-mfa-has-recovery-codes'), $indicator->message());
         });
     }
@@ -30,7 +30,7 @@ class UserTest extends TestCase
 
         tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
             $this->assertTrue($indicator->hasIssues());
-            $this->assertSame("RED", $indicator->color());
+            $this->assertSame('RED', $indicator->color());
             $this->assertSame(__('laravel-auth::auth.security-indicator.no-mfa-no-recovery-codes'), $indicator->message());
         });
     }
@@ -42,7 +42,7 @@ class UserTest extends TestCase
 
         tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
             $this->assertTrue($indicator->hasIssues());
-            $this->assertSame("RED", $indicator->color());
+            $this->assertSame('RED', $indicator->color());
             $this->assertSame(__('laravel-auth::auth.security-indicator.no-mfa-has-recovery-codes'), $indicator->message());
         });
     }
@@ -55,7 +55,7 @@ class UserTest extends TestCase
 
         tap($user->accountSecurityIndicator(), function (AccountSecurityIndicator $indicator) {
             $this->assertTrue($indicator->hasIssues());
-            $this->assertSame("ORANGE", $indicator->color());
+            $this->assertSame('ORANGE', $indicator->color());
             $this->assertSame(__('laravel-auth::auth.security-indicator.has-mfa-no-recovery-codes'), $indicator->message());
         });
     }
