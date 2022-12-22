@@ -1,0 +1,91 @@
+name: Validate Generator Styling
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validator:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        variants: [
+          '',
+          '--without-rate-limiting',
+          '--kind username-based',
+          '--kind username-based --without-rate-limiting'
+        ]
+
+    name: Variant - ${{ matrix.variants }}
+    steps:
+      - name: Checkout core
+        uses: actions/checkout@v3
+        with:
+          path: ./core
+
+      - name: Checkout adapter
+        uses: actions/checkout@v3
+        with:
+          repository: "claudiodekker/laravel-auth-bladebones"
+          ref: '1.x'
+          path: ./adapter
+
+      - name: Core - Switch to predictable branch name
+        run: git checkout -b gh-actions-predictable-core-branch
+        working-directory: ./core
+
+      - name: Adapter - Switch to predictable branch name
+        run: git checkout -b gh-actions-predictable-adapter-branch
+        working-directory: ./adapter
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2, pint
+          coverage: none
+
+      - name: Create Laravel Project
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer create-project laravel/laravel app "9.x" --remove-vcs --prefer-dist --no-interaction
+
+      - name: Install Packages
+        run: |
+          composer config repositories.core path ../core
+          composer config repositories.adapter path ../adapter
+          composer require "claudiodekker/laravel-auth:dev-gh-actions-predictable-core-branch as 1.9999.0" "claudiodekker/laravel-auth-bladebones:dev-gh-actions-predictable-adapter-branch" --${{ matrix.stability }}
+        working-directory: ./app
+
+      - name: Generate Auth Scaffolding
+        run: php artisan auth:generate --yes ${{ matrix.variants }}
+        working-directory: ./app
+
+      - name: Stage all generated files
+        run: |
+          git config --global user.email "github@actions.test"
+          git config --global user.name "GitHub Actions"
+          git init .
+          git add .
+          git commit -m "Generated Auth Scaffolding"
+        working-directory: ./app
+
+      - name: Fix using Laravel Pint
+        run: pint --preset laravel
+        working-directory: ./app
+
+      - name: Show any to-be-fixed changes
+        run: |
+          if [[ -z $(git status --porcelain) ]]; then
+              exit 0
+          fi
+
+          git -c color.ui=always --no-pager diff
+          exit 1
+        working-directory: ./app
