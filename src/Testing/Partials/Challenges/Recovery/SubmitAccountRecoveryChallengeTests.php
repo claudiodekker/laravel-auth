@@ -40,6 +40,30 @@ trait SubmitAccountRecoveryChallengeTests
     }
 
     /** @test */
+    public function the_account_recovery_challenge_code_verification_request_accepts_any_code_when_the_users_recovery_codes_are_cleared(): void
+    {
+        Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
+        $user = $this->generateUser(['recovery_codes' => null]);
+        $repository = Password::getRepository();
+        $token = $repository->create($user);
+        $this->assertTrue($repository->exists($user, $token));
+
+        $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
+            'email' => $user->getEmailForPasswordReset(),
+            'code' => 'INVLD-CODES',
+        ]);
+
+        $response->assertRedirect(route('auth.settings'));
+        $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
+        $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
+        $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertFalse($repository->exists($user, $token));
+        Event::assertDispatched(AccountRecovered::class, fn ($event) => $event->user->is($user) && $event->request === request());
+        Event::assertNotDispatched(AccountRecoveryFailed::class);
+        Event::assertNotDispatched(SudoModeEnabled::class);
+    }
+
+    /** @test */
     public function the_user_account_cannot_be_recovered_when_authenticated(): void
     {
         Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
@@ -153,31 +177,6 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.recovery')]], $response->exception->errors());
         $this->assertTrue($repository->exists($user, $token));
         $this->assertSame($codes, $user->fresh()->recovery_codes);
-        $this->assertGuest();
-        $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
-        $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        Event::assertDispatched(AccountRecoveryFailed::class, fn ($event) => $event->user->is($user) && $event->request === request());
-        Event::assertNotDispatched(AccountRecovered::class);
-        Event::assertNotDispatched(SudoModeEnabled::class);
-    }
-
-    /** @test */
-    public function the_user_account_cannot_be_recovered_when_the_user_has_no_configured_recovery_codes(): void
-    {
-        Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
-        $user = $this->generateUser(['recovery_codes' => null]);
-        $repository = Password::getRepository();
-        $token = $repository->create($user);
-
-        $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $user->getEmailForPasswordReset(),
-            'code' => 'PIPIM-7LTUT',
-        ]);
-
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.recovery')]], $response->exception->errors());
-        $this->assertTrue($repository->exists($user, $token));
-        $this->assertNull($user->fresh()->recovery_codes);
         $this->assertGuest();
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
