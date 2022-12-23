@@ -41,6 +41,8 @@ abstract class CredentialsController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendOverviewPageResponse()
      */
     public function index(Request $request)
     {
@@ -55,6 +57,9 @@ abstract class CredentialsController
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $id
      * @return mixed
+     *
+     * @see static::sendCredentialNotFoundResponse()
+     * @see static::sendCredentialDeletedResponse()
      */
     public function destroy(Request $request, mixed $id)
     {

@@ -65,6 +65,10 @@ abstract class AccountRecoveryChallengeController
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $token
      * @return mixed
+     *
+     * @see static::sendAccountRecoveredResponse()
+     * @see static::sendChallengePageResponse()
+     * @see static::sendInvalidRecoveryLinkResponse()
      */
     public function create(Request $request, string $token)
     {
@@ -91,6 +95,11 @@ abstract class AccountRecoveryChallengeController
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $token
      * @return mixed
+     *
+     * @see static::sendAccountRecoveredResponse()
+     * @see static::sendInvalidRecoveryCodeResponse()
+     * @see static::sendInvalidRecoveryLinkResponse()
+     * @see static::sendRateLimitedResponse()
      */
     public function store(Request $request, string $token)
     {

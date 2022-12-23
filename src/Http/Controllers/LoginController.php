@@ -63,6 +63,8 @@ abstract class LoginController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendLoginPageResponse()
      */
     public function create(Request $request)
     {
@@ -76,6 +78,12 @@ abstract class LoginController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendInvalidPasskeyAuthenticationStateResponse()
+     * @see static::sendMultiFactorChallengeResponse()
+     * @see static::sendAuthenticationFailedResponse()
+     * @see static::sendAuthenticatedResponse()
      */
     public function store(Request $request)
     {
@@ -102,6 +110,8 @@ abstract class LoginController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendLoggedOutResponse()
      */
     public function destroy(Request $request)
     {

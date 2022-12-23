@@ -24,6 +24,8 @@ abstract class ChangePasswordController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendPasswordChangedResponse()
      */
     public function update(Request $request)
     {

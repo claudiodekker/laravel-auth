@@ -69,6 +69,11 @@ abstract class AccountRecoveryRequestController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendNoSuchUserResponse()
+     * @see static::sendRecoveryAlreadyRequestedResponse()
+     * @see static::sendRecoveryLinkSentResponse()
      */
     public function store(Request $request)
     {

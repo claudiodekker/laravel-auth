@@ -45,6 +45,11 @@ abstract class RegisterController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendPasskeyBasedRegistrationInitializedResponse()
+     * @see static::sendInvalidPasskeyRegistrationStateResponse()
+     * @see static::sendInvalidPasskeyResponse()
+     * @see static::sendRegisteredResponse()
      */
     public function store(Request $request)
     {
@@ -60,6 +65,9 @@ abstract class RegisterController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidPasskeyRegistrationStateResponse()
+     * @see static::sendPasskeyRegistrationCancelledResponse()
      */
     public function destroy(Request $request)
     {

@@ -62,6 +62,8 @@ abstract class RegisterPublicKeyCredentialController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRegistrationPageResponse()
      */
     public function create(Request $request)
     {
@@ -76,6 +78,10 @@ abstract class RegisterPublicKeyCredentialController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidPublicKeyRegistrationStateResponse()
+     * @see static::sendInvalidPublicKeyCredentialResponse()
+     * @see static::sendCredentialRegisteredResponse()
      */
     public function store(Request $request)
     {
