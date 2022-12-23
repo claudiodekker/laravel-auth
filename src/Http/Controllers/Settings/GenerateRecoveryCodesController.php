@@ -48,6 +48,8 @@ abstract class GenerateRecoveryCodesController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRecoveryCodesPreparedResponse()
      */
     public function create(Request $request)
     {
@@ -69,6 +71,9 @@ abstract class GenerateRecoveryCodesController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidConfigurationStateResponse()
+     * @see static::sendConfirmationPageResponse()
      */
     public function confirm(Request $request)
     {
@@ -84,6 +89,10 @@ abstract class GenerateRecoveryCodesController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidConfigurationStateResponse()
+     * @see static::sendInvalidRecoveryCodeResponse()
+     * @see static::sendRecoveryCodesConfiguredResponse()
      */
     public function store(Request $request)
     {

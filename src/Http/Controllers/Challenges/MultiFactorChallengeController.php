@@ -38,7 +38,7 @@ abstract class MultiFactorChallengeController
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function handleChallengeSuccessfulResponse(Request $request): mixed
+    protected function handleChallengeSuccessfulResponse(Request $request): mixed
     {
         $user = $this->authenticate($request);
 
@@ -76,6 +76,9 @@ abstract class MultiFactorChallengeController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendAuthenticatedResponse()
+     * @see static::sendChallengePageResponse()
      */
     public function create(Request $request)
     {
@@ -97,6 +100,11 @@ abstract class MultiFactorChallengeController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendInvalidPublicKeyChallengeStateResponse()
+     * @see static::sendChallengeFailedResponse()
+     * @see static::sendAuthenticatedResponse()
      */
     public function store(Request $request)
     {

@@ -73,6 +73,8 @@ abstract class RegisterTotpCredentialController
      * @return mixed
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
+     *
+     * @see static::sendRegistrationInitializedResponse()
      */
     public function initialize(Request $request)
     {
@@ -86,6 +88,9 @@ abstract class RegisterTotpCredentialController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidRegistrationStateResponse()
+     * @see static::sendConfirmationPageResponse()
      */
     public function confirm(Request $request)
     {
@@ -101,6 +106,10 @@ abstract class RegisterTotpCredentialController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendInvalidRegistrationStateResponse()
+     * @see static::sendInvalidConfirmationCodeResponse()
+     * @see static::sendCredentialRegisteredResponse()
      */
     public function store(Request $request)
     {
@@ -125,6 +134,8 @@ abstract class RegisterTotpCredentialController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendRegistrationCancelledResponse()
      */
     public function cancel(Request $request)
     {

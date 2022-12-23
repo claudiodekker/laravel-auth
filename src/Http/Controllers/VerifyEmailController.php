@@ -38,6 +38,9 @@ abstract class VerifyEmailController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     *
+     * @see static::sendEmailAlreadyVerifiedResponse()
+     * @see static::sendEmailVerificationSentResponse()
      */
     public function store(Request $request)
     {
@@ -55,6 +58,9 @@ abstract class VerifyEmailController
      *
      * @param  \Illuminate\Foundation\Auth\EmailVerificationRequest  $request
      * @return mixed
+     *
+     * @see static::sendEmailAlreadyVerifiedResponse()
+     * @see static::sendEmailSuccessfullyVerifiedResponse()
      */
     public function update(EmailVerificationRequest $request)
     {
@@ -62,9 +68,8 @@ abstract class VerifyEmailController
             return $this->sendEmailAlreadyVerifiedResponse($request);
         }
 
-        if ($this->markEmailAsVerified($request)) {
-            $this->emitsVerifiedEvent($request);
-        }
+        $this->markEmailAsVerified($request);
+        $this->emitsVerifiedEvent($request);
 
         return $this->sendEmailSuccessfullyVerifiedResponse($request);
     }
