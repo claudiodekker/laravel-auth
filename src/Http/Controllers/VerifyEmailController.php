@@ -68,9 +68,8 @@ abstract class VerifyEmailController
             return $this->sendEmailAlreadyVerifiedResponse($request);
         }
 
-        if ($this->markEmailAsVerified($request)) {
-            $this->emitsVerifiedEvent($request);
-        }
+        $this->markEmailAsVerified($request);
+        $this->emitsVerifiedEvent($request);
 
         return $this->sendEmailSuccessfullyVerifiedResponse($request);
     }

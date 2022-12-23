@@ -219,6 +219,8 @@ abstract class AccountRecoveryChallengeController
     }
 
     /**
+     * Invalidate the used recovery code for the given user.
+     *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void

@@ -85,10 +85,9 @@ abstract class SudoModeChallengeController
      * @see static::sendConfirmationNotRequiredResponse()
      * @see static::sendRateLimitedResponse()
      * @see static::sendPasswordChallengeFailedResponse()
-     * @see static::sendPasswordChallengeSuccessfulResponse()
      * @see static::sendInvalidPublicKeyChallengeStateResponse()
      * @see static::sendPublicKeyChallengeFailedResponse()
-     * @see static::sendPublicKeyChallengeSuccessfulResponse()
+     * @see static::sendSudoModeEnabledResponse()
      */
     public function store(Request $request)
     {

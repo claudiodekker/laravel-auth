@@ -90,7 +90,7 @@ abstract class RegisterTotpCredentialController
      * @return mixed
      *
      * @see static::sendInvalidRegistrationStateResponse()
-     * @see static::sendConfirmationPageResponse
+     * @see static::sendConfirmationPageResponse()
      */
     public function confirm(Request $request)
     {

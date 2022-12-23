@@ -188,7 +188,7 @@ abstract class RegisterPublicKeyCredentialController
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    protected function clearPublicKeyRegistrationOptions(Request $request)
+    protected function clearPublicKeyRegistrationOptions(Request $request): void
     {
         $request->session()->forget('auth.mfa_setup.public_key_credential_creation_options');
     }
