@@ -54,15 +54,5 @@ class PublicKeyCredentialSourceRepository implements \Webauthn\PublicKeyCredenti
         // However, it also returns the same credential data directly after, and since we prefer to give
         // the developer as much control as possible over managing database calls, we'll just ignore
         // this method, and will call an update method ourselves on the controller-level instead.
-
-//        $credential = LaravelAuth::multiFactorCredential()->query()
-//            ->where('type', CredentialType::PUBLIC_KEY)
-//            ->findOrFail(CredentialType::PUBLIC_KEY->value.'-'.Base64UrlSafe::encodeUnpadded($publicKeyCredentialSource->getPublicKeyCredentialId()));
-//
-//        $credential->secret = CredentialAttributes::fromJson($credential->secret)
-//            ->setSignCount($publicKeyCredentialSource->getCounter())
-//            ->jsonSerialize();
-//
-//        $credential->saveOrFail();
     }
 }
