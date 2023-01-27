@@ -14,12 +14,12 @@ trait ViewSudoModeChallengePageTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
         MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
-        $this->assertFalse(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->get(route('auth.sudo_mode'));
 
         $response->assertOk();
-        $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionHas('auth.sudo_mode.public_key_challenge_request_options');
     }
 
     /** @test */
@@ -27,12 +27,12 @@ trait ViewSudoModeChallengePageTests
     {
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
-        $this->assertFalse(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->get(route('auth.sudo_mode'));
 
         $response->assertOk();
-        $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.sudo_mode.public_key_challenge_request_options');
     }
 
     /** @test */

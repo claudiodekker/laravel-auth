@@ -47,7 +47,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
         $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
@@ -81,7 +81,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertStatus(428);
         $this->assertSame('The current authentication challenge state is invalid.', $response->exception->getMessage());
         $this->assertPartlyAuthenticatedAs($response, $user);
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
         $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNothingDispatched();
     }
@@ -115,7 +115,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertPartlyAuthenticatedAs($response, $user);
-        $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.public_key_challenge_request_options'));
         $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
@@ -150,7 +150,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertPartlyAuthenticatedAs($response, $user);
-        $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.public_key_challenge_request_options'));
         $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
@@ -185,7 +185,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertPartlyAuthenticatedAs($response, $user);
-        $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.public_key_challenge_request_options'));
         $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
         Event::assertNotDispatched(Authenticated::class);
@@ -295,7 +295,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
         $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
@@ -365,6 +365,6 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         // The result is a state in which the victim is being authenticated, with the attacker's MFA challenge details still set.
         // At this point all the attacker has to do, is to confirm their own MFA challenge, to be signed in as the victim.
         // To prevent this, we'll make sure to always clear any MFA challenge details during the initial login attempt.
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
     }
 }
