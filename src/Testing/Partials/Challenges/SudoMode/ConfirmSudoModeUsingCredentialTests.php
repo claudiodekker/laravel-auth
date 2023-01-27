@@ -31,7 +31,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -51,7 +51,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertExactJson(['redirect_url' => $redirectsTo]);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
-        $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNotDispatched(SudoModeChallenged::class);
         Event::assertDispatched(SudoModeEnabled::class, fn (SudoModeEnabled $event) => $event->request === request() && $event->user->is($user));
         Carbon::setTestNow();
@@ -71,7 +71,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -91,7 +91,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->assertSame(['credential' => [__('laravel-auth::auth.challenge.public-key')]], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionHas('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -110,7 +110,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -130,7 +130,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->assertSame(['credential' => [__('laravel-auth::auth.challenge.public-key')]], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionHas('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -154,7 +154,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($userA)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($userA)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -174,7 +174,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionHas('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -194,7 +194,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'authtest.wrp.app');
         $this->mockWebauthnChallenge('R9KnmyTxs6zHJB75bhLKgw');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -214,7 +214,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertExactJson(['redirect_url' => $redirectsTo]);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
-        $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNotDispatched(SudoModeChallenged::class);
         Event::assertDispatched(SudoModeEnabled::class, fn (SudoModeEnabled $event) => $event->request === request() && $event->user->is($user));
         Carbon::setTestNow();
@@ -251,7 +251,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->assertSame('The current confirmation state is invalid.', $response->exception->getMessage());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.sudo_mode.public_key_challenge_request_options');
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -272,7 +272,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->assertSame(['credential' => ['The credential field is required.']], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.sudo_mode.public_key_challenge_request_options');
         Carbon::setTestNow();
         Event::assertNothingDispatched();
     }

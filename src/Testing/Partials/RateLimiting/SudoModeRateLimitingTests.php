@@ -76,7 +76,7 @@ trait SudoModeRateLimitingTests
         $user = $this->generateUser(['id' => 1]);
         MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::partialMock();
         $mock->shouldReceive('tooManyAttempts')->once()->withSomeOfArgs($this->predictableSudoRateLimitingKey($user))->andReturn(true);
         $mock->shouldReceive('availableIn')->once()->andReturn(75);
@@ -109,7 +109,7 @@ trait SudoModeRateLimitingTests
         $user = $this->generateUser(['id' => 1]);
         MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
         $this->assertSame(0, RateLimiter::attempts($throttlingKey = $this->predictableSudoRateLimitingKey($user)));
 
         $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
@@ -143,7 +143,7 @@ trait SudoModeRateLimitingTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
         RateLimiter::hit($throttlingKey = $this->predictableSudoRateLimitingKey($user));
         $this->assertSame(1, RateLimiter::attempts($throttlingKey));
 

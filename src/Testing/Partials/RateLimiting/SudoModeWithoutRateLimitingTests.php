@@ -54,7 +54,7 @@ trait SudoModeWithoutRateLimitingTests
         $user = $this->generateUser(['id' => 1]);
         MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
@@ -84,7 +84,7 @@ trait SudoModeWithoutRateLimitingTests
         $user = $this->generateUser(['id' => 1]);
         MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->assertTrue(Session::has('auth.sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::spy();
 
         $this->actingAs($user)->postJson(route('auth.sudo_mode'), [

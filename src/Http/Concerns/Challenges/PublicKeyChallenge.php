@@ -188,7 +188,7 @@ trait PublicKeyChallenge
      */
     protected function publicKeyChallengeOptionsKey(Request $request): string
     {
-        return 'laravel-auth::public_key_challenge_request_options';
+        return 'auth.public_key_challenge_request_options';
     }
 
     /**

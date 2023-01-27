@@ -186,7 +186,7 @@ trait Helpers
             Collection::make($allowedCredentials)->map(fn ($credential) => CredentialAttributes::fromJson($credential->secret))
         );
 
-        Session::put('laravel-auth::public_key_challenge_request_options', serialize($options));
+        Session::put('auth.public_key_challenge_request_options', serialize($options));
 
         return $options;
     }

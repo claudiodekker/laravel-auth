@@ -189,6 +189,6 @@ abstract class SudoModeChallengeController
      */
     protected function publicKeyChallengeOptionsKey(Request $request): string
     {
-        return 'laravel-auth::sudo_mode.public_key_challenge_request_options';
+        return 'auth.sudo_mode.public_key_challenge_request_options';
     }
 }

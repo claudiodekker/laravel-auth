@@ -126,7 +126,7 @@ trait PasswordBasedAuthentication
      */
     protected function sanitizeMultiFactorSessionState(Request $request): void
     {
-        $request->session()->forget('laravel-auth::public_key_challenge_request_options');
+        $request->session()->forget('auth.public_key_challenge_request_options');
     }
 
     /**

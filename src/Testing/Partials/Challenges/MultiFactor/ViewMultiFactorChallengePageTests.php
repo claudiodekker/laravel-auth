@@ -28,7 +28,7 @@ trait ViewMultiFactorChallengePageTests
         $response = $this->get(route('login.challenge.multi_factor'));
 
         $response->assertOk();
-        $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options = unserialize(Session::get('laravel-auth::public_key_challenge_request_options'), [PublicKeyCredentialRequestOptions::class]));
+        $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options = unserialize(Session::get('auth.public_key_challenge_request_options'), [PublicKeyCredentialRequestOptions::class]));
         $this->assertSame([
             'challenge' => $challenge,
             'rpId' => $rpId,
@@ -51,12 +51,12 @@ trait ViewMultiFactorChallengePageTests
         LaravelAuth::multiFactorCredential()::factory()->forUser($user)->totp()->create();
         $response = $this->preAuthenticate($user);
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
 
         $response = $this->get(route('login.challenge.multi_factor'));
 
         $response->assertOk();
-        $response->assertSessionMissing('laravel-auth::public_key_challenge_request_options');
+        $response->assertSessionMissing('auth.public_key_challenge_request_options');
     }
 
     /** @test */
@@ -75,7 +75,7 @@ trait ViewMultiFactorChallengePageTests
         $response->assertRedirect($intendedLocation);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
-        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertFalse(Session::has('auth.public_key_challenge_request_options'));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
     }
