@@ -2,12 +2,16 @@ name: App Tests
 
 on:
   push:
+    branches:
+      - master
+      - 1.x
   pull_request:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
   tests:
+    if: ${{ github.event_name != 'pull_request' || ! contains(github.event.pull_request.pull_request.body, '🛠️') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
