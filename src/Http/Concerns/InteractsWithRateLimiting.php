@@ -2,18 +2,23 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns;
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
 
 trait InteractsWithRateLimiting
 {
     /**
-     * Get the rate limiting throttle key for the request.
+     * Prepare the identifier used to track the rate limiting state.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $key
      * @return string
      */
-    abstract protected function throttleKey(Request $request): string;
+    protected function throttleKey(string $key): string
+    {
+        return "auth::$key";
+    }
 
     /**
      * Sends a response indicating that the requests have been rate limited.
@@ -25,13 +30,17 @@ trait InteractsWithRateLimiting
     abstract protected function sendRateLimitedResponse(Request $request, int $availableInSeconds);
 
     /**
-     * The number of requests per minute that aren't rate limited.
+     * Determine the rate limits that apply to the request.
      *
-     * @return int
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
      */
-    protected function maxAttempts(): int
+    protected function rateLimits(Request $request): array
     {
-        return 5;
+        return [
+            Limit::perMinute(250),
+            Limit::perMinute(5)->by('ip::'.$request->ip()),
+        ];
     }
 
     /**
@@ -42,7 +51,9 @@ trait InteractsWithRateLimiting
      */
     protected function isCurrentlyRateLimited(Request $request): bool
     {
-        return RateLimiter::tooManyAttempts($this->throttleKey($request), $this->maxAttempts());
+        return Collection::make($this->rateLimits($request))->contains(function (Limit $limit) {
+            return RateLimiter::tooManyAttempts($this->throttleKey($limit->key), $limit->maxAttempts);
+        });
     }
 
     /**
@@ -51,9 +62,10 @@ trait InteractsWithRateLimiting
      * @param  \Illuminate\Http\Request  $request
      * @return int
      */
-    protected function rateLimitingExpiresInSeconds(Request $request): int
+    protected function rateLimitExpiresInSeconds(Request $request): int
     {
-        return RateLimiter::availableIn($this->throttleKey($request));
+        return Collection::make($this->rateLimits($request))
+            ->max(fn (Limit $limit) => RateLimiter::availableIn($this->throttleKey($limit->key)));
     }
 
     /**
@@ -64,7 +76,9 @@ trait InteractsWithRateLimiting
      */
     protected function incrementRateLimitingCounter(Request $request): void
     {
-        RateLimiter::hit($this->throttleKey($request));
+        Collection::make($this->rateLimits($request))->each(function (Limit $limit) {
+            RateLimiter::hit($this->throttleKey($limit->key), $limit->decayMinutes * 60);
+        });
     }
 
     /**
@@ -75,6 +89,8 @@ trait InteractsWithRateLimiting
      */
     protected function resetRateLimitingCounter(Request $request): void
     {
-        RateLimiter::clear($this->throttleKey($request));
+        Collection::make($this->rateLimits($request))
+            ->filter(fn (Limit $limit) => $limit->key)
+            ->each(fn (Limit $limit) => RateLimiter::clear($this->throttleKey($limit->key)));
     }
 }

@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 abstract class AccountRecoveryChallengeController
 {
@@ -106,7 +105,7 @@ abstract class AccountRecoveryChallengeController
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitingExpiresInSeconds($request));
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
         if (! $user = $this->resolveUser($request)) {
@@ -273,16 +272,5 @@ abstract class AccountRecoveryChallengeController
     protected function emitAccountRecoveryFailedEvent(Request $request, Authenticatable $user): void
     {
         Event::dispatch(new AccountRecoveryFailed($request, $user));
-    }
-
-    /**
-     * Get the rate limiting throttle key for the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
-     */
-    protected function throttleKey(Request $request): string
-    {
-        return Str::lower('account-recovery-challenge|'.$request->ip());
     }
 }

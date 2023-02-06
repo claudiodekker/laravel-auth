@@ -10,9 +10,9 @@ use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 abstract class SudoModeChallengeController
 {
@@ -171,17 +171,6 @@ abstract class SudoModeChallengeController
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
-     */
-    protected function throttleKey(Request $request): string
-    {
-        return Str::transliterate(Str::lower(Auth::id().'|'.$request->ip().'|sudo'));
-    }
-
-    /**
      * Determine the identifier used to track the public key challenge options state.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -190,5 +179,19 @@ abstract class SudoModeChallengeController
     protected function publicKeyChallengeOptionsKey(Request $request): string
     {
         return 'auth.sudo_mode.public_key_challenge_request_options';
+    }
+
+    /**
+     * Determine the rate limits that apply to the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function rateLimits(Request $request): array
+    {
+        return [
+            Limit::perMinute(5)->by('ip::'.$request->ip()),
+            Limit::perMinute(5)->by('user_id::'.Auth::id()),
+        ];
     }
 }

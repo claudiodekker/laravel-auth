@@ -37,7 +37,7 @@ trait PasswordBasedAuthentication
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitingExpiresInSeconds($request));
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
         if (! $user = $this->validatePasswordBasedCredentials($request)) {
@@ -153,7 +153,6 @@ trait PasswordBasedAuthentication
     {
         $request->session()->put('auth.mfa.intended_location', $this->intendedLocation($request));
         $request->session()->put('auth.mfa.remember', $this->isRememberingUser($request));
-        $request->session()->put('auth.mfa.throttle_key', $this->throttleKey($request));
         $request->session()->put('auth.mfa.user_id', $user->getAuthIdentifier());
     }
 
