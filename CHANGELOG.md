@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The recovery challenge will now be skipped when no codes have been configured ([#13](https://github.com/claudiodekker/laravel-auth/pull/13))
+- The Session keys now use the `auth` namespace instead of `laravel-auth::` ([#15](https://github.com/claudiodekker/laravel-auth/pull/15))
+- The rate limiting functionality has been overhauled to use multiple limiters ([#17](https://github.com/claudiodekker/laravel-auth/pull/17))
 
 ### Fixed
 
