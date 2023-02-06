@@ -116,7 +116,7 @@ trait ViewAccountRecoveryChallengePageTests
     /** @test */
     public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_recovery_token_has_expired(): void
     {
-        Carbon::setTestNow('2022-01-01 00:00:00');
+        Carbon::setTestNow(now());
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
         Carbon::setTestNow(now()->addHour()->addSecond());

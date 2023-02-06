@@ -2,6 +2,7 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
+use Carbon\Carbon;
 use ClaudioDekker\LaravelAuth\Events\Authenticated;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallengeFailed;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
@@ -10,7 +11,6 @@ use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 trait MultiFactorChallengeRateLimitingTests
@@ -18,6 +18,7 @@ trait MultiFactorChallengeRateLimitingTests
     /** @test */
     public function the_public_key_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
@@ -26,9 +27,7 @@ trait MultiFactorChallengeRateLimitingTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
-        $mock = RateLimiter::partialMock();
-        $mock->shouldReceive('tooManyAttempts')->once()->withSomeOfArgs(session()->get('auth.mfa.throttle_key'))->andReturn(true);
-        $mock->shouldReceive('availableIn')->once()->andReturn(75);
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -45,40 +44,42 @@ trait MultiFactorChallengeRateLimitingTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['credential' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 75])]], $response->exception->errors());
+        $this->assertSame(['credential' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Carbon::setTestNow();
     }
 
     /** @test */
     public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
-        $mock = RateLimiter::partialMock();
-        $mock->shouldReceive('tooManyAttempts')->once()->withSomeOfArgs(session()->get('auth.mfa.throttle_key'))->andReturn(true);
-        $mock->shouldReceive('availableIn')->once()->andReturn(75);
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 75])]], $response->exception->errors());
+        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Carbon::setTestNow();
     }
 
     /** @test */
     public function the_public_key_multi_factor_challenge_retains_the_rate_limiting_attempts_from_the_login(): void
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        RateLimiter::hit($throttlingKey = $this->predictableRateLimitingKey());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->submitPasswordBasedLoginAttempt();
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $user = $this->generateUser();
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
@@ -101,7 +102,7 @@ trait MultiFactorChallengeRateLimitingTests
             ],
         ]);
 
-        $this->assertSame(2, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(2, $this->getRateLimitAttempts($ipKey));
         $this->assertSame(['credential' => [__('laravel-auth::auth.challenge.public-key')]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
         Event::assertDispatched(MultiFactorChallengeFailed::class);
@@ -113,15 +114,16 @@ trait MultiFactorChallengeRateLimitingTests
     public function the_time_based_one_time_password_multi_factor_challenge_retains_the_rate_limiting_attempts_from_the_login(): void
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        RateLimiter::hit($throttlingKey = $this->predictableRateLimitingKey());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->submitPasswordBasedLoginAttempt();
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
 
-        $this->assertSame(2, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(2, $this->getRateLimitAttempts($ipKey));
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
         Event::assertDispatched(MultiFactorChallengeFailed::class);
@@ -133,9 +135,13 @@ trait MultiFactorChallengeRateLimitingTests
     public function it_resets_the_rate_limiting_attempts_when_the_public_key_multi_factor_challenge_succeeds(): void
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        RateLimiter::hit($throttlingKey = $this->predictableRateLimitingKey());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
         $user = $this->generateUser(['id' => 1]);
+        $this->hitRateLimiter(1, '');
+        $this->hitRateLimiter(1, $userIdKey = 'user_id::1');
+        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts($userIdKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
@@ -157,7 +163,9 @@ trait MultiFactorChallengeRateLimitingTests
             ],
         ]);
 
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts($userIdKey));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
         $this->assertFullyAuthenticatedAs($response, $user);
         Event::assertDispatched(Authenticated::class);
         Event::assertNotDispatched(Lockout::class);
@@ -168,9 +176,13 @@ trait MultiFactorChallengeRateLimitingTests
     public function it_resets_the_rate_limiting_attempts_when_the_time_based_one_time_password_multi_factor_challenge_succeeds(): void
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        RateLimiter::hit($throttlingKey = $this->predictableRateLimitingKey());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
-        $user = $this->generateUser();
+        $user = $this->generateUser(['id' => 1]);
+        $this->hitRateLimiter(1, '');
+        $this->hitRateLimiter(1, $userIdKey = 'user_id::1');
+        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts($userIdKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
 
@@ -179,7 +191,9 @@ trait MultiFactorChallengeRateLimitingTests
         ]);
 
         $this->assertFullyAuthenticatedAs($response, $user);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts($userIdKey));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
         Event::assertDispatched(Authenticated::class);
         Event::assertNotDispatched(Lockout::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);

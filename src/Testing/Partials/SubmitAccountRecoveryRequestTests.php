@@ -86,7 +86,7 @@ trait SubmitAccountRecoveryRequestTests
     /** @test */
     public function it_only_sends_a_fresh_recovery_link_when_one_has_not_been_sent_recently(): void
     {
-        Carbon::setTestNow('2022-01-01 00:00:00');
+        Carbon::setTestNow(now());
         Notification::fake();
         $repository = Password::getRepository();
         $user = $this->generateUser();

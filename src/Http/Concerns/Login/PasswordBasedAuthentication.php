@@ -153,7 +153,6 @@ trait PasswordBasedAuthentication
     {
         $request->session()->put('auth.mfa.intended_location', $this->intendedLocation($request));
         $request->session()->put('auth.mfa.remember', $this->isRememberingUser($request));
-        $request->session()->put('auth.mfa.throttle_key', $this->throttleKey($request));
         $request->session()->put('auth.mfa.user_id', $user->getAuthIdentifier());
     }
 
