@@ -82,7 +82,7 @@ abstract class AccountRecoveryRequestController
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitingExpiresInSeconds($request));
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
         $this->incrementRateLimitingCounter($request);

@@ -51,7 +51,7 @@ trait InteractsWithRateLimiting
      * @param  \Illuminate\Http\Request  $request
      * @return int
      */
-    protected function rateLimitingExpiresInSeconds(Request $request): int
+    protected function rateLimitExpiresInSeconds(Request $request): int
     {
         return RateLimiter::availableIn($this->throttleKey($request));
     }
