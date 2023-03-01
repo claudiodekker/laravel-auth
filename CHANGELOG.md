@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - PHP 8.2 Support ([#6](https://github.com/claudiodekker/laravel-auth/pull/6))
+- Laravel 10 Support ([#18](https://github.com/claudiodekker/laravel-auth/pull/18))
 - The Passkey-based registration flow can now be cancelled, directly releasing the claimed user ([#7](https://github.com/claudiodekker/laravel-auth/pull/7))
 - `exec` generator method, providing an easy way to run cli commands ([#8](https://github.com/claudiodekker/laravel-auth/pull/8))
 - New Account Security Strength Indicator ([#11](https://github.com/claudiodekker/laravel-auth/pull/11))
