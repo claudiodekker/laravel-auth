@@ -24,16 +24,12 @@ trait PasskeyBasedAuthentication
     /**
      * Sends a response indicating that the passkey authentication state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPasskeyAuthenticationStateResponse(Request $request);
 
     /**
      * Initialize the passkey based authentication process by generating challenge details.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions
      */
     protected function initializePasskeyAuthenticationOptions(Request $request): PublicKeyCredentialRequestOptions
     {
@@ -45,7 +41,6 @@ trait PasskeyBasedAuthentication
     /**
      * Handle a passkey based authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePasskeyBasedAuthentication(Request $request)
@@ -86,8 +81,6 @@ trait PasskeyBasedAuthentication
     /**
      * Validate the passkey based authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -100,10 +93,6 @@ trait PasskeyBasedAuthentication
 
     /**
      * Update the passkey credential using the latest attributes, such as the signature counter.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes  $attributes
-     * @return void
      */
     protected function updatePasskeyCredential(Request $request, CredentialAttributes $attributes): void
     {
@@ -117,9 +106,6 @@ trait PasskeyBasedAuthentication
      * Generate the challenge details used to perform passkey based authentication.
      *
      * @link https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions
      */
     protected function generatePasskeyAuthenticationOptions(Request $request): PublicKeyCredentialRequestOptions
     {
@@ -131,10 +117,6 @@ trait PasskeyBasedAuthentication
 
     /**
      * Temporarily store the challenge details used to perform passkey based authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
-     * @return void
      */
     protected function setPasskeyAuthenticationOptions(Request $request, PublicKeyCredentialRequestOptions $options): void
     {
@@ -143,9 +125,6 @@ trait PasskeyBasedAuthentication
 
     /**
      * Retrieve the temporarily stored challenge details used to perform passkey based authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null
      */
     protected function getPasskeyAuthenticationOptions(Request $request): ?PublicKeyCredentialRequestOptions
     {
@@ -159,9 +138,6 @@ trait PasskeyBasedAuthentication
 
     /**
      * Clear the temporarily stored challenge details used to perform passkey based authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function clearPasskeyAuthenticationOptions(Request $request): void
     {
@@ -171,9 +147,6 @@ trait PasskeyBasedAuthentication
     /**
      * Validates the signed passkey for the given challenge details.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
-     * @return \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException
@@ -192,9 +165,6 @@ trait PasskeyBasedAuthentication
     /**
      * Resolve the User that is being authenticated using the passkey.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes  $credential
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */

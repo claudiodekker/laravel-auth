@@ -39,7 +39,6 @@ class MultiFactorCredentialFactory extends Factory
      * Update the Factory state to generate a token for the specified user.
      *
      * @param  User  $user
-     * @return self
      */
     public function forUser($user): self
     {
@@ -48,8 +47,6 @@ class MultiFactorCredentialFactory extends Factory
 
     /**
      * Update the Factory state to generate a time-based one-time-password credential.
-     *
-     * @return self
      */
     public function totp(): self
     {
@@ -66,8 +63,6 @@ class MultiFactorCredentialFactory extends Factory
 
     /**
      * Update the Factory state to generate a public key credential.
-     *
-     * @return self
      */
     public function publicKey(): self
     {

@@ -10,8 +10,6 @@ class RecoveryCodeManager implements Arrayable
 {
     /**
      * The recovery codes that are being managed.
-     *
-     * @var \Illuminate\Support\Collection
      */
     protected Collection $codes;
 
@@ -20,8 +18,6 @@ class RecoveryCodeManager implements Arrayable
      *
      * @see RecoveryCodeManager::generate()
      * @see RecoveryCodeManager::from()
-     *
-     * @param  array  $codes
      */
     protected function __construct(array $codes)
     {
@@ -30,9 +26,6 @@ class RecoveryCodeManager implements Arrayable
 
     /**
      * Create a new recovery code manager instance from existing codes.
-     *
-     * @param  array  $codes
-     * @return static
      */
     public static function from(array $codes): static
     {
@@ -41,8 +34,6 @@ class RecoveryCodeManager implements Arrayable
 
     /**
      * Generate a fresh batch of recovery codes.
-     *
-     * @return static
      */
     public static function generate(): static
     {
@@ -56,10 +47,6 @@ class RecoveryCodeManager implements Arrayable
 
     /**
      * Determine whether the provided codes are identical.
-     *
-     * @param  string  $expected
-     * @param  string  $provided
-     * @return bool
      */
     protected function isIdentical(string $expected, string $provided): bool
     {
@@ -68,9 +55,6 @@ class RecoveryCodeManager implements Arrayable
 
     /**
      * Determine whether the provided code exists in the collection.
-     *
-     * @param  string  $code
-     * @return bool
      */
     public function contains(string $code): bool
     {
@@ -80,7 +64,6 @@ class RecoveryCodeManager implements Arrayable
     /**
      * Remove the provided code from the collection.
      *
-     * @param  string  $code
      * @return $this
      */
     public function remove(string $code): self
@@ -92,8 +75,6 @@ class RecoveryCodeManager implements Arrayable
 
     /**
      * Get the recovery codes as an array.
-     *
-     * @return array
      */
     public function toArray(): array
     {

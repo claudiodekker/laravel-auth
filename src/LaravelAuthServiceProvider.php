@@ -48,9 +48,6 @@ class LaravelAuthServiceProvider extends ServiceProvider
 
     /**
      * Determines the path to the application's language files.
-     *
-     * @param  string  $path
-     * @return string
      */
     protected function languagePath(string $path): string
     {

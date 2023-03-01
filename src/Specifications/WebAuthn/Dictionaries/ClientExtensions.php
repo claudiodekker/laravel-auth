@@ -29,7 +29,6 @@ abstract class ClientExtensions
     /**
      * Set a new item in the collection.
      *
-     * @param  ClientExtension  $value
      * @return $this
      */
     public function set(ClientExtension $value): static

@@ -62,8 +62,6 @@ class PublicKeyCredentialUserEntity implements JsonSerializable
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

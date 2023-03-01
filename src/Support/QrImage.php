@@ -14,8 +14,6 @@ class QrImage
 {
     /**
      * Create a new QR Image instance.
-     *
-     * @param  string  $contents
      */
     public function __construct(
         protected string $contents
@@ -26,7 +24,6 @@ class QrImage
     /**
      * Fluently create a new QR Image instance.
      *
-     * @param  string  $contents
      * @return static
      */
     public static function make(string $contents): self
@@ -37,10 +34,7 @@ class QrImage
     /**
      * Convert the QR Image to an SVG string.
      *
-     * @param  int  $size
-     * @param  int  $margin
      * @param  int[]  $rgb
-     * @return string
      */
     public function svg(int $size = 400, int $margin = 0, array $rgb = [0, 0, 0]): string
     {
@@ -59,10 +53,7 @@ class QrImage
      * Convert the QR Image to a SVG string, encoded as an image data URI.
      * Can be directly embedded in an HTML document <img> src attribute.
      *
-     * @param  int  $size
-     * @param  int  $margin
      * @param  int[]  $rgb
-     * @return string
      */
     public function svgData(int $size = 400, int $margin = 0, array $rgb = [0, 0, 0]): string
     {

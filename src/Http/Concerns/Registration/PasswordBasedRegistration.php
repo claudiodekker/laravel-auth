@@ -13,7 +13,6 @@ trait PasswordBasedRegistration
     /**
      * Handle a password based registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePasswordBasedRegistration(Request $request)
@@ -33,8 +32,6 @@ trait PasswordBasedRegistration
     /**
      * Validate a password based user registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -49,9 +46,6 @@ trait PasswordBasedRegistration
 
     /**
      * Create a password based user account using the given details.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function createPasswordBasedUser(Request $request): Authenticatable
     {

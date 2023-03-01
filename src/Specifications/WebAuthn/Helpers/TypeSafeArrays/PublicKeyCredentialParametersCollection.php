@@ -30,7 +30,6 @@ class PublicKeyCredentialParametersCollection implements \JsonSerializable
     /**
      * Add a new item to the array.
      *
-     * @param  PublicKeyCredentialParameters  $parameter
      * @return $this
      */
     public function add(PublicKeyCredentialParameters $parameter): static
@@ -52,8 +51,6 @@ class PublicKeyCredentialParametersCollection implements \JsonSerializable
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {

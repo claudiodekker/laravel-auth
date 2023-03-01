@@ -18,8 +18,6 @@ trait PasswordBasedAuthentication
     /**
      * Sends a response indicating that the user needs to confirm a 2FA challenge.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\CredentialType  $preferredMethod
      * @return mixed
      */
     abstract protected function sendMultiFactorChallengeResponse(Request $request, CredentialType $preferredMethod);
@@ -27,7 +25,6 @@ trait PasswordBasedAuthentication
     /**
      * Handle a password based authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePasswordBasedAuthentication(Request $request)
@@ -69,8 +66,6 @@ trait PasswordBasedAuthentication
     /**
      * Validate the password based authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -84,9 +79,6 @@ trait PasswordBasedAuthentication
 
     /**
      * Resolve the User that is being authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     protected function resolvePasswordBasedUser(Request $request): ?Authenticatable
     {
@@ -98,9 +90,6 @@ trait PasswordBasedAuthentication
 
     /**
      * Validates the username and password combination.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     protected function validatePasswordBasedCredentials(Request $request): ?Authenticatable
     {
@@ -120,9 +109,6 @@ trait PasswordBasedAuthentication
      *
      * This prevents state carry-over attacks where an attacker can manipulate the order of requests as such that
      * they can confirm a 2FA challenge intended for their account, while pre-authenticated as their victim.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function sanitizeMultiFactorSessionState(Request $request): void
     {
@@ -131,9 +117,6 @@ trait PasswordBasedAuthentication
 
     /**
      * Retrieve all multi-factor credentials for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \Illuminate\Support\Collection
      */
     protected function fetchMultiFactorCredentials(Authenticatable $user): Collection
     {
@@ -144,10 +127,6 @@ trait PasswordBasedAuthentication
 
     /**
      * Prepares the details necessary for multi-factor authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function prepareMultiFactorAuthenticationDetails(Request $request, Authenticatable $user): void
     {
@@ -158,10 +137,6 @@ trait PasswordBasedAuthentication
 
     /**
      * Determines the preferred multi-factor authentication method.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  \Illuminate\Support\Collection  $credentials
-     * @return \ClaudioDekker\LaravelAuth\CredentialType
      */
     protected function determinePreferredMultiFactorMethod(Authenticatable $user, Collection $credentials): CredentialType
     {

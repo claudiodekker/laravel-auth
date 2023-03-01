@@ -24,8 +24,6 @@ class CredentialAttributes implements JsonSerializable, Jsonable
     /**
      * Decode the given JSON back into an instance.
      *
-     * @param  string  $json
-     * @return static
      *
      * @throws JsonException
      */
@@ -134,8 +132,6 @@ class CredentialAttributes implements JsonSerializable, Jsonable
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {

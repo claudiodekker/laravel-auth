@@ -26,18 +26,12 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response that displays the multi-factor challenge page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null  $options
-     * @param  \Illuminate\Support\Collection  $availableCredentialTypes
      * @return mixed
      */
     abstract protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options, Collection $availableCredentialTypes);
 
     /**
      * Sends a response indicating that the multi-factor challenge has succeeded.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      */
     protected function handleChallengeSuccessfulResponse(Request $request): mixed
     {
@@ -54,9 +48,6 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the user has been successfully authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $intendedUrl
      * @return mixed
      */
     abstract protected function sendAuthenticatedResponse(Request $request, Authenticatable $user, string $intendedUrl);
@@ -67,7 +58,6 @@ abstract class MultiFactorChallengeController
      * This can be for a large number of reasons, including (but not limited to) a malformed request,
      * a non-existent credential, an invalid signature or confirmation code etc.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendChallengeFailedResponse(Request $request);
@@ -75,7 +65,6 @@ abstract class MultiFactorChallengeController
     /**
      * Handle an incoming request to view the multi-factor challenge page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendAuthenticatedResponse()
@@ -99,7 +88,6 @@ abstract class MultiFactorChallengeController
     /**
      * Handle an incoming multi-factor challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendRateLimitedResponse()
@@ -118,9 +106,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Determine if the given request is a security key based confirmation request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isPublicKeyConfirmationRequest(Request $request): bool
     {
@@ -130,7 +115,6 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the public key challenge did not succeed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendPublicKeyChallengeFailedResponse(Request $request)
@@ -143,7 +127,6 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the time-based one-time-password challenge did not succeed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendTotpChallengeFailedResponse(Request $request)
@@ -156,7 +139,6 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the public key challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendPublicKeyChallengeSuccessfulResponse(Request $request)
@@ -167,7 +149,6 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the time-based one-time-password challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendTotpChallengeSuccessfulResponse(Request $request)
@@ -177,9 +158,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Retrieve all active multi-factor credentials for the authenticating user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Support\Collection
      */
     protected function getMultiFactorCredentials(Request $request): Collection
     {
@@ -190,9 +168,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Filter and prepare all public key credentials for the given multi-factor credentials.
-     *
-     * @param  \Illuminate\Support\Collection  $credentials
-     * @return \Illuminate\Support\Collection
      */
     protected function filterPublicKeyCredentials(Collection $credentials): Collection
     {
@@ -202,9 +177,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Filter all unique multi-factor credential types for the given credentials.
-     *
-     * @param  \Illuminate\Support\Collection  $credentials
-     * @return \Illuminate\Support\Collection
      */
     protected function filterAvailableCredentialTypes(Collection $credentials): Collection
     {
@@ -215,9 +187,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Resolve the User instance that is being authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUser(Request $request): Authenticatable
     {
@@ -228,9 +197,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Fully authenticate the user into the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function authenticate(Request $request): Authenticatable
     {
@@ -242,9 +208,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Resolve the URL that the user intended to visit prior to authentication.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function intendedLocation(Request $request): string
     {
@@ -253,9 +216,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Clear the multi-factor specific authentication details set during login.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function clearMultiFactorAuthenticationDetails(Request $request): void
     {
@@ -266,9 +226,6 @@ abstract class MultiFactorChallengeController
 
     /**
      * Determine the rate limits that apply to the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
     protected function rateLimits(Request $request): array
     {

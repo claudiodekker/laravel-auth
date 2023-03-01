@@ -12,8 +12,6 @@ abstract class CredentialsController
     /**
      * Sends a response that displays the credential overview page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Support\Collection  $mfaCredentials
      * @return mixed
      */
     abstract protected function sendOverviewPageResponse(Request $request, Collection $mfaCredentials);
@@ -21,7 +19,6 @@ abstract class CredentialsController
     /**
      * Sends a response indicating that the multi-factor credential could not be found.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $id
      * @return mixed
      */
@@ -30,7 +27,6 @@ abstract class CredentialsController
     /**
      * Sends a response indicating that the multi-factor credential was deleted.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\MultiFactorCredential  $credential
      * @return mixed
      */
@@ -39,7 +35,6 @@ abstract class CredentialsController
     /**
      * Handle an incoming request to view the credential overview page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendOverviewPageResponse()
@@ -54,7 +49,6 @@ abstract class CredentialsController
     /**
      * Delete a multi-factor credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $id
      * @return mixed
      *
@@ -74,8 +68,6 @@ abstract class CredentialsController
 
     /**
      * Retrieve all multi-factor credentials for the given user.
-     *
-     * @return \Illuminate\Support\Collection
      */
     protected function getMultiFactorCredentials(): Collection
     {
@@ -101,7 +93,6 @@ abstract class CredentialsController
      * Delete the given multi-factor credential.
      *
      * @param  \ClaudioDekker\LaravelAuth\MultiFactorCredential  $credential
-     * @return void
      */
     protected function deleteMultiFactorCredential($credential): void
     {

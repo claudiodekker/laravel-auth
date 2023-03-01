@@ -12,7 +12,6 @@ abstract class VerifyEmailController
     /**
      * Sends a response indicating that the email verification link has been resent.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendEmailVerificationSentResponse(Request $request);
@@ -20,7 +19,6 @@ abstract class VerifyEmailController
     /**
      * Sends a response indicating that the email has already been verified.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendEmailAlreadyVerifiedResponse(Request $request);
@@ -28,7 +26,6 @@ abstract class VerifyEmailController
     /**
      * Sends a response indicating that the email has been successfully verified.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendEmailSuccessfullyVerifiedResponse(Request $request);
@@ -36,7 +33,6 @@ abstract class VerifyEmailController
     /**
      * Handle an incoming request to (re)send the verification email.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendEmailAlreadyVerifiedResponse()
@@ -56,7 +52,6 @@ abstract class VerifyEmailController
     /**
      * Handle an incoming request to confirm the email verification.
      *
-     * @param  \Illuminate\Foundation\Auth\EmailVerificationRequest  $request
      * @return mixed
      *
      * @see static::sendEmailAlreadyVerifiedResponse()
@@ -76,9 +71,6 @@ abstract class VerifyEmailController
 
     /**
      * Determine whether the user has verified their email address.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function hasVerifiedEmail(Request $request): bool
     {
@@ -87,9 +79,6 @@ abstract class VerifyEmailController
 
     /**
      * Send the email verification notification.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function sendEmailVerificationNotification(Request $request): void
     {
@@ -98,9 +87,6 @@ abstract class VerifyEmailController
 
     /**
      * Mark the user's email as verified.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function markEmailAsVerified(Request $request): bool
     {
@@ -109,9 +95,6 @@ abstract class VerifyEmailController
 
     /**
      * Emits an event that the user has been verified.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function emitsVerifiedEvent(Request $request): void
     {

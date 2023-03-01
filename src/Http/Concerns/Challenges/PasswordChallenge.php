@@ -15,7 +15,6 @@ trait PasswordChallenge
     /**
      * Sends a response indicating that the password challenge did not succeed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPasswordChallengeFailedResponse(Request $request);
@@ -23,7 +22,6 @@ trait PasswordChallenge
     /**
      * Sends a response indicating that the password challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPasswordChallengeSuccessfulResponse(Request $request);
@@ -31,7 +29,6 @@ trait PasswordChallenge
     /**
      * Handle a password challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePasswordChallengeRequest(Request $request)
@@ -58,8 +55,6 @@ trait PasswordChallenge
     /**
      * Validate the password challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -72,9 +67,6 @@ trait PasswordChallenge
 
     /**
      * Determine whether the provided password matches the current user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function hasValidPassword(Request $request): bool
     {

@@ -18,8 +18,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response indicating that the time-based one-time-password registration has been initialized.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
      * @return mixed
      */
     abstract protected function sendRegistrationInitializedResponse(Request $request, string $secret);
@@ -27,8 +25,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response that displays the time-based one-time-password confirmation page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
      * @return mixed
      */
     abstract protected function sendConfirmationPageResponse(Request $request, string $secret);
@@ -36,7 +32,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response indicating that the time-based one-time-password credential has been registered.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\MultiFactorCredential  $credential
      * @return mixed
      */
@@ -45,7 +40,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response indicating that the time-based one-time-password credential registration has been cancelled.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendRegistrationCancelledResponse(Request $request);
@@ -53,7 +47,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response indicating that the time-based one-time-password registration state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidRegistrationStateResponse(Request $request);
@@ -61,7 +54,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Sends a response indicating that the provided confirmation code is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidConfirmationCodeResponse(Request $request);
@@ -69,7 +61,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Initialize the registration of a new time-based one-time-password credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
@@ -86,7 +77,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Display the view for confirming the time-based one-time-password credential registration.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendInvalidRegistrationStateResponse()
@@ -104,7 +94,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Confirm and finalize the registration of the time-based one-time-password credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendInvalidRegistrationStateResponse()
@@ -132,7 +121,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Cancel the registration of the time-based one-time-password credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendRegistrationCancelledResponse()
@@ -147,8 +135,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Validate the time-based one-time-password confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -162,10 +148,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Determine whether the request contains a valid time-based one-time-password confirmation code.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
-     * @return bool
      */
     protected function hasValidConfirmationCode(Request $request, string $secret): bool
     {
@@ -178,8 +160,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Creates the new time-based one-time password credential for the current user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
      * @return \ClaudioDekker\LaravelAuth\MultiFactorCredential
      */
     protected function createTotpCredential(Request $request, string $secret)
@@ -196,7 +176,6 @@ abstract class RegisterTotpCredentialController
     /**
      * Generate a fresh time-based one-time-password credential secret.
      *
-     * @return string
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
      */
@@ -210,10 +189,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Generates a scannable, time-based one-time-password setup QR Code SVG for the current user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
-     * @return string
      */
     protected function generateSetupQrImage(Request $request, string $secret): string
     {
@@ -228,10 +203,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Store the pending time-based one-time-password credential secret.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $secret
-     * @return void
      */
     protected function setPendingTotpSecret(Request $request, string $secret): void
     {
@@ -240,9 +211,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Retrieve the pending time-based one-time-password credential secret.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
      */
     protected function getPendingTotpSecret(Request $request): ?string
     {
@@ -251,9 +219,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Clear the pending time-based one-time-password credential secret.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function clearPendingTotpSecret(Request $request): void
     {

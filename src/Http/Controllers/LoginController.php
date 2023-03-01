@@ -28,8 +28,6 @@ abstract class LoginController
     /**
      * Sends a response that displays the login page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
      * @return mixed
      */
     abstract protected function sendLoginPageResponse(Request $request, PublicKeyCredentialRequestOptions $options);
@@ -37,8 +35,6 @@ abstract class LoginController
     /**
      * Sends a response indicating that the user has been authenticated successfully.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return mixed
      */
     abstract protected function sendAuthenticatedResponse(Request $request, Authenticatable $user);
@@ -46,7 +42,6 @@ abstract class LoginController
     /**
      * Sends a response indicating that authentication has failed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendAuthenticationFailedResponse(Request $request);
@@ -54,7 +49,6 @@ abstract class LoginController
     /**
      * Sends a response indicating that the user has been signed out.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendLoggedOutResponse(Request $request);
@@ -62,7 +56,6 @@ abstract class LoginController
     /**
      * Handle an incoming request to view the login page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendLoginPageResponse()
@@ -77,7 +70,6 @@ abstract class LoginController
     /**
      * Handle an incoming authentication request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendRateLimitedResponse()
@@ -97,9 +89,6 @@ abstract class LoginController
 
     /**
      * Determine whether the authentication attempt is password based.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isPasswordBasedAuthenticationAttempt(Request $request): bool
     {
@@ -109,7 +98,6 @@ abstract class LoginController
     /**
      * Sign the user out of the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendLoggedOutResponse()
@@ -123,10 +111,6 @@ abstract class LoginController
 
     /**
      * Fully authenticate the user into the application.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  bool  $remember
-     * @return void
      */
     protected function authenticate(Authenticatable $user, bool $remember = false): void
     {
@@ -135,9 +119,6 @@ abstract class LoginController
 
     /**
      * Determines whether the user should be authenticated indefinitely or until they manually logout.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isRememberingUser(Request $request): bool
     {
@@ -148,9 +129,6 @@ abstract class LoginController
      * Resolve the URL that the user intended to visit (if any) prior to authentication.
      *
      * @see \Illuminate\Routing\Redirector::intended
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function intendedLocation(Request $request): string
     {
@@ -162,9 +140,6 @@ abstract class LoginController
 
     /**
      * Determine the rate limits that apply to the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
     protected function rateLimits(Request $request): array
     {

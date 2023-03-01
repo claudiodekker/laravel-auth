@@ -10,8 +10,6 @@ class EnsurePreAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return \Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next)

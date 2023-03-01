@@ -9,9 +9,6 @@ trait HandlesLogouts
 {
     /**
      * Sign the user out of the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function logout(Request $request): void
     {

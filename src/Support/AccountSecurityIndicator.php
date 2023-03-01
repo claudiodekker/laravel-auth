@@ -13,8 +13,6 @@ enum AccountSecurityIndicator implements Arrayable
 
     /**
      * Determine the color of the indicator.
-     *
-     * @return string
      */
     public function color(): string
     {
@@ -27,8 +25,6 @@ enum AccountSecurityIndicator implements Arrayable
 
     /**
      * Determine whether the account security indicator has any issues to indicate.
-     *
-     * @return bool
      */
     public function hasIssues(): bool
     {
@@ -37,8 +33,6 @@ enum AccountSecurityIndicator implements Arrayable
 
     /**
      * Determine the message that should be displayed for the indicator.
-     *
-     * @return string
      */
     public function message(): string
     {

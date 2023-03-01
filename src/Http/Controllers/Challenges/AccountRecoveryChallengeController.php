@@ -24,8 +24,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Sends a response that displays the account recovery challenge page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $token
      * @return mixed
      */
     abstract protected function sendChallengePageResponse(Request $request, string $token);
@@ -33,7 +31,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Sends a response indicating that the given recovery link is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidRecoveryLinkResponse(Request $request);
@@ -41,7 +38,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Sends a response indicating that the given recovery code is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidRecoveryCodeResponse(Request $request);
@@ -52,8 +48,6 @@ abstract class AccountRecoveryChallengeController
      * Typically, you'd want this response to redirect the user to their account's security settings page,
      * where they can adjust whatever is causing them to be unable to authenticate using normal means.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return mixed
      */
     abstract protected function sendAccountRecoveredResponse(Request $request, Authenticatable $user);
@@ -61,8 +55,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $token
      * @return mixed
      *
      * @see static::sendAccountRecoveredResponse()
@@ -91,8 +83,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handle an incoming account recovery challenge response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $token
      * @return mixed
      *
      * @see static::sendAccountRecoveredResponse()
@@ -142,10 +132,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Determines whether the current recovery link is valid.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $token
-     * @return bool
      */
     protected function isValidRecoveryLink(Authenticatable $user, string $token): bool
     {
@@ -155,7 +141,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Resolves the User instance for which the account is being reset.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUser(Request $request)
@@ -168,8 +153,6 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handles the situation where the user has successfully recovered their account.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return mixed
      */
     protected function handleAccountRecoveredResponse(Request $request, Authenticatable $user)
@@ -183,10 +166,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Authenticate the user into the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function authenticate(Request $request, Authenticatable $user): void
     {
@@ -195,10 +174,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Determine whether the user has recovery codes.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return bool
      */
     protected function hasRecoveryCodes(Request $request, Authenticatable $user): bool
     {
@@ -207,10 +182,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Determine whether the user has entered a valid confirmation code.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return bool
      */
     protected function hasValidRecoveryCode(Request $request, Authenticatable $user): bool
     {
@@ -219,10 +190,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Invalidate the used recovery code for the given user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function invalidateRecoveryCode(Request $request, Authenticatable $user): void
     {
@@ -235,10 +202,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Invalidates the recovery link for the given user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function invalidateRecoveryLink(Request $request, Authenticatable $user): void
     {
@@ -247,10 +210,6 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Emits an event indicating that the user's account has been recovered.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitAccountRecoveredEvent(Request $request, Authenticatable $user): void
     {
@@ -264,10 +223,6 @@ abstract class AccountRecoveryChallengeController
      * such as detecting the possibility of an user's email account being compromised, to
      * identify the IP address of whoever is attempting to recover, or to provide extra
      * context to the support team in case the user ends up being unable to recover.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitAccountRecoveryFailedEvent(Request $request, Authenticatable $user): void
     {

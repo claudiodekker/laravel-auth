@@ -11,9 +11,6 @@ trait InteractsWithRateLimiting
 {
     /**
      * Prepare the identifier used to track the rate limiting state.
-     *
-     * @param  string  $key
-     * @return string
      */
     protected function throttleKey(string $key): string
     {
@@ -23,17 +20,12 @@ trait InteractsWithRateLimiting
     /**
      * Sends a response indicating that the requests have been rate limited.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $availableInSeconds
      * @return mixed
      */
     abstract protected function sendRateLimitedResponse(Request $request, int $availableInSeconds);
 
     /**
      * Determine the rate limits that apply to the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
     protected function rateLimits(Request $request): array
     {
@@ -45,9 +37,6 @@ trait InteractsWithRateLimiting
 
     /**
      * Determines whether the request is currently rate limited.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isCurrentlyRateLimited(Request $request): bool
     {
@@ -58,9 +47,6 @@ trait InteractsWithRateLimiting
 
     /**
      * Determines the seconds remaining until rate limiting is lifted.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return int
      */
     protected function rateLimitExpiresInSeconds(Request $request): int
     {
@@ -70,9 +56,6 @@ trait InteractsWithRateLimiting
 
     /**
      * Increments the rate limiting counter.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function incrementRateLimitingCounter(Request $request): void
     {
@@ -83,9 +66,6 @@ trait InteractsWithRateLimiting
 
     /**
      * Clears the rate limiting counter (if any).
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function resetRateLimitingCounter(Request $request): void
     {

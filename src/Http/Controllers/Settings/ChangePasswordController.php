@@ -14,7 +14,6 @@ abstract class ChangePasswordController
     /**
      * Send a response indicating that the user's password has been changed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPasswordChangedResponse(Request $request);
@@ -22,7 +21,6 @@ abstract class ChangePasswordController
     /**
      * Change the current user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendPasswordChangedResponse()
@@ -42,8 +40,6 @@ abstract class ChangePasswordController
     /**
      * Validate the password change request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -57,10 +53,6 @@ abstract class ChangePasswordController
 
     /**
      * Change the user's password and persist it to the database.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $newPassword
-     * @return void
      */
     protected function updateUserPassword(Authenticatable $user, string $newPassword): void
     {
@@ -71,9 +63,6 @@ abstract class ChangePasswordController
 
     /**
      * Emits an event indicating that the user's password has changed.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitPasswordChangedEvent(Authenticatable $user): void
     {

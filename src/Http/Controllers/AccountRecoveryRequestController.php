@@ -21,8 +21,6 @@ abstract class AccountRecoveryRequestController
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
      * indicate that recovery has already been requested. Instead, it should always return the same response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return mixed
      */
     abstract protected function sendRecoveryAlreadyRequestedResponse(Request $request, Authenticatable $user);
@@ -33,7 +31,6 @@ abstract class AccountRecoveryRequestController
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
      * indicate that the account was not found. Instead, it should always return the same response.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendNoSuchUserResponse(Request $request);
@@ -47,7 +44,6 @@ abstract class AccountRecoveryRequestController
      * @see static::sendNoSuchUserResponse()
      * @see static::sendRecoveryAlreadyRequestedResponse()
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract public function sendRecoveryLinkSentResponse(Request $request);
@@ -55,7 +51,6 @@ abstract class AccountRecoveryRequestController
     /**
      * Handle an incoming request to view the account recovery page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function create(Request $request)
@@ -66,7 +61,6 @@ abstract class AccountRecoveryRequestController
     /**
      * Handle an incoming request to receive an account recovery link.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      *
      * @see static::sendRateLimitedResponse()
@@ -103,8 +97,6 @@ abstract class AccountRecoveryRequestController
     /**
      * Validate the account recovery request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -118,7 +110,6 @@ abstract class AccountRecoveryRequestController
     /**
      * Resolve the User that should be recovered.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Auth\CanResetPassword|null
      */
     protected function getUser(Request $request)
@@ -132,7 +123,6 @@ abstract class AccountRecoveryRequestController
      * Determines whether the given user has already requested a recovery link recently.
      *
      * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @return bool
      */
     protected function recoveryRecentlyRequested(mixed $user): bool
     {
@@ -143,7 +133,6 @@ abstract class AccountRecoveryRequestController
      * Create a new recovery token for the given user.
      *
      * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @return string
      */
     protected function createRecoveryToken(mixed $user): string
     {
@@ -153,10 +142,7 @@ abstract class AccountRecoveryRequestController
     /**
      * Sends the recovery link notification to the given user.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @param  string  $token
-     * @return void
      */
     protected function sendRecoveryLinkNotification(Request $request, mixed $user, string $token): void
     {
