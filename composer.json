@@ -22,7 +22,7 @@
         "ext-json": "*",
         "bacon/bacon-qr-code": "^2.0.3",
         "claudiodekker/word-generator": "^1.0",
-        "laravel/framework": "^9.33",
+        "laravel/framework": "^9.33|^10.0",
         "nyholm/psr7": "^1.5",
         "pragmarx/google2fa": "^8.0",
         "symfony/psr-http-message-bridge": "^2.1",
