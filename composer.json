@@ -1,5 +1,54 @@
 {
+    "authors": [
+        {
+            "name": "Claudio Dekker",
+            "email": "claudio@ubient.net",
+            "homepage": "https://ubient.net",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "bacon/bacon-qr-code": "^2.0",
+        "claudiodekker/word-generator": "^1.0",
+        "ext-json": "*",
+        "laravel/framework": "^9.0",
+        "nyholm/psr7": "^1.5",
+        "php": "~8.1.0",
+        "pragmarx/google2fa": "^8.0",
+        "symfony/psr-http-message-bridge": "^2.1",
+        "web-auth/webauthn-lib": "^4.0"
+    },
     "require-dev": {
+        "orchestra/testbench": "^6.5|^7.0",
+        "phpunit/phpunit": "^8.4|^9.5.8",
+        "roave/security-advisories": "dev-latest",
         "symplify/monorepo-builder": "11.2.2.72"
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuthBladebones\\": "packages/bladebones/src/",
+            "ClaudioDekker\\LaravelAuth\\": "packages/core/src/",
+            "ClaudioDekker\\LaravelAuth\\Database\\Factories\\": "packages/core/database/factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ClaudioDekker\\LaravelAuthBladebones\\Tests\\": "packages/bladebones/tests/",
+            "ClaudioDekker\\LaravelAuth\\Tests\\": "packages/core/tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ClaudioDekker\\LaravelAuthBladebones\\LaravelAuthBladebonesServiceProvider",
+                "ClaudioDekker\\LaravelAuth\\LaravelAuthServiceProvider"
+            ]
+        }
+    },
+    "replace": {
+        "claudiodekker/laravel-auth": "self.version",
+        "claudiodekker/laravel-auth-bladebones": "self.version"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
