@@ -1,4 +1,4 @@
-name: Validate Generator Styling
+name: Validate Core Generator Styling
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          path: ./package
+          path: ./monorepo
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -39,12 +39,13 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer create-project laravel/laravel app "9.x" --remove-vcs --prefer-dist --no-interaction
+          command: composer create-project laravel/laravel app "10.x" --remove-vcs --prefer-dist --no-interaction
 
       - name: Install Package
         run: |
-          composer config repositories.package path ../package
-          composer require claudiodekker/laravel-auth-bladebones
+          composer config repositories.library path ../monorepo/core
+          composer config repositories.adapter path ../monorepo/bladebones
+          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones
         working-directory: ./app
 
       - name: Generate Auth Scaffolding

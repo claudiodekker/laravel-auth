@@ -1,6 +1,12 @@
 {
     "name": "claudiodekker/laravel-auth-bladebones",
     "description": "Rich (yet bare) authentication scaffolding for any blade-based Laravel application.",
+    "license": "MIT",
+    "homepage": "https://github.com/claudiodekker/laravel-auth",
+    "support": {
+        "issues": "https://github.com/claudiodekker/laravel-auth/issues",
+        "source": "https://github.com/claudiodekker/laravel-auth"
+    },
     "keywords": [
         "laravel",
         "auth",
@@ -10,21 +16,17 @@
         "barebones",
         "template"
     ],
-    "homepage": "https://github.com/claudiodekker/laravel-auth-bladebones",
-    "license": "MIT",
     "authors": [
         {
             "name": "Claudio Dekker",
-            "email": "claudio@ubient.net",
-            "homepage": "https://ubient.net",
-            "role": "Developer"
+            "email": "claudio@ubient.net"
         }
     ],
     "require": {
         "php": "~8.1.0",
         "ext-json": "*",
         "laravel/framework": "^9.0",
-        "claudiodekker/laravel-auth": "~0.1"
+        "claudiodekker/laravel-auth-core": "^0.1.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

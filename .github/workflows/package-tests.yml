@@ -3,20 +3,19 @@ name: Package Tests
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
-  tests:
+  package-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        php: [ 8.1 ]
-        laravel: [ 8, 9 ]
+        package: [ 'core', 'bladebones' ]
+        php: [ '8.0', 8.1, 8.2 ]
+        laravel: [ 9, 10 ]
         stability: [ 'prefer-lowest', 'prefer-stable' ]
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} (w/ ${{ matrix.stability }})
+    name: ${{ matrix.package }} - PHP ${{ matrix.php }} L${{ matrix.laravel }} w/ ${{ matrix.stability }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -39,6 +38,7 @@ jobs:
             composer require phpunit/phpunit:^9.5.8 --dev --${{ matrix.stability }} --no-update --no-interaction
             composer require vlucas/phpdotenv:^5.3.1 --${{ matrix.stability }} --no-update --no-interaction
         if: matrix.php >= 8.1 && matrix.stability == 'prefer-lowest'
+        working-directory: ./packages/${{ matrix.package }}
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
@@ -46,6 +46,8 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --no-interaction
+        working-directory: ./packages/${{ matrix.package }}
 
       - name: Execute tests
-        run: composer test
+        run: vendor/bin/phpunit
+        working-directory: ./packages/${{ matrix.package }}

@@ -1,20 +1,16 @@
 {
-    "name": "claudiodekker/laravel-auth",
-    "description": "Rich authentication logic for your Laravel applications; not intended for direct use.",
-    "keywords": [
-        "laravel",
-        "auth",
-        "authentication",
-        "core"
-    ],
-    "homepage": "https://github.com/claudiodekker/laravel-auth",
+    "name": "claudiodekker/laravel-auth-core",
+    "description": "The Laravel Auth Core Package.",
     "license": "MIT",
+    "homepage": "https://github.com/claudiodekker/laravel-auth",
+    "support": {
+        "issues": "https://github.com/claudiodekker/laravel-auth/issues",
+        "source": "https://github.com/claudiodekker/laravel-auth"
+    },
     "authors": [
         {
             "name": "Claudio Dekker",
-            "email": "claudio@ubient.net",
-            "homepage": "https://ubient.net",
-            "role": "Developer"
+            "email": "claudio@ubient.net"
         }
     ],
     "require": {
@@ -50,7 +46,7 @@
     "extra": {
         "laravel": {
             "providers": [
-              "ClaudioDekker\\LaravelAuth\\LaravelAuthServiceProvider"
+                "ClaudioDekker\\LaravelAuth\\LaravelAuthServiceProvider"
             ]
         }
     },

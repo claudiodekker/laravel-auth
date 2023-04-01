@@ -3,8 +3,6 @@ name: App Tests
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
   tests:
@@ -12,8 +10,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [ 8.1 ]
-        laravel: [ 9 ]
+        php: [ '8.0', 8.1, 8.2 ]
+        laravel: [ 9, 10 ]
         stability: [ 'prefer-lowest', 'prefer-stable' ]
         variants: [
           '',
@@ -22,12 +20,12 @@ jobs:
           '--kind username-based --without-rate-limiting'
         ]
 
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} ${{ matrix.variants }} (w/ ${{ matrix.stability }})
+    name: PHP ${{ matrix.php }} L${{ matrix.laravel }} ${{ matrix.variants }} (w/ ${{ matrix.stability }})
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          path: ./package
+          path: ./monorepo
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -51,10 +49,11 @@ jobs:
           sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=secret/" .env
         working-directory: ./app
 
-      - name: Install Package
+      - name: Install Library & Bladebones Adapter
         run: |
-          composer config repositories.package path ../package
-          composer require claudiodekker/laravel-auth-bladebones --${{ matrix.stability }}
+          composer config repositories.library path ../monorepo/core
+          composer config repositories.adapter path ../monorepo/bladebones
+          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones --${{ matrix.stability }}
         working-directory: ./app
 
       - name: Generate Auth Scaffolding
