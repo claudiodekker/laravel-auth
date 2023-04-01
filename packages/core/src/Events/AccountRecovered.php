@@ -10,8 +10,6 @@ class AccountRecovered
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
     public function __construct(

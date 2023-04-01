@@ -9,9 +9,6 @@ trait EnablesSudoMode
 {
     /**
      * Enables sudo-mode for the current user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function enableSudoMode(Request $request): void
     {

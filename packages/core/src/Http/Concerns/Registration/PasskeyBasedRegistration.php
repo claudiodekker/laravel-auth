@@ -24,8 +24,6 @@ trait PasskeyBasedRegistration
     /**
      * Sends a response indicating that the passkey-based registration process has been initialized.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
      * @return mixed
      */
     abstract protected function sendPasskeyBasedRegistrationInitializedResponse(Request $request, PublicKeyCredentialCreationOptions $options);
@@ -33,7 +31,6 @@ trait PasskeyBasedRegistration
     /**
      * Sends a response indicating that the passkey-based registration state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPasskeyRegistrationStateResponse(Request $request);
@@ -41,7 +38,6 @@ trait PasskeyBasedRegistration
     /**
      * Sends a response indicating that the signed passkey is not valid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPasskeyResponse(Request $request);
@@ -49,7 +45,6 @@ trait PasskeyBasedRegistration
     /**
      * Handle a passkey based registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePasskeyBasedRegistration(Request $request)
@@ -64,7 +59,6 @@ trait PasskeyBasedRegistration
     /**
      * Initialize the passkey based registration process.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function initializePasskeyRegistration(Request $request)
@@ -82,7 +76,6 @@ trait PasskeyBasedRegistration
     /**
      * Finalize the passkey based registration process.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function confirmPasskeyBasedRegistration(Request $request)
@@ -112,9 +105,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Determine if the given request is a passkey-based registration confirmation request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isPasskeyConfirmationRequest(Request $request): bool
     {
@@ -124,8 +114,6 @@ trait PasskeyBasedRegistration
     /**
      * Validate the passkey-based registration initialization request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -139,9 +127,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Claims (read: creates) a passkey-based user account.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function claimPasswordlessUser(Request $request): Authenticatable
     {
@@ -156,9 +141,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Resolve the given user as a public key credential user entity instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity
      */
     protected function prepareUserEntity(Authenticatable $user): PublicKeyCredentialUserEntity
     {
@@ -173,10 +155,6 @@ trait PasskeyBasedRegistration
      * Generate the challenge details used to perform passkey-based registration.
      *
      * @link https://www.w3.org/TR/webauthn-2/#sctn-registering-a-new-credential
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions
      */
     protected function generatePasskeyCreationOptions(Request $request, Authenticatable $user): PublicKeyCredentialCreationOptions
     {
@@ -190,10 +168,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Temporarily store the challenge details used to perform passkey based registration.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * @return void
      */
     protected function setPasskeyCreationOptions(Request $request, PublicKeyCredentialCreationOptions $options): void
     {
@@ -202,9 +176,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Retrieve the temporarily stored challenge details used to perform passkey based registration.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions|null
      */
     protected function getPasskeyCreationOptions(Request $request): ?PublicKeyCredentialCreationOptions
     {
@@ -218,10 +189,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Validates the signed passkey for the given challenge details.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * @return \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes
      */
     protected function validateAndPrepareCredentialAttributes(Request $request, PublicKeyCredentialCreationOptions $options): CredentialAttributes
     {
@@ -236,9 +203,6 @@ trait PasskeyBasedRegistration
 
     /**
      * Resolve the User that is being registered from the passkey creation options.
-     *
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUserFromPasskeyCreationOptions(PublicKeyCredentialCreationOptions $options): Authenticatable
     {
@@ -248,9 +212,6 @@ trait PasskeyBasedRegistration
     /**
      * Attaches the passkey to the passwordless user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes  $attributes
      * @return \ClaudioDekker\LaravelAuth\MultiFactorCredential
      */
     protected function createPasskey(Request $request, Authenticatable $user, CredentialAttributes $attributes)
@@ -267,7 +228,6 @@ trait PasskeyBasedRegistration
     /**
      * Clear the temporarily stored challenge details used to perform passkey based authentication.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function clearPasskeyCreationOptions(Request $request)

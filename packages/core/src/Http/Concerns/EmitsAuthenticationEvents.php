@@ -18,9 +18,6 @@ trait EmitsAuthenticationEvents
 {
     /**
      * Emits an event indicating that the user has been registered.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitRegisteredEvent(Authenticatable $user): void
     {
@@ -29,10 +26,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating that the user was fully authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitAuthenticatedEvent(Request $request, Authenticatable $user): void
     {
@@ -41,9 +34,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating that the authentication attempt has failed.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function emitAuthenticationFailedEvent(Request $request): void
     {
@@ -55,9 +45,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating that the user has been locked out for a while.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function emitLockoutEvent(Request $request): void
     {
@@ -66,10 +53,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating the user received a multi-factor authentication challenge.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function emitMultiFactorChallengedEvent(Request $request, Authenticatable $user): void
     {
@@ -78,11 +61,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating that the multi-factor challenge attempt has failed.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  \ClaudioDekker\LaravelAuth\CredentialType  $type
-     * @return void
      */
     protected function emitMultiFactorChallengeFailedEvent(Request $request, Authenticatable $user, CredentialType $type): void
     {
@@ -91,9 +69,6 @@ trait EmitsAuthenticationEvents
 
     /**
      * Emits an event indicating that sudo-mode was enabled.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function emitSudoModeEnabledEvent(Request $request): void
     {

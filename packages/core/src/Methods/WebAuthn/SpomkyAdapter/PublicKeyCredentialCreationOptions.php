@@ -49,8 +49,6 @@ class PublicKeyCredentialCreationOptions extends PublicKeyCredentialCreationOpti
      * Extends parent-behaviour as to polyfill 'missing' fields.
      *
      * @link https://github.com/web-auth/webauthn-framework/issues/234
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

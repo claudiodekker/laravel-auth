@@ -26,8 +26,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Sends a response that displays the public key registration page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
      * @return mixed
      */
     abstract protected function sendRegistrationPageResponse(Request $request, PublicKeyCredentialCreationOptions $options);
@@ -35,7 +33,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Sends a response indicating that the public key credential has been registered.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\MultiFactorCredential  $credential
      * @return mixed
      */
@@ -44,7 +41,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Sends a response indicating that the public key credential registration state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPublicKeyRegistrationStateResponse(Request $request);
@@ -52,7 +48,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Sends a response indicating that the provided public key credential is not valid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPublicKeyCredentialResponse(Request $request);
@@ -60,7 +55,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Handle an incoming request to view the public key registration page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function create(Request $request)
@@ -74,7 +68,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Complete the registration of a new public key credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function store(Request $request)
@@ -101,9 +94,6 @@ abstract class RegisterPublicKeyCredentialController
      * Generate the challenge details used to register a new public key credential.
      *
      * @link https://www.w3.org/TR/webauthn-2/#sctn-registering-a-new-credential
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions
      */
     protected function generatePublicKeyRegistrationOptions(Request $request): PublicKeyCredentialCreationOptions
     {
@@ -120,9 +110,6 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Resolve the given user as a public key credential user entity instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity
      */
     protected function prepareUserEntity(Authenticatable $user): PublicKeyCredentialUserEntity
     {
@@ -135,9 +122,6 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Retrieve all public key credentials for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \Illuminate\Support\Collection
      */
     protected function getExcludedCredentials(Authenticatable $user): Collection
     {
@@ -150,10 +134,6 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Temporarily store the challenge details used to register a new public key credential.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * @return void
      */
     protected function setPublicKeyRegistrationOptions(Request $request, PublicKeyCredentialCreationOptions $options): void
     {
@@ -162,9 +142,6 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Retrieve the temporarily stored challenge details used to register a new public key credential.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions|null
      */
     protected function getPublicKeyRegistrationOptions(Request $request): ?PublicKeyCredentialCreationOptions
     {
@@ -179,7 +156,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Clear the temporarily stored challenge details used to register a new public key credential.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function clearPublicKeyRegistrationOptions(Request $request)
@@ -190,8 +166,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Validate the public key credential registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -205,10 +179,6 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Validates the signed public key credential for the given challenge details.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * @return \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes
      */
     protected function validateAndPrepareCredentialAttributes(Request $request, PublicKeyCredentialCreationOptions $options): CredentialAttributes
     {
@@ -224,8 +194,6 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Creates the new public key credential for the current user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes  $attributes
      * @return \ClaudioDekker\LaravelAuth\MultiFactorCredential
      */
     protected function createPublicKeyCredential(Request $request, CredentialAttributes $attributes)

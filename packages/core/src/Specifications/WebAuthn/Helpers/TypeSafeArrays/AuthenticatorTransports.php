@@ -31,7 +31,6 @@ class AuthenticatorTransports implements JsonSerializable
     /**
      * Add a new item to the array.
      *
-     * @param  AuthenticatorTransport  $transport
      * @return $this
      */
     public function add(AuthenticatorTransport $transport): static
@@ -53,8 +52,6 @@ class AuthenticatorTransports implements JsonSerializable
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {

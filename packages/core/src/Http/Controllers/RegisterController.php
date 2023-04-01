@@ -23,8 +23,6 @@ abstract class RegisterController
     /**
      * Sends a response indicating that the user has successfully registered.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return mixed
      */
     abstract protected function sendRegisteredResponse(Request $request, Authenticatable $user);
@@ -32,7 +30,6 @@ abstract class RegisterController
     /**
      * Handle an incoming request to view the registration page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function create(Request $request)
@@ -43,7 +40,6 @@ abstract class RegisterController
     /**
      * Handle an incoming registration request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function store(Request $request)
@@ -57,9 +53,6 @@ abstract class RegisterController
 
     /**
      * Determine whether the registration attempt is password based.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isPasswordBasedRegistrationAttempt(Request $request): bool
     {
@@ -68,9 +61,6 @@ abstract class RegisterController
 
     /**
      * Authenticate the user into the application.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function authenticate(Authenticatable $user): void
     {
@@ -79,10 +69,6 @@ abstract class RegisterController
 
     /**
      * Determine the URL to redirect to once the user has been registered.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return string
      */
     protected function redirectUrl(Request $request, Authenticatable $user): string
     {
@@ -93,9 +79,6 @@ abstract class RegisterController
 
     /**
      * Send the email verification notification.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return void
      */
     protected function sendEmailVerificationNotification(Authenticatable $user): void
     {

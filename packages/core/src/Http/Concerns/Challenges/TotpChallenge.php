@@ -20,7 +20,6 @@ trait TotpChallenge
     /**
      * Sends a response indicating that the time-based one-time-password challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendTotpChallengeFailedResponse(Request $request);
@@ -28,7 +27,6 @@ trait TotpChallenge
     /**
      * Sends a response indicating that the time-based one-time-password challenge did not succeed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendTotpChallengeSuccessfulResponse(Request $request);
@@ -36,7 +34,6 @@ trait TotpChallenge
     /**
      * Handle a time-based one-time-password challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handleTotpChallengeRequest(Request $request)
@@ -63,8 +60,6 @@ trait TotpChallenge
     /**
      * Validate the time-based one-time-password challenge response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -77,11 +72,6 @@ trait TotpChallenge
 
     /**
      * Verify whether the time-based one-time-password is valid for the given secret.
-     *
-     * @param  mixed  $userId
-     * @param  string  $secret
-     * @param  string  $code
-     * @return bool
      */
     protected function verifyTotpCode(mixed $userId, string $secret, string $code): bool
     {
@@ -93,9 +83,6 @@ trait TotpChallenge
 
     /**
      * Resolve the User instance that the challenge is for.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUser(Request $request): Authenticatable
     {
@@ -104,9 +91,6 @@ trait TotpChallenge
 
     /**
      * Determine whether the request contains a valid time-based one-time-password.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function hasValidTotpCode(Request $request): bool
     {
@@ -120,9 +104,6 @@ trait TotpChallenge
 
     /**
      * Retrieve all active time-based one-time-password secrets for the given user ID.
-     *
-     * @param  mixed  $userId
-     * @return \Illuminate\Support\Collection
      */
     protected function getTotpSecrets(mixed $userId): Collection
     {

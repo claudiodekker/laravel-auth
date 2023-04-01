@@ -6,8 +6,6 @@ trait EmailBased
 {
     /**
      * The field name used to identify the user.
-     *
-     * @return string
      */
     protected function usernameField(): string
     {
@@ -16,8 +14,6 @@ trait EmailBased
 
     /**
      * Any flavor-specific validation rules used to validate a registration request.
-     *
-     * @return array
      */
     protected function registrationValidationRules(): array
     {
@@ -28,8 +24,6 @@ trait EmailBased
 
     /**
      * Any flavor-specific validation rules used to validate an authentication request.
-     *
-     * @return array
      */
     protected function authenticationValidationRules(): array
     {

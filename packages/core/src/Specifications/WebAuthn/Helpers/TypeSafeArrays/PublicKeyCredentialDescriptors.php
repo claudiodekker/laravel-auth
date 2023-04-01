@@ -30,9 +30,6 @@ class PublicKeyCredentialDescriptors implements JsonSerializable
 
     /**
      * Set a new item in the array.
-     *
-     * @param  PublicKeyCredentialDescriptor  $descriptor
-     * @return static
      */
     public function set(PublicKeyCredentialDescriptor $descriptor): static
     {
@@ -53,8 +50,6 @@ class PublicKeyCredentialDescriptors implements JsonSerializable
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {

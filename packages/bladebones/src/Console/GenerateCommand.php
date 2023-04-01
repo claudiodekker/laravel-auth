@@ -8,8 +8,6 @@ class GenerateCommand extends BaseGenerateCommand
 {
     /**
      * Determines the path to this package.
-     *
-     * @return string
      */
     protected function determinePackagePath(): string
     {
@@ -18,8 +16,6 @@ class GenerateCommand extends BaseGenerateCommand
 
     /**
      * Installs the package's authentication routes.
-     *
-     * @return void
      */
     protected function installRoutes(): void
     {
@@ -28,8 +24,6 @@ class GenerateCommand extends BaseGenerateCommand
 
     /**
      * Installs the package's authentication tests.
-     *
-     * @return void
      */
     protected function installTests(): void
     {
@@ -38,8 +32,6 @@ class GenerateCommand extends BaseGenerateCommand
 
     /**
      * Installs the package's authentication views.
-     *
-     * @return void
      */
     protected function installViews(): void
     {

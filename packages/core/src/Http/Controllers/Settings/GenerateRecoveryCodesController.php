@@ -13,7 +13,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Sends a response indicating that new recovery codes have been prepared.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
      * @return mixed
      */
@@ -22,7 +21,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Sends a response that displays the recovery code confirmation page.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendConfirmationPageResponse(Request $request);
@@ -30,7 +28,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Sends a response indicating that the new recovery codes have been configured.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendRecoveryCodesConfiguredResponse(Request $request);
@@ -38,7 +35,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Sends a response indicating that the recovery codes configuration state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidConfigurationStateResponse(Request $request);
@@ -46,7 +42,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Prepare the configuration of fresh recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function create(Request $request)
@@ -59,7 +54,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Sends a response indicating that the provided confirmation code is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidRecoveryCodeResponse(Request $request);
@@ -67,7 +61,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Display the view for confirming that the user has saved their recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function confirm(Request $request)
@@ -82,7 +75,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Confirm and finalize the generation of the recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function store(Request $request)
@@ -107,8 +99,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Validate the recovery code confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -132,9 +122,7 @@ abstract class GenerateRecoveryCodesController
     /**
      * Store the pending recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
-     * @return void
      */
     protected function setPendingRecoveryCodes(Request $request, $codes): void
     {
@@ -144,7 +132,6 @@ abstract class GenerateRecoveryCodesController
     /**
      * Retrieve the pending recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \ClaudioDekker\LaravelAuth\RecoveryCodeManager|null
      */
     protected function getPendingRecoveryCodes(Request $request)
@@ -154,9 +141,6 @@ abstract class GenerateRecoveryCodesController
 
     /**
      * Clear the pending recovery codes.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function clearPendingRecoveryCodes(Request $request): void
     {
@@ -166,9 +150,7 @@ abstract class GenerateRecoveryCodesController
     /**
      * Determine whether the user has entered a valid confirmation code.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
-     * @return bool
      */
     protected function hasValidRecoveryCode(Request $request, $codes): bool
     {
@@ -178,9 +160,7 @@ abstract class GenerateRecoveryCodesController
     /**
      * Configure the generated recovery codes.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
-     * @return void
      */
     protected function saveRecoveryCodes(Request $request, $codes): void
     {
@@ -192,9 +172,6 @@ abstract class GenerateRecoveryCodesController
 
     /**
      * Emits an event indicating that the user has generated new recovery codes.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function emitRecoveryCodesGeneratedEvent(Request $request): void
     {

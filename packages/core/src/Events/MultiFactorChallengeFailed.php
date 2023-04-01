@@ -11,9 +11,6 @@ class MultiFactorChallengeFailed
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  \ClaudioDekker\LaravelAuth\CredentialType  $type
      * @return void
      */
     public function __construct(

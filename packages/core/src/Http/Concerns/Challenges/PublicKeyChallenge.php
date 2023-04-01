@@ -28,7 +28,6 @@ trait PublicKeyChallenge
     /**
      * Sends a response indicating that the public key challenge state is invalid.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendInvalidPublicKeyChallengeStateResponse(Request $request);
@@ -36,7 +35,6 @@ trait PublicKeyChallenge
     /**
      * Sends a response indicating that the public key challenge did not succeed.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPublicKeyChallengeFailedResponse(Request $request);
@@ -44,16 +42,12 @@ trait PublicKeyChallenge
     /**
      * Sends a response indicating that the public key challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPublicKeyChallengeSuccessfulResponse(Request $request);
 
     /**
      * Determine the identifier used to track the public key challenge options state.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function publicKeyChallengeOptionsKey(Request $request): string
     {
@@ -62,9 +56,6 @@ trait PublicKeyChallenge
 
     /**
      * Resolve the User instance that the challenge is for.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUser(Request $request): Authenticatable
     {
@@ -75,10 +66,6 @@ trait PublicKeyChallenge
      * Initialize the public key challenge by generating challenge details.
      *
      * When no credentials are found, NULL will be returned, indicating that the challenge is not available.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Support\Collection|null  $allowedCredentials
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null
      */
     protected function initializePublicKeyChallenge(Request $request, Collection $allowedCredentials = null): ?PublicKeyCredentialRequestOptions
     {
@@ -96,7 +83,6 @@ trait PublicKeyChallenge
     /**
      * Handle a public key challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function handlePublicKeyChallengeRequest(Request $request)
@@ -130,8 +116,6 @@ trait PublicKeyChallenge
     /**
      * Validate the public key challenge confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -144,9 +128,6 @@ trait PublicKeyChallenge
 
     /**
      * Retrieve all active public key credentials for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \Illuminate\Support\Collection
      */
     protected function getPublicKeyCredentials(Authenticatable $user): Collection
     {
@@ -161,10 +142,6 @@ trait PublicKeyChallenge
      * Generate the challenge details used to perform the public key challenge.
      *
      * @link https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Support\Collection  $allowedCredentials
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions
      */
     protected function generatePublicKeyChallengeOptions(Request $request, Collection $allowedCredentials): PublicKeyCredentialRequestOptions
     {
@@ -176,10 +153,6 @@ trait PublicKeyChallenge
 
     /**
      * Temporarily store the challenge details used to perform the public key challenge confirmation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
-     * @return void
      */
     protected function setPublicKeyChallengeOptions(Request $request, PublicKeyCredentialRequestOptions $options): void
     {
@@ -188,9 +161,6 @@ trait PublicKeyChallenge
 
     /**
      * Retrieve the temporarily stored challenge details used to perform the public key challenge confirmation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null
      */
     protected function getPublicKeyChallengeOptions(Request $request): ?PublicKeyCredentialRequestOptions
     {
@@ -204,9 +174,6 @@ trait PublicKeyChallenge
 
     /**
      * Clear the temporarily stored challenge details used to perform the public key challenge confirmation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
      */
     protected function clearPublicKeyChallengeOptions(Request $request): void
     {
@@ -215,9 +182,6 @@ trait PublicKeyChallenge
 
     /**
      * Resolve the given user as a public key credential user entity instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @return \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity
      */
     protected function prepareUserEntity(Authenticatable $user): PublicKeyCredentialUserEntity
     {
@@ -231,9 +195,6 @@ trait PublicKeyChallenge
     /**
      * Validates the signed public key credential for the given public key challenge details.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
-     * @return \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException

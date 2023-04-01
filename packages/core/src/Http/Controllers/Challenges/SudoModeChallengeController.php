@@ -25,8 +25,6 @@ abstract class SudoModeChallengeController
     /**
      * Sends a response that displays the sudo-mode challenge page.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null  $options
      * @return mixed
      */
     abstract protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options);
@@ -34,7 +32,6 @@ abstract class SudoModeChallengeController
     /**
      * Sends a response indicating that sudo-mode has been enabled.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendSudoModeEnabledResponse(Request $request);
@@ -42,7 +39,6 @@ abstract class SudoModeChallengeController
     /**
      * Sends a response indicating that sudo-mode is currently not required.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendConfirmationNotRequiredResponse(Request $request);
@@ -50,7 +46,6 @@ abstract class SudoModeChallengeController
     /**
      * Display the sudo-mode challenge view.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function create(Request $request)
@@ -64,9 +59,6 @@ abstract class SudoModeChallengeController
 
     /**
      * Determine whether the user is able to confirm the sudo-mode challenge using their password.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function supportsPasswordBasedConfirmation(Request $request): bool
     {
@@ -76,7 +68,6 @@ abstract class SudoModeChallengeController
     /**
      * Verify the sudo-mode confirmation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -94,9 +85,6 @@ abstract class SudoModeChallengeController
 
     /**
      * Determines if the application has requested the user to enter sudo-mode.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function requiresConfirmation(Request $request): bool
     {
@@ -105,9 +93,6 @@ abstract class SudoModeChallengeController
 
     /**
      * Determine if the given request is a password based confirmation request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function isPasswordBasedConfirmationRequest(Request $request): bool
     {
@@ -117,7 +102,6 @@ abstract class SudoModeChallengeController
     /**
      * Sends a response indicating that the password challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendPasswordChallengeSuccessfulResponse(Request $request)
@@ -133,7 +117,6 @@ abstract class SudoModeChallengeController
     /**
      * Sends a response indicating that the public key challenge has succeeded.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function sendPublicKeyChallengeSuccessfulResponse(Request $request)
@@ -148,9 +131,6 @@ abstract class SudoModeChallengeController
      * Determine the URL that the user intended to visit (if any) prior to receiving a sudo-mode challenge.
      *
      * @see \Illuminate\Routing\Redirector::intended
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function intendedLocation(Request $request): string
     {
@@ -162,9 +142,6 @@ abstract class SudoModeChallengeController
 
     /**
      * Get the rate limiting throttle key for the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function throttleKey(Request $request): string
     {
@@ -173,9 +150,6 @@ abstract class SudoModeChallengeController
 
     /**
      * Determine the identifier used to track the public key challenge options state.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function publicKeyChallengeOptionsKey(Request $request): string
     {

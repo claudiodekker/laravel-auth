@@ -18,18 +18,11 @@ interface TotpContract
      * If the code is valid, we'll mark it as used as to prevent replay attacks.
      *
      * @param  int  $userId
-     * @param  string  $secret
-     * @param  string  $code
-     * @return bool
      */
     public function verify(mixed $userId, string $secret, string $code): bool;
 
     /**
      * Generate a QR Code Image instance for the given secret and owner.
-     *
-     * @param  string  $secret
-     * @param  string  $holder
-     * @return \ClaudioDekker\LaravelAuth\Support\QrImage
      */
     public function toQrImage(string $secret, string $holder): QrImage;
 }

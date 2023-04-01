@@ -38,8 +38,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Determines the path to the extending package.
-     *
-     * @return string
      */
     abstract protected function determinePackagePath(): string;
 
@@ -57,8 +55,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -80,8 +76,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Install the authentication scaffolding into the application.
-     *
-     * @return void
      */
     protected function install(): void
     {
@@ -98,29 +92,21 @@ abstract class GenerateCommand extends Command
 
     /**
      * Installs the extending package's authentication routes.
-     *
-     * @return void
      */
     abstract protected function installRoutes(): void;
 
     /**
      * Installs the extending package's authentication tests.
-     *
-     * @return void
      */
     abstract protected function installTests(): void;
 
     /**
      * Installs the extending package's authentication views.
-     *
-     * @return void
      */
     abstract protected function installViews(): void;
 
     /**
      * Installs the extending package's authentication controllers.
-     *
-     * @return void
      */
     protected function installControllers(): void
     {
@@ -140,8 +126,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Overrides some of the files in Laravel's application scaffolding with the core package's own versions.
-     *
-     * @return void
      */
     protected function installCoreOverrides(): void
     {
@@ -154,10 +138,6 @@ abstract class GenerateCommand extends Command
      * Renders a (Blade) Template from the extending package and writes it to an application path.
      *
      * @see static::determinePackagePath()
-     *
-     * @param  string  $template
-     * @param  string  $path
-     * @return bool
      */
     protected function generate(string $template, string $path): bool
     {
@@ -168,10 +148,6 @@ abstract class GenerateCommand extends Command
      * Copies a stub file from the extending package and writes it to the given application path.
      *
      * @see static::determinePackagePath()
-     *
-     * @param  string  $stub
-     * @param  string  $path
-     * @return bool
      */
     protected function copy(string $stub, string $path): bool
     {
@@ -194,11 +170,6 @@ abstract class GenerateCommand extends Command
      * Renders a (Blade) Template and writes it to an application path.
      *
      * @see static::generate()
-     *
-     * @param  string  $template
-     * @param  string  $path
-     * @param  string  $namespace
-     * @return bool
      */
     protected function rawGenerate(string $template, string $path, string $namespace = 'laravel-auth-core-templates'): bool
     {
@@ -217,10 +188,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Writes the given contents to the given file path.
-     *
-     * @param  string  $contents
-     * @param  string  $path
-     * @return bool
      */
     private function writeContentsToFile(string $contents, string $path): bool
     {
@@ -233,8 +200,6 @@ abstract class GenerateCommand extends Command
 
     /**
      * Determine the path at which the package is located.
-     *
-     * @return string
      */
     protected function determineCorePackageInstallationPath(): string
     {
