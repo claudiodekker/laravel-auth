@@ -1,0 +1,72 @@
+@php
+    $rateLimitingTrait = $withoutRateLimiting ? "WithoutRateLimitingTests" : "RateLimitingTests";
+    $verificationTrait = $withoutEmailVerification ? "RegisterWithoutVerificationEmailTests" : "RegisterWithVerificationEmailTests";
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+@endphp
+namespace Tests\Feature;
+
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
+use ClaudioDekker\LaravelAuth\Testing\EmailVerification\{{ $verificationTrait }};
+use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
+use ClaudioDekker\LaravelAuth\Testing\Flavors\{{ $flavorTrait }};
+use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
+use ClaudioDekker\LaravelAuth\Testing\LoginTests;
+use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
+use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RateLimiting\{{ $rateLimitingTrait }};
+use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
+use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
+use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
+use ClaudioDekker\LaravelAuth\Testing\RemoveCredentialTests;
+use ClaudioDekker\LaravelAuth\Testing\SubmitChangePasswordTests;
+use ClaudioDekker\LaravelAuth\Testing\SudoModeChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\ViewCredentialsOverviewPageTests;
+@if (! $withoutViews)
+use ClaudioDekker\LaravelAuthBladebones\Testing\BladeViewTests;
+@endif
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class AuthenticationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    // Configuration Mixins
+@php
+    $mixins = [
+        $flavorTrait,
+        $rateLimitingTrait,
+        $verificationTrait
+    ];
+
+    if (! $withoutViews) {
+        $mixins[] = "BladeViewTests";
+    }
+
+    asort($mixins);
+@endphp
+@foreach($mixins as $mixin)
+    use {{ $mixin }};
+@endforeach
+
+    // Basic Auth
+    use AccountRecoveryRequestTests;
+    use RegistrationTests;
+    use LoginTests;
+    use LogoutTests;
+
+    // Challenges
+    use AccountRecoveryChallengeTests;
+    use MultiFactorChallengeTests;
+    use SudoModeChallengeTests;
+
+    // Settings
+    use ViewCredentialsOverviewPageTests;
+    use EmailVerificationTests;
+    use GenerateRecoveryCodesTests;
+    use SubmitChangePasswordTests;
+    use RegisterPublicKeyCredentialTests;
+    use RegisterTotpCredentialTests;
+    use RemoveCredentialTests;
+}

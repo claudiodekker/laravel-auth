@@ -1,0 +1,51 @@
+name: Package Tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 8.1 ]
+        laravel: [ 8, 9 ]
+        stability: [ 'prefer-lowest', 'prefer-stable' ]
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} (w/ ${{ matrix.stability }})
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          ini-values: error_reporting=E_ALL
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Minimum PHP 8.1 Versions
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: |
+            composer require phpunit/phpunit:^9.5.8 --dev --${{ matrix.stability }} --no-update --no-interaction
+            composer require vlucas/phpdotenv:^5.3.1 --${{ matrix.stability }} --no-update --no-interaction
+        if: matrix.php >= 8.1 && matrix.stability == 'prefer-lowest'
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --${{ matrix.stability }} --no-interaction
+
+      - name: Execute tests
+        run: composer test

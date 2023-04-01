@@ -1,0 +1,107 @@
+namespace App\Http\Controllers\Auth\Settings;
+
+use ClaudioDekker\LaravelAuth\Http\Controllers\Settings\GenerateRecoveryCodesController as BaseController;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+
+class GenerateRecoveryCodesController extends BaseController
+{
+    /**
+     * Prepare the configuration of fresh recovery codes.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function create(Request $request): View
+    {
+        return parent::create($request);
+    }
+
+    /**
+     * Display the view for confirming that the user has saved their recovery codes.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    public function confirm(Request $request): View
+    {
+        return parent::confirm($request);
+    }
+
+    /**
+     * Confirm and finalize the generation of the recovery codes.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        return parent::store($request);
+    }
+
+    /**
+     * Sends a response indicating that new recovery codes have been prepared.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    protected function sendRecoveryCodesPreparedResponse(Request $request, $codes): View
+    {
+        return view('auth.settings.recovery_codes', [
+            'codes' => $codes->toArray(),
+        ]);
+    }
+
+    /**
+     * Sends a response that displays the recovery code confirmation page.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Contracts\View\View
+     */
+    protected function sendConfirmationPageResponse(Request $request): View
+    {
+        return view('auth.settings.confirm_recovery_codes');
+    }
+
+    /**
+     * Sends a response indicating that the new recovery codes have been configured.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
+     */
+    protected function sendRecoveryCodesConfiguredResponse(Request $request): RedirectResponse
+    {
+        return redirect()->route('auth.settings')->with('status', __('laravel-auth::auth.settings.recovery-configured'));
+    }
+
+    /**
+     * Sends a response indicating that the recovery codes configuration state is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function sendInvalidConfigurationStateResponse(Request $request): void
+    {
+        abort(428, 'The account recovery codes configuration state is invalid.');
+    }
+
+    /**
+     * Sends a response indicating that the provided confirmation code is invalid.
+     *
+     * {!! '@' !!}param  \Illuminate\Http\Request  $request
+     * {!! '@' !!}return void
+     *
+     * {!! '@' !!}throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendInvalidRecoveryCodeResponse(Request $request): void
+    {
+        throw ValidationException::withMessages([
+            'code' => __('laravel-auth::auth.challenge.recovery'),
+        ]);
+    }
+}

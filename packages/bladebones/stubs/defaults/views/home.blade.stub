@@ -1,0 +1,15 @@
+<h1>Authenticated as {{ Auth::user()->name }}</h1>
+
+@if (! Auth::user()->recovery_codes)
+  <h3 style="color: #FF0000;">You currently do not have any recovery codes configured</h3>
+@endif
+
+<a href="{{ route('auth.settings') }}">View Authentication Settings</a>
+
+<form method="POST" action="{{ route('logout') }}">
+  <input type="hidden" name="_method" value="DELETE">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+  <button type="submit">
+    Logout
+  </button>
+</form>

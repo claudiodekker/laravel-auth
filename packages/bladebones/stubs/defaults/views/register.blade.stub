@@ -1,0 +1,511 @@
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+  const BLADE_INJECTED_VARIABLES = {{ Illuminate\Support\Js::from([
+    "endpoint" => route("register"),
+    "headers" => [
+        "X-CSRF-TOKEN" => csrf_token(),
+    ],
+  ]) }};
+</script>
+
+<div style="border: 5px solid #FF0000; padding: 4px;">
+  <h2>You are using the barebones authentication views.</h2>
+  <p>
+    Don't worry, you didn't forget to run <i>npm run dev</i> or some other build process, and the installation of laravel-auth finished successfully.<br>
+    These views are intentionally kept extremely basic, to make it easier for you to understand the bare minimum required code, and to customize it to your own liking, without having to remove a bunch of default styling first.<br /><br />
+
+    If you want prettier default views, you can require and install a view-preset package (such as <a href="https://github.com/claudiodekker/laravel-auth-inertia" rel="noreferrer noopener" target="_blank">the inertia one</a>, which internally extends the laravel-auth package) instead.
+  </p>
+</div>
+
+<h1>Register</h1>
+<a href="{{ route('login') }}">Already registered?</a>
+
+<!-- Error Messages Component -->
+<script type="text/x-template" id="error-messages">
+  <div v-if="hasErrors">
+    An error has occurred.
+    <ul>
+      <li v-for="error in messages">@{{ error }}</li>
+    </ul>
+  </div>
+</script>
+<script>
+  const errorMessages = {
+    template: '#error-messages',
+    props: {
+      errors: {
+        required: true,
+      },
+    },
+    computed: {
+      hasErrors() {
+        return Object.keys(this.errors || {}).length > 0
+      },
+      messages() {
+        if (!this.hasErrors) {
+          return []
+        }
+
+        return Object.values(this.errors.errors || {}).reduce((carry, field) => carry.concat(field), [])
+      },
+    },
+  }
+</script>
+
+<!-- Passkey-based Register Form Component -->
+<script type="text/x-template" id="passkey-based-register-form">
+  <h2>Passkey-based registration</h2>
+
+  <error-messages :errors="errors" />
+  <template v-if="state === 'preparing'">
+    <h3>Please wait...</h3>
+    <span>Passkey-based registration is being prepared..</span>
+  </template>
+  <template v-else-if="state === 'waiting'">
+    <h3>Waiting for passkey</h3>
+    <span>Please follow your browser's instructions to register your account.</span>
+  </template>
+  <template v-else-if="state === 'submitting'">
+    <h2>Please wait...</h2>
+    <span>Your registration is being processed.</span>
+  </template>
+  <template v-else-if="state === 'failed'">
+    <h2>Passkey-based Registration Failed</h2>
+
+{{--    Note: This state this can instantly occur when you're on an "insecure" environment, without any logged errors.--}}
+
+{{--    To solve this, make sure that the following things are set up correctly:--}}
+{{--    - Your (local) environment is using a valid non-local domain name (e.g. my-laravel-app.test).--}}
+{{--    - The connection to the page is 100% secure (e.g. no mixed content / no requests to http:// at all).--}}
+{{--    - The relying_party configured in the app matches the domain name used.--}}
+
+{{--    On a local environment, you can use a self-signed certificate to get this to work. If you're using--}}
+{{--    Laravel Valet, you can easily configure one for this device by using the "valet secure" command.--}}
+
+    <form @submit.prevent="submit">
+      <button type="submit">
+        Try again
+      </button>
+    </form>
+  </template>
+  <template v-else>
+    <p>
+      This form allows you to register a new account without a password.
+      This uses the latest in account management technology, and provides the easiest and most secure way to access your account.
+      If you're not ready to use this, you can <a href="#" @click.prevent="toggleForm">register a password-based account instead</a>.
+    </p>
+    <form @submit.prevent="submit">
+      <label>
+        <span>Name</span>
+        <input v-model="form.name" type="text" name="name" required autofocus autocomplete="name" />
+      </label>
+      <label>
+        <span>Email</span>
+        <input v-model="form.email" type="email" name="email" required autocomplete="email" />
+      </label>
+      <button type="submit">
+        Register
+      </button>
+    </form>
+  </template>
+</script>
+<script>
+  const passkeyBasedRegisterForm = {
+    template: '#passkey-based-register-form',
+    emits: ['toggleForm'],
+    components: {
+      'error-messages': errorMessages,
+    },
+    props: {
+      endpoint: {
+        type: String,
+        required: true,
+      },
+      headers: {
+        type: Object,
+        default: () => ({}),
+      },
+    },
+    data: () => ({
+      state: 'default',
+      form: {
+        name: '',
+        email: '',
+      },
+      errors: null,
+      publicKeyCreationOptions: null,
+    }),
+    computed: {
+      /**
+       * Determines whether the form is currently busy.
+       */
+      processing() {
+        return this.state === 'preparing' || this.state === 'submitting'
+      },
+    },
+    methods: {
+      /**
+       * Toggles the form between passkey-based and password-based registration.
+       */
+      toggleForm() {
+        this.$emit('toggleForm')
+      },
+      /**
+       * This function encodes the attested credential (read: new credential), so that it can be used by the server.
+       *
+       * @see https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+       * @see https://www.w3.org/TR/webauthn-2/#authenticatorattestationresponse
+       */
+      prepareAttestationCredential(credential) {
+        const arrayBufferToBase64 = (input) => window.btoa(String.fromCharCode(...new Uint8Array(input)))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '')
+
+        return {
+          id: credential.id,
+          rawId: arrayBufferToBase64(credential.rawId),
+          response: {
+            clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+            /** https://www.w3.org/TR/webauthn-2/#authenticatorattestationresponse */
+            attestationObject: arrayBufferToBase64(credential.response.attestationObject),
+          },
+          type: credential.type,
+        }
+      },
+      /**
+       * This function uses the given public key creation options to create a new passkey.
+       */
+      async createPasskeyCredential(publicKeyCreationOptions) {
+        this.state = 'waiting'
+
+        // Using the given options, we'll ask the browser to handle the rest of the creation process.
+        // If something goes wrong (e.g. the user reject the request), a promise rejection (error) will be thrown here.
+        const credential = await navigator.credentials.create({
+          publicKey: publicKeyCreationOptions,
+        })
+
+        // Now that an attested credential is created, we'll prepare it for submission to the server.
+        return this.prepareAttestationCredential(credential)
+      },
+      /**
+       * Ensures that we have a generated credential, or create one if we haven't already.
+       */
+      async ensureCredentialCreated() {
+        if (this.credential) {
+          return
+        }
+
+        try {
+          this.credential = await this.createPasskeyCredential(this.publicKeyCreationOptions)
+        } catch (e) {
+          this.state = 'failed'
+          throw e
+        }
+      },
+      /**
+       * This function confirms the registration of the passkey-based user, by submitting the attested credential.
+       * Without this credential, our "claimed" user account will expire, as they won't be able to login.
+       */
+      async confirmPasskeyRegistration() {
+        // First, we'll make sure that the credential is created, or create one if we haven't already.
+        await this.ensureCredentialCreated()
+
+        // Then, we'll submit the registration attempt to the server.
+        this.state = 'submitting'
+
+        const response = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...this.headers,
+          },
+          body: JSON.stringify({
+            type: 'passkey',
+            credential: this.credential,
+          }),
+        })
+
+        // If the server somehow returned a validation error, we'll want to abort the process and show the error.
+        if (response.status === 422) {
+          this.errors = await response.json()
+          this.state = 'failed'
+          return
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 201) {
+          this.state = 'failed'
+          throw new Error('Failed to submit credential (unexpected response from server)')
+        }
+
+        // Finally, we'll redirect the user to their destination.
+        window.location.href = (await response.json()).redirect_url
+      },
+      /**
+       * This function decodes the options object encoded by the server, so that the browser's credential management API can use it.
+       *
+       * @see https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
+       */
+      preparePublicKeyCreationOptions(publicKeyOptions) {
+        const fixPadding = (input) => (input.length % 4 !== 0 ? input + '='.repeat(4 - (input.length % 4)) : input)
+        const normalizeBase64 = (input) => fixPadding(input.replace(/-/g, '+').replace(/_/g, '/'))
+        const base64Decode = (input) => window.atob(normalizeBase64(input))
+        const base64ToByteArray = (input) => Uint8Array.from([...base64Decode(input)].map((c) => c.charCodeAt(0)))
+
+        return {
+          ...publicKeyOptions,
+          challenge: base64ToByteArray(publicKeyOptions.challenge),
+          user: {
+            ...publicKeyOptions.user,
+            id: base64ToByteArray(publicKeyOptions.user.id),
+          },
+          excludeCredentials:
+            publicKeyOptions.excludeCredentials?.map((credential) => ({
+              ...credential,
+              id: base64ToByteArray(credential.id),
+            })) || [],
+        }
+      },
+      /**
+       * Claim a new passkey-based user, and initialize the passkey registration process for it.
+       */
+      async initializePasskeyRegistration() {
+        this.state = 'preparing'
+
+        // First, we'll attempt to claim the user account details, and retrieve
+        // the public key creation options that are relevant for it.
+        const response = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...this.headers,
+          },
+          body: JSON.stringify({
+            ...this.form,
+            type: 'passkey',
+          }),
+        })
+
+        // When the session has expired, reload the page.
+        if (response.status === 419) {
+          window.location.reload()
+          return
+        }
+
+        // If the server returned a validation error, we'll want to display it to the user.
+        if (response.status === 422) {
+          this.errors = await response.json()
+          this.state = 'default'
+          return null
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 200) {
+          this.state = 'default'
+          throw new Error('Failed to register passkey-based user (unexpected response from server)')
+        }
+
+        // If we've made it this far, we've successfully claimed the user, and obtained the public key creation options.
+        // Next, we'll want to prepare them, so that they can be used by the browser's credential management.
+        this.publicKeyCreationOptions = this.preparePublicKeyCreationOptions(await response.json())
+
+        // Finally, we'll kick of the confirmation process.
+        await this.confirmPasskeyRegistration()
+      },
+      /**
+       * Handles the registration process when the user submits the form.
+       */
+      async submit() {
+        if (this.processing) {
+          return
+        }
+
+        this.errors = null
+
+        if (this.publicKeyCreationOptions) {
+          await this.confirmPasskeyRegistration()
+          return
+        }
+
+        await this.initializePasskeyRegistration()
+      },
+    },
+  }
+</script>
+
+<!-- Password-based Register Component -->
+<script type="text/x-template" id="password-based-register-form">
+  <error-messages :errors="errors" />
+  <h2>Password-based registration</h2>
+  <p>
+    This form allows you to register a new account using an username and password combination.
+    <template v-if="isWebAuthnSupported">
+        While this is what most people are still used to, we highly recommended to <a href="#" @click.prevent="toggleForm">register using a passkey instead</a>.
+    </template>
+  </p>
+  <form @submit.prevent="submit">
+    <label>
+      <span>Name</span>
+      <input v-model="form.name" type="text" name="name" required autofocus autocomplete="name" />
+    </label>
+    <label>
+      <span>Email</span>
+      <input v-model="form.email" type="email" name="email" required autocomplete="email" />
+    </label>
+    <label>
+      <span>Password</span>
+      <input v-model="form.password" type="password" name="password" autocomplete="new-password" />
+    </label>
+    <label>
+      <span>Confirm Password</span>
+      <input v-model="form.password_confirmation" type="password" name="password_confirmation" />
+    </label>
+    <button type="submit">
+      Register
+    </button>
+  </form>
+</script>
+<script>
+  const passwordBasedRegisterForm = {
+    template: '#password-based-register-form',
+    emits: ['toggleForm'],
+    components: {
+      'error-messages': errorMessages,
+    },
+    props: {
+      endpoint: {
+        type: String,
+        required: true,
+      },
+      headers: {
+        type: Object,
+        default: () => ({}),
+      },
+      isWebAuthnSupported: {
+        type: Boolean,
+        required: true,
+      },
+    },
+    data: () => ({
+      processing: false,
+      form: {
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+      },
+      errors: null,
+    }),
+    methods: {
+      /**
+       * Clears the form's password and password confirmation input fields.
+       */
+      clearPasswordFields() {
+        this.form.password = ''
+        this.form.password_confirmation = ''
+      },
+      /**
+       * Toggles the form between passkey-based and password-based registration.
+       */
+      toggleForm() {
+        this.clearPasswordFields()
+        this.$emit('toggleForm')
+      },
+      /**
+       * Handles the registration process when the user submits the form.
+       */
+      async submit() {
+        if (this.processing) {
+          return
+        }
+
+        this.errors = null
+        this.processing = true
+
+        const payload = {
+          name: this.form.name,
+          email: this.form.email,
+          password: this.form.password,
+          password_confirmation: this.form.password_confirmation,
+        }
+
+        this.clearPasswordFields()
+
+        // Submit the registration request to the server.
+        const response = await fetch(this.endpoint, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            ...this.headers,
+          },
+          body: JSON.stringify(payload),
+        })
+
+        // When the session has expired, reload the page.
+        if (response.status === 419) {
+          window.location.reload()
+          return
+        }
+
+        // If the server returned a validation error, we'll want to display it to the user.
+        if (response.status === 422) {
+          this.errors = await response.json()
+          this.processing = false
+          return
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 201) {
+          this.processing = false
+          throw new Error('Failed to register account (unexpected response from server)')
+        }
+
+        // If registration succeeded, manually redirect the user there.
+        window.location.href = (await response.json()).redirect_url
+      },
+    },
+  }
+</script>
+
+<!-- Root Page Component -->
+<div id="app">JavaScript is required to create an account.</div>
+<script type="text/x-template" id="vue-register-root">
+  <passkey-based-register-form v-if="isWebAuthnSupported && passkeyBased" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @toggleForm="toggleForm"  />
+  <password-based-register-form v-else :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" :is-webauthn-supported="isWebAuthnSupported" @toggleForm="toggleForm" />
+</script>
+<script>
+  const { createApp } = Vue
+
+  createApp({
+    template: '#vue-register-root',
+    components: {
+      'passkey-based-register-form': passkeyBasedRegisterForm,
+      'password-based-register-form': passwordBasedRegisterForm,
+    },
+    data: () => ({
+      bladeVariables: BLADE_INJECTED_VARIABLES,
+      passkeyBased: false,
+    }),
+    computed: {
+      /*
+       * Determines whether this browser supports WebAuthn (passkey credentials).
+       */
+      isWebAuthnSupported() {
+        return typeof navigator.credentials !== 'undefined' && typeof window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
+      },
+    },
+    methods: {
+      /**
+       * Toggles between the password-based and passkey-based registration forms.
+       */
+      toggleForm() {
+        this.passkeyBased ^= true
+      },
+    },
+  }).mount('#app')
+</script>

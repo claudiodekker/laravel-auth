@@ -1,0 +1,244 @@
+<h1>Multi-factor authentication</h1>
+@if ($errors->any())
+  <ul>
+    @foreach ($errors->all() as $error)
+      <li>{{ $error }}</li>
+    @endforeach
+  </ul>
+@endif
+
+@if ($availableMethods->contains(\ClaudioDekker\LaravelAuth\CredentialType::PUBLIC_KEY))
+  <h2>Security Key</h2>
+
+  <p>When you are ready to authenticate, press the button below.</p>
+
+  <form id="security_key_verification_form" method="POST" onsubmit="return interceptFormSubmission(event, verifySecurityKey)">
+    <div id="security_key_verification_default">
+      <button type="submit">
+        Use Security Key
+      </button>
+    </div>
+    <div style="display:none;" id="security_key_verification_waiting">
+      <h2>Waiting for security key</h2>
+    </div>
+    <div style="display:none;" id="security_key_verification_submitting">
+      <h2>Verifying...</h2>
+    </div>
+    <div style="display: none;" id="security_key_verification_failed">
+      <h2>Security key verification failed.</h2>
+      {{--
+        Note: This state this can instantly occur when you're on an "insecure" environment, without any logged errors.
+
+        To solve this, make sure that the following things are set up correctly:
+        - Your (local) environment is using a valid non-local domain name (e.g. my-laravel-app.test).
+        - The connection to the page is 100% secure (e.g. no mixed content / no requests to http:// at all).
+        - The relying_party configured in the app matches the domain name used.
+
+        On a local environment, you can use a self-signed certificate to get this to work. If you're using
+        Laravel Valet, you can easily configure one for this device by using the "valet secure" command.
+      --}}
+      <button type="submit">
+        Retry security key
+      </button>
+    </div>
+  </form>
+  <div style="display:none;" id="security_keys_unsupported">
+    <h2>Unsupported Browser</h2>
+    <span>This browser doesn't support security keys yet. Please try a different browser, or use a different method to authenticate.</span>
+    {{-- https://caniuse.com/credential-management --}}
+  </div>
+
+  <script>
+    /**
+     * Determines whether WebAuthn / Public Key Credentials are supported by this browser.
+     */
+    const isWebAuthnSupported = () => typeof navigator.credentials !== "undefined" && typeof window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable === 'function';
+
+    /**
+     * This function prevents a <html> form from submitting, and instead calls the callback function.
+     */
+    const interceptFormSubmission = (event, callback) => {
+      // First, we'll instruct the browser to not actually submit the <form>.
+      event.preventDefault();
+
+      // Then, we'll call our callback.
+      callback();
+
+      // Finally, we'll also return false, as to stop the form submission event from firing any further.
+      // This is very similar to event.preventDefault(), but does other stuff as well.
+      return false;
+    }
+
+    /**
+     * This function updates our UI to display the state that the verification process is in to the user.
+     *
+     * In a JavaScript app that uses for example Vue or React, this will likely be handled for you reactively.
+     */
+    const showUserInterfaceState = (state) => {
+      document.getElementById("security_key_verification_form").style.display = "block";
+      document.getElementById("security_key_verification_default").style.display = "none";
+      document.getElementById("security_key_verification_waiting").style.display = "none";
+      document.getElementById("security_key_verification_submitting").style.display = "none";
+      document.getElementById("security_key_verification_failed").style.display = "none";
+
+      if (state === "unsupported") {
+        document.getElementById("security_key_verification_form").style.display = "none";
+        document.getElementById("security_keys_unsupported").style.display = "block";
+        return;
+      }
+
+      document.getElementById("security_key_verification_" + state).style.display = "block";
+    }
+
+    /**
+     * This function decodes the server-side encoded options object, so that any connected security keys can use it.
+     *
+     * @see https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
+     */
+    const preparePublicKeyRequestOptions = options => {
+      const fixPadding = input => input.length % 4 !== 0 ? input + "=".repeat(4 - input.length % 4) : input;
+      const normalizeBase64 = input => fixPadding(input.replace(/-/g, '+').replace(/_/g, '/'));
+      const base64Decode = input => window.atob(normalizeBase64(input));
+      const base64ToByteArray = input => Uint8Array.from([... base64Decode(input)].map(c => c.charCodeAt(0)))
+
+      return {
+        ... options,
+        challenge: base64ToByteArray(options.challenge),
+        allowCredentials: (options.allowCredentials?.map(credential => ({
+          ... credential,
+          id: base64ToByteArray(credential.id),
+        })) || []),
+      }
+    };
+
+    /**
+     * This function encodes the asserted credential (read: signed challenge), so that it can be used by the server.
+     *
+     * @see https://www.w3.org/TR/webauthn-2/#iface-pkcredential
+     * @see https://www.w3.org/TR/webauthn-2/#iface-authenticatorassertionresponse
+     */
+    const prepareAssertionCredential = credential => {
+      const arrayBufferToBase64 = input => window.btoa(String.fromCharCode(... new Uint8Array(input)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '')
+
+      return {
+        id: credential.id,
+        rawId: arrayBufferToBase64(credential.rawId),
+        response: {
+          clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+          /** @see https://www.w3.org/TR/webauthn-2/#iface-authenticatorassertionresponse */
+          authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
+          signature: arrayBufferToBase64(credential.response.signature),
+          userHandle: (credential.response.userHandle ? arrayBufferToBase64(credential.response.userHandle) : null),
+        },
+        type: credential.type,
+      }
+    };
+
+    /**
+     * This function handles the process that generates an asserted credential (read: signed challenge).
+     */
+    const generateAssertionCredential = async () => {
+      // First, we'll prepare the options variable that we've received from the back-end.
+      // These options will be used to identify the security key, and to sign the challenge using the right credential.
+      const options = preparePublicKeyRequestOptions({{ Illuminate\Support\Js::from($options->jsonSerialize()) }});
+
+      // Now, with the options prepared, we'll ask the browser to handle the rest of the signing process.
+      // If something goes wrong (e.g. the user reject the request), a promise rejection (error) will be thrown here.
+      const credential = await navigator.credentials.get({
+        publicKey: options,
+      });
+
+      // Now that the asserted credential is generated, we'll prepare it for submission to the server.
+      return prepareAssertionCredential(credential);
+    }
+
+    /**
+     * This function handles the full security key authentication flow.
+     */
+    const verifySecurityKey = async () => {
+      // First, we'll update the UI to show that we're waiting for the user to interact with their security key.
+      showUserInterfaceState("waiting");
+
+      try {
+        // Next, we'll actually generate the (asserted) credential, and prepare it for submission.
+        // Within the WebAuthn standard, an asserted credential is a challenge that has been signed by a security key.
+        const credential = await generateAssertionCredential();
+
+        // Now that the asserted credential has been generated, we'll update our UI to show that we're submitting it.
+        showUserInterfaceState("submitting");
+
+        // Then, we'll actually submit the asserted credential to the server.
+        const response = await fetch("{{ route("login.challenge.multi_factor") }}", {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+          },
+          body: JSON.stringify({
+            credential: credential,
+          }),
+        });
+
+        // If we've hit 403, that likely means we've been signed out.
+        // The easiest way to solve this is to reload the current page.
+        if (response.status === 403) {
+          window.location.reload();
+          return;
+        }
+
+        // Otherwise, we'll want to make sure we haven't received a different, unexpected error.
+        if (response.status !== 200) {
+          throw new Error("Failed to authenticate using security key (unexpected response from server)");
+        }
+
+        // If we've made it this far, we've successfully authenticated using the security key.
+        // As such, we'll redirect the to their intended location.
+        window.location.href = "{{ $intendedLocation }}";
+      } catch (e) {
+        // If at any point something failed, we'll log the error to the browser's console, and show the failed UI.
+        showUserInterfaceState("failed");
+        console.error(e)
+      }
+    };
+
+    // While defined last, this check will run as soon as the page is loaded.
+    if (! isWebAuthnSupported()) {
+      showUserInterfaceState("unsupported");
+    }
+  </script>
+  <hr />
+@endif
+
+@if ($availableMethods->contains(\ClaudioDekker\LaravelAuth\CredentialType::TOTP))
+  <h2>Authentication code</h2>
+
+  <form method="POST" action="{{ route('login.challenge.multi_factor') }}">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+    <label>
+      <span>Authentication Token</span>
+      <input type="text" name="code" placeholder="6-digit code" inputmode="numeric" pattern="[0-9]*" minlength="6" maxlength="6" required autocomplete="one-time-code" />
+    </label>
+    <button type="submit">
+      Verify
+    </button>
+  </form>
+
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        // Auto-submit the 2FA token when it's instantly auto-filled (by a password manager)
+        // This allows for a seamless (yet secure) sign-in experience for the user.
+        if (document.querySelector('input[name="code"]').value.length === 6) {
+          document.querySelector('button[type="submit"]').click()
+        }
+      }, 25)
+    })
+  </script>
+
+
+  <p>Open the two-factor authenticator (TOTP) app on your mobile device to view your authentication code. </p>
+@endif
