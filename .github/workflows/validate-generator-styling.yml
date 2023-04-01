@@ -41,10 +41,16 @@ jobs:
           max_attempts: 5
           command: composer create-project laravel/laravel app "10.x" --remove-vcs --prefer-dist --no-interaction
 
-      - name: Install Package
+      - name: Relax dependency constraint for claudiodekker/laravel-auth-core
         run: |
-          composer config repositories.library path ../monorepo/core
-          composer config repositories.adapter path ../monorepo/bladebones
+          sed -i "s/\"claudiodekker\/laravel-auth-core\": \".*\"/\"claudiodekker\/laravel-auth-core\": \"\*\"/" composer.json
+        working-directory: ./monorepo/packages/bladebones
+
+      - name: Install Library & Bladebones Adapter
+        run: |
+          composer config minimum-stability dev
+          composer config repositories.library path ../monorepo/packages/core
+          composer config repositories.adapter path ../monorepo/packages/bladebones
           composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones
         working-directory: ./app
 

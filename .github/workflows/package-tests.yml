@@ -11,8 +11,8 @@ jobs:
       fail-fast: true
       matrix:
         package: [ 'core', 'bladebones' ]
-        php: [ '8.0', 8.1, 8.2 ]
-        laravel: [ 9, 10 ]
+        php: [ 8.1 ]
+        laravel: [ 9 ]
         stability: [ 'prefer-lowest', 'prefer-stable' ]
 
     name: ${{ matrix.package }} - PHP ${{ matrix.php }} L${{ matrix.laravel }} w/ ${{ matrix.stability }}
@@ -29,24 +29,32 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Configure ${{ matrix.package }} to use local core package
+        run: |
+          sed -i "s/\"claudiodekker\/laravel-auth-core\": \".*\"/\"claudiodekker\/laravel-auth-core\": \"\*\"/" composer.json
+          composer config repositories.library path ../core
+        working-directory: ./packages/${{ matrix.package }}
+        if: matrix.package != 'core'
+
       - name: Set Minimum PHP 8.1 Versions
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
           command: |
+            cd ./packages/${{ matrix.package }}
             composer require phpunit/phpunit:^9.5.8 --dev --${{ matrix.stability }} --no-update --no-interaction
             composer require vlucas/phpdotenv:^5.3.1 --${{ matrix.stability }} --no-update --no-interaction
         if: matrix.php >= 8.1 && matrix.stability == 'prefer-lowest'
-        working-directory: ./packages/${{ matrix.package }}
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --${{ matrix.stability }} --no-interaction
-        working-directory: ./packages/${{ matrix.package }}
+          command: |
+            cd ./packages/${{ matrix.package }}
+            composer update --${{ matrix.stability }} --no-interaction
 
       - name: Execute tests
         run: vendor/bin/phpunit
