@@ -23,5 +23,5 @@ jobs:
             repository_organization: 'claudiodekker'
             repository_name: 'laravel-auth-${{ matrix.package }}'
             branch: '${{ github.ref_name }}'
-            user_name: "CI Publisher"
+            user_name: "Publisher"
             user_email: "publisher@ubient.net"
