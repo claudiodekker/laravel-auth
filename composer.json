@@ -7,12 +7,12 @@
         }
     ],
     "require": {
+        "ext-json": "*",
+        "php": "~8.1.0|~8.2.0",
+        "laravel/framework": "^9.0|^10.0",
         "bacon/bacon-qr-code": "^2.0",
         "claudiodekker/word-generator": "^1.0",
-        "ext-json": "*",
-        "laravel/framework": "^9.0",
         "nyholm/psr7": "^1.5",
-        "php": "~8.1.0",
         "pragmarx/google2fa": "^8.0",
         "symfony/psr-http-message-bridge": "^2.1",
         "web-auth/webauthn-lib": "^4.0"

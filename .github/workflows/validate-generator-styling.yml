@@ -39,7 +39,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer create-project laravel/laravel app "9.x" --remove-vcs --prefer-dist --no-interaction
+          command: composer create-project laravel/laravel app "10.x" --remove-vcs --prefer-dist --no-interaction
 
       - name: Relax dependency constraint for claudiodekker/laravel-auth-core
         run: |
