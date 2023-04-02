@@ -1,0 +1,27 @@
+name: 'Split monorepo'
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [ 'core', 'bladebones' ]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: "danharrin/monorepo-split-github-action@v2.3.0"
+        env:
+          GITHUB_TOKEN: ${{ secrets.MONOREPO_SPLITTER_PERSONAL_ACCESS_TOKEN }}
+        with:
+            package_directory: 'packages/${{ matrix.package }}'
+            repository_organization: 'claudiodekker'
+            repository_name: 'laravel-auth-${{ matrix.package }}'
+            branch: '${{ github.ref_name }}'
+            user_name: "CI Publisher"
+            user_email: "publisher@ubient.net"
