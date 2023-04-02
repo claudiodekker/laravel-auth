@@ -39,9 +39,6 @@ class SudoModeChallengeController extends BaseController
 @endif
     /**
      * Display the sudo-mode challenge view.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function create(Request $request): View
     {
@@ -50,9 +47,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Verify the sudo-mode confirmation request.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -61,10 +55,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Sends a response that displays the sudo-mode challenge page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null  $options
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options): View
     {
@@ -76,9 +66,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Sends a response indicating that sudo-mode has been enabled.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     protected function sendSudoModeEnabledResponse(Request $request): JsonResponse
     {
@@ -90,9 +77,6 @@ class SudoModeChallengeController extends BaseController
     /**
      * Sends a response indicating that sudo-mode is currently not required.
      *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
-     *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function sendConfirmationNotRequiredResponse(Request $request): void
@@ -102,9 +86,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Sends a response indicating that the password challenge did not succeed.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
@@ -118,9 +99,6 @@ class SudoModeChallengeController extends BaseController
     /**
      * Sends a response indicating that the public key challenge state is invalid.
      *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
-     *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function sendInvalidPublicKeyChallengeStateResponse(Request $request): void
@@ -130,9 +108,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Sends a response indicating that the public key challenge did not succeed.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
@@ -146,10 +121,6 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  int  $availableInSeconds
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */

@@ -43,9 +43,6 @@ class MultiFactorChallengeController extends BaseController
 @endif
     /**
      * Handle an incoming request to view the multi-factor challenge page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function create(Request $request): View|RedirectResponse
     {
@@ -54,9 +51,6 @@ class MultiFactorChallengeController extends BaseController
 
     /**
      * Handle an incoming multi-factor challenge confirmation request.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -65,11 +59,6 @@ class MultiFactorChallengeController extends BaseController
 
     /**
      * Sends a response that displays the multi-factor challenge page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions|null  $options
-     * {!! '@' !!}param  \Illuminate\Support\Collection  $availableCredentialTypes
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options, Collection $availableCredentialTypes): View
     {
@@ -82,11 +71,6 @@ class MultiFactorChallengeController extends BaseController
 
     /**
      * Sends a response indicating that the user has been successfully authenticated.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * {!! '@' !!}param  string  $intendedUrl
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     protected function sendAuthenticatedResponse(Request $request, Authenticatable $user, string $intendedUrl): JsonResponse|RedirectResponse
     {
@@ -104,9 +88,6 @@ class MultiFactorChallengeController extends BaseController
     /**
      * Sends a response indicating that the public key credential challenge state is invalid.
      *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
-     *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function sendInvalidPublicKeyChallengeStateResponse(Request $request): void
@@ -119,9 +100,6 @@ class MultiFactorChallengeController extends BaseController
      *
      * This can be for a large number of reasons, including (but not limited to) a malformed request,
      * a non-existent credential, an invalid signature or confirmation code etc.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
@@ -141,10 +119,6 @@ class MultiFactorChallengeController extends BaseController
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  int  $availableInSeconds
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */

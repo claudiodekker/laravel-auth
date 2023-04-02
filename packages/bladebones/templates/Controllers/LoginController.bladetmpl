@@ -42,9 +42,6 @@ class LoginController extends BaseController
 @endif
     /**
      * Display the login view.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function create(Request $request): View
     {
@@ -53,9 +50,6 @@ class LoginController extends BaseController
 
     /**
      * Handle an incoming authentication request.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -64,9 +58,6 @@ class LoginController extends BaseController
 
     /**
      * Sign the user out of the application.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -75,10 +66,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response that displays the login page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions  $options
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     protected function sendLoginPageResponse(Request $request, PublicKeyCredentialRequestOptions $options): View
     {
@@ -89,10 +76,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response indicating that the user has been authenticated successfully.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     protected function sendAuthenticatedResponse(Request $request, Authenticatable $user): JsonResponse
     {
@@ -103,9 +86,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response indicating that authentication has failed.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
@@ -118,10 +98,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response indicating that the user needs to confirm a 2FA challenge.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\CredentialType  $preferredMethod
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     protected function sendMultiFactorChallengeResponse(Request $request, CredentialType $preferredMethod): JsonResponse
     {
@@ -133,9 +109,6 @@ class LoginController extends BaseController
     /**
      * Sends a response indicating that the passkey authentication state is invalid.
      *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
-     *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     protected function sendInvalidPasskeyAuthenticationStateResponse(Request $request): void
@@ -145,9 +118,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response indicating that the user has been signed out.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendLoggedOutResponse(Request $request): RedirectResponse
     {
@@ -157,10 +127,6 @@ class LoginController extends BaseController
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  int  $availableInSeconds
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */

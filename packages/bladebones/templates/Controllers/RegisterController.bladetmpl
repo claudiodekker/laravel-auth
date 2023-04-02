@@ -50,9 +50,6 @@ class RegisterController extends BaseController
 @endif
     /**
      * Display the registration view.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function create(Request $request): View
     {
@@ -61,9 +58,6 @@ class RegisterController extends BaseController
 
     /**
      * Handle an incoming registration request.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request): JsonResponse
     {
@@ -72,10 +66,6 @@ class RegisterController extends BaseController
 
     /**
      * Sends a response indicating that the passkey-based registration process has been initialized.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions  $options
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     protected function sendPasskeyBasedRegistrationInitializedResponse(Request $request, PublicKeyCredentialCreationOptions $options): JsonResponse
     {
@@ -84,9 +74,6 @@ class RegisterController extends BaseController
 
     /**
      * Sends a response indicating that the passkey-based registration state is invalid.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -97,9 +84,6 @@ class RegisterController extends BaseController
 
     /**
      * Sends a response indicating that the signed passkey is not valid.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
@@ -112,10 +96,6 @@ class RegisterController extends BaseController
 
     /**
      * Sends a response indicating that the user has successfully registered.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * {!! '@' !!}return \Illuminate\Http\JsonResponse
      */
     protected function sendRegisteredResponse(Request $request, Authenticatable $user): JsonResponse
     {
