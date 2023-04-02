@@ -47,7 +47,7 @@
         }
     },
     "replace": {
-        "claudiodekker/laravel-auth": "self.version",
+        "claudiodekker/laravel-auth-core": "self.version",
         "claudiodekker/laravel-auth-bladebones": "self.version"
     },
     "minimum-stability": "dev",
