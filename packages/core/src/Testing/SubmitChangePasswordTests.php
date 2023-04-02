@@ -44,7 +44,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['current_password' => ['The current password field is required.']], $response->exception->errors());
+        $this->assertSame(['current_password' => [__('validation.required', ['attribute' => 'current password'])]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }
@@ -65,7 +65,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['current_password' => ['The password is incorrect.']], $response->exception->errors());
+        $this->assertSame(['current_password' => [__('validation.current_password')]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }
@@ -85,7 +85,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['new_password' => ['The new password field is required.']], $response->exception->errors());
+        $this->assertSame(['new_password' => [__('validation.required', ['attribute' => 'new password'])]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }
@@ -105,7 +105,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['new_password' => ['The new password confirmation does not match.']], $response->exception->errors());
+        $this->assertSame(['new_password' => [__('validation.confirmed', ['attribute' => 'new password'])]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }
@@ -126,7 +126,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['new_password' => ['The new password confirmation does not match.']], $response->exception->errors());
+        $this->assertSame(['new_password' => [__('validation.confirmed', ['attribute' => 'new password'])]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }
@@ -147,7 +147,7 @@ trait SubmitChangePasswordTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['new_password' => ['The new password must be at least 8 characters.']], $response->exception->errors());
+        $this->assertSame(['new_password' => [__('validation.min.string', ['attribute' => 'new password', 'min' => 8])]], $response->exception->errors());
         $this->assertTrue(password_verify('password', $user->fresh()->password));
         Event::assertNothingDispatched();
     }

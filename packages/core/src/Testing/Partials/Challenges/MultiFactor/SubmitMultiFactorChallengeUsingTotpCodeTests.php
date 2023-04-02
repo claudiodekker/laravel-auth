@@ -28,7 +28,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response = $this->postJson(route('login.challenge.multi_factor'));
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code field is required.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
     }
 
@@ -43,7 +43,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response = $this->postJson(route('login.challenge.multi_factor'), ['code' => true]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code must be a string.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
         Event::assertNothingDispatched();
     }

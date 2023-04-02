@@ -64,7 +64,7 @@ trait SubmitAccountRecoveryRequestTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email field is required.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
         $response->assertSessionMissing('status');
         Notification::assertNothingSent();
     }

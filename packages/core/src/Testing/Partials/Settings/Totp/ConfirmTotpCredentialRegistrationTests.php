@@ -48,7 +48,7 @@ trait ConfirmTotpCredentialRegistrationTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code field is required.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertCount(0, MultiFactorCredential::all());
     }
 
@@ -65,7 +65,7 @@ trait ConfirmTotpCredentialRegistrationTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code must be a string.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertCount(0, MultiFactorCredential::all());
     }
 
@@ -82,7 +82,7 @@ trait ConfirmTotpCredentialRegistrationTests
             ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code must be 6 characters.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.size.string', ['attribute' => 'code', 'size' => 6])]], $response->exception->errors());
         $this->assertCount(0, MultiFactorCredential::all());
     }
 

@@ -27,7 +27,7 @@ trait LoginRateLimitingTests
         $response = $this->submitPasswordBasedLoginAttempt();
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['Too many login attempts. Please try again in 75 seconds.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('auth.throttle', ['seconds' => 75])]], $response->exception->errors());
         $this->assertGuest();
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
@@ -106,7 +106,7 @@ trait LoginRateLimitingTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['Too many login attempts. Please try again in 75 seconds.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('auth.throttle', ['seconds' => 75])]], $response->exception->errors());
         $this->assertGuest();
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(AuthenticationFailed::class);

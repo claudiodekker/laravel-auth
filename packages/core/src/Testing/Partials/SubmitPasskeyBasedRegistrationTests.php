@@ -90,7 +90,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name field is required.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -101,7 +101,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name must be a string.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -112,7 +112,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -143,7 +143,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email field is required.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -154,7 +154,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -164,7 +164,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => 'foo']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email must be a valid email address.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
