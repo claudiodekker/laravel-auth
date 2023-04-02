@@ -3,9 +3,7 @@
     "authors": [
         {
             "name": "Claudio Dekker",
-            "email": "claudio@ubient.net",
-            "homepage": "https://ubient.net",
-            "role": "Developer"
+            "email": "claudio@ubient.net"
         }
     ],
     "require": {
@@ -47,8 +45,8 @@
         }
     },
     "replace": {
-        "claudiodekker/laravel-auth-core": "self.version",
-        "claudiodekker/laravel-auth-bladebones": "self.version"
+        "claudiodekker/laravel-auth-bladebones": "self.version",
+        "claudiodekker/laravel-auth-core": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
