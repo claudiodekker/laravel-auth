@@ -60,7 +60,7 @@ trait ConfirmRecoveryCodesGenerationTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code']),]], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertNull($user->fresh()->recovery_codes);
         Event::assertNothingDispatched();
     }
