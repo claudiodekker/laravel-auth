@@ -80,7 +80,6 @@ class GoogleTwoFactorAuthenticator implements TotpContract
      * Generates a currently valid time-based one-time-password for the given secret.
      * This method is only intended to be used within your tests.
      *
-     *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
      */
     public function testCode(string $secret): string

@@ -60,7 +60,6 @@ trait TotpChallenge
     /**
      * Validate the time-based one-time-password challenge response.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validateTotpChallengeRequest(Request $request): void

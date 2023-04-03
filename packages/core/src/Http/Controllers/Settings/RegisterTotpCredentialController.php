@@ -61,6 +61,8 @@ abstract class RegisterTotpCredentialController
     /**
      * Initialize the registration of a new time-based one-time-password credential.
      *
+     * @see static::sendRegistrationInitializedResponse()
+     *
      * @return mixed
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
@@ -75,6 +77,9 @@ abstract class RegisterTotpCredentialController
     /**
      * Display the view for confirming the time-based one-time-password credential registration.
      *
+     * @see static::sendInvalidRegistrationStateResponse()
+     * @see static::sendConfirmationPageResponse()
+     *
      * @return mixed
      */
     public function confirm(Request $request)
@@ -88,6 +93,10 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Confirm and finalize the registration of the time-based one-time-password credential.
+     *
+     * @see static::sendInvalidRegistrationStateResponse()
+     * @see static::sendInvalidConfirmationCodeResponse()
+     * @see static::sendCredentialRegisteredResponse()
      *
      * @return mixed
      */
@@ -112,6 +121,8 @@ abstract class RegisterTotpCredentialController
     /**
      * Cancel the registration of the time-based one-time-password credential.
      *
+     * @see static::sendRegistrationCancelledResponse()
+     *
      * @return mixed
      */
     public function cancel(Request $request)
@@ -123,7 +134,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Validate the time-based one-time-password confirmation request.
-     *
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -164,7 +174,6 @@ abstract class RegisterTotpCredentialController
 
     /**
      * Generate a fresh time-based one-time-password credential secret.
-     *
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\Totp\Exceptions\InvalidSecretException
      */

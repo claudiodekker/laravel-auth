@@ -55,6 +55,8 @@ abstract class LoginController
     /**
      * Handle an incoming request to view the login page.
      *
+     * @see static::sendLoginPageResponse()
+     *
      * @return mixed
      */
     public function create(Request $request)
@@ -66,6 +68,12 @@ abstract class LoginController
 
     /**
      * Handle an incoming authentication request.
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendInvalidPasskeyAuthenticationStateResponse()
+     * @see static::sendMultiFactorChallengeResponse()
+     * @see static::sendAuthenticationFailedResponse()
+     * @see static::sendAuthenticatedResponse()
      *
      * @return mixed
      */
@@ -88,6 +96,8 @@ abstract class LoginController
 
     /**
      * Sign the user out of the application.
+     *
+     * @see static::sendLoggedOutResponse()
      *
      * @return mixed
      */

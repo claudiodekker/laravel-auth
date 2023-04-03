@@ -42,6 +42,8 @@ abstract class GenerateRecoveryCodesController
     /**
      * Prepare the configuration of fresh recovery codes.
      *
+     * @see static::sendRecoveryCodesPreparedResponse()
+     *
      * @return mixed
      */
     public function create(Request $request)
@@ -61,6 +63,9 @@ abstract class GenerateRecoveryCodesController
     /**
      * Display the view for confirming that the user has saved their recovery codes.
      *
+     * @see static::sendInvalidConfigurationStateResponse()
+     * @see static::sendConfirmationPageResponse()
+     *
      * @return mixed
      */
     public function confirm(Request $request)
@@ -74,6 +79,10 @@ abstract class GenerateRecoveryCodesController
 
     /**
      * Confirm and finalize the generation of the recovery codes.
+     *
+     * @see static::sendInvalidConfigurationStateResponse()
+     * @see static::sendInvalidRecoveryCodeResponse()
+     * @see static::sendRecoveryCodesConfiguredResponse()
      *
      * @return mixed
      */
@@ -98,7 +107,6 @@ abstract class GenerateRecoveryCodesController
 
     /**
      * Validate the recovery code confirmation request.
-     *
      *
      * @throws \Illuminate\Validation\ValidationException
      */

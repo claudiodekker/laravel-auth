@@ -58,10 +58,26 @@ class RegisterController extends BaseController
 
     /**
      * Handle an incoming registration request.
+     *
+     * {!! '@' !!}see static::sendPasskeyBasedRegistrationInitializedResponse()
+     * {!! '@' !!}see static::sendInvalidPasskeyRegistrationStateResponse()
+     * {!! '@' !!}see static::sendInvalidPasskeyResponse()
+     * {!! '@' !!}see static::sendRegisteredResponse()
      */
     public function store(Request $request): JsonResponse
     {
         return parent::store($request);
+    }
+
+    /**
+     * Handle an incoming registration cancellation request.
+     *
+     * {!! '@' !!}see static::sendInvalidPasskeyRegistrationStateResponse()
+     * {!! '@' !!}see static::sendPasskeyRegistrationCancelledResponse()
+     */
+    public function destroy(Request $request): JsonResponse
+    {
+        return parent::destroy($request);
     }
 
     /**

@@ -138,7 +138,6 @@ trait PasskeyBasedRegistration
     /**
      * Validate the passkey-based registration initialization request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePasskeyBasedInitializationRequest(Request $request): void

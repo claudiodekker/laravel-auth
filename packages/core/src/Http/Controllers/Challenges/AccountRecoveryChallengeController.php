@@ -56,6 +56,10 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
+     * @see static::sendAccountRecoveredResponse()
+     * @see static::sendChallengePageResponse()
+     * @see static::sendInvalidRecoveryLinkResponse()
+     *
      * @return mixed
      */
     public function create(Request $request, string $token)
@@ -73,6 +77,11 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Handle an incoming account recovery challenge response.
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendAccountRecoveredResponse()
+     * @see static::sendInvalidRecoveryCodeResponse()
+     * @see static::sendInvalidRecoveryLinkResponse()
      *
      * @return mixed
      */
@@ -160,6 +169,9 @@ abstract class AccountRecoveryChallengeController
         return RecoveryCodeManager::from($user->recovery_codes ?? [])->contains($request->input('code'));
     }
 
+    /**
+     * Invalidates the recovery code for the given user.
+     */
     protected function invalidateRecoveryCode(Request $request, Authenticatable $user): void
     {
         $user->recovery_codes = RecoveryCodeManager::from($user->recovery_codes)

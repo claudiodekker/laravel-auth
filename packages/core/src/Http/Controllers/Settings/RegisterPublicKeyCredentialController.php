@@ -55,6 +55,8 @@ abstract class RegisterPublicKeyCredentialController
     /**
      * Handle an incoming request to view the public key registration page.
      *
+     * @see static::sendRegistrationPageResponse()
+     *
      * @return mixed
      */
     public function create(Request $request)
@@ -67,6 +69,10 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Complete the registration of a new public key credential.
+     *
+     * @see static::sendInvalidPublicKeyRegistrationStateResponse()
+     * @see static::sendInvalidPublicKeyCredentialResponse()
+     * @see static::sendCredentialRegisteredResponse()
      *
      * @return mixed
      */
@@ -155,17 +161,14 @@ abstract class RegisterPublicKeyCredentialController
 
     /**
      * Clear the temporarily stored challenge details used to register a new public key credential.
-     *
-     * @return void
      */
-    protected function clearPublicKeyRegistrationOptions(Request $request)
+    protected function clearPublicKeyRegistrationOptions(Request $request): void
     {
         $request->session()->forget('auth.mfa_setup.public_key_credential_creation_options');
     }
 
     /**
      * Validate the public key credential registration request.
-     *
      *
      * @throws \Illuminate\Validation\ValidationException
      */

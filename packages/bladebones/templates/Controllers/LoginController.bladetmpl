@@ -42,6 +42,8 @@ class LoginController extends BaseController
 @endif
     /**
      * Display the login view.
+     *
+     * {!! '@' !!}see static::sendLoginPageResponse()
      */
     public function create(Request $request): View
     {
@@ -50,6 +52,14 @@ class LoginController extends BaseController
 
     /**
      * Handle an incoming authentication request.
+     *
+@if (!$withoutRateLimiting)
+     * {!! '@' !!}see static::sendRateLimitedResponse()
+@endif
+     * {!! '@' !!}see static::sendInvalidPasskeyAuthenticationStateResponse()
+     * {!! '@' !!}see static::sendMultiFactorChallengeResponse()
+     * {!! '@' !!}see static::sendAuthenticationFailedResponse()
+     * {!! '@' !!}see static::sendAuthenticatedResponse()
      */
     public function store(Request $request): JsonResponse
     {
@@ -58,6 +68,8 @@ class LoginController extends BaseController
 
     /**
      * Sign the user out of the application.
+     *
+     * {!! '@' !!}see static::sendLoggedOutResponse()
      */
     public function destroy(Request $request): RedirectResponse
     {

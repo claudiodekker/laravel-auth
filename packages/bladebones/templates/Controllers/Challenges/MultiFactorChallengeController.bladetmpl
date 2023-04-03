@@ -43,14 +43,24 @@ class MultiFactorChallengeController extends BaseController
 @endif
     /**
      * Handle an incoming request to view the multi-factor challenge page.
+     *
+     * {!! '@' !!}see static::sendAuthenticatedResponse()
+     * {!! '@' !!}see static::sendChallengePageResponse()
      */
-    public function create(Request $request): View|RedirectResponse
+    public function create(Request $request): View|JsonResponse|RedirectResponse
     {
         return parent::create($request);
     }
 
     /**
      * Handle an incoming multi-factor challenge confirmation request.
+     *
+@if (!$withoutRateLimiting)
+     * {!! '@' !!}see static::sendRateLimitedResponse()
+@endif
+     * {!! '@' !!}see static::sendChallengeFailedResponse()
+     * {!! '@' !!}see static::sendAuthenticatedResponse()
+     * {!! '@' !!}see static::sendInvalidPublicKeyChallengeStateResponse()
      */
     public function store(Request $request): JsonResponse
     {

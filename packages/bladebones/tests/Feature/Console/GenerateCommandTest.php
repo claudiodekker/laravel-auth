@@ -65,7 +65,9 @@ class GenerateCommandTest extends TestCase
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -163,7 +165,9 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -249,7 +253,9 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -334,7 +340,9 @@ EOF;
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -420,7 +428,9 @@ EOF;
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -506,7 +516,9 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -591,7 +603,9 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -677,7 +691,9 @@ EOF;
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -778,7 +794,9 @@ EOF;
             $this->assertStringContainsString("use UsernameBased;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
-        $this->assertMockShouldReceiveTest('AuthenticationTest', function ($contents) {
+        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
+        $this->assertMockShouldReceiveTest('Unit/UserTest');
+        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
             $expected = <<<EOF
 <?php
 
@@ -910,7 +928,7 @@ EOF;
         $this->mock->shouldReceive('put')->once()->withArgs(function ($path, $contents) use ($filename, $callback) {
             $className = Str::afterLast($filename, '/');
 
-            return $path === base_path("tests/Feature/$filename.php")
+            return $path === base_path("tests/$filename.php")
                 && str_contains($contents, "class $className extends TestCase")
                 && (! $callback || $callback($contents));
         });

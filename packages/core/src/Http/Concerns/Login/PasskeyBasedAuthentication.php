@@ -77,7 +77,6 @@ trait PasskeyBasedAuthentication
     /**
      * Validate the passkey based authentication request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePasskeyBasedRequest(Request $request): void
@@ -132,7 +131,6 @@ trait PasskeyBasedAuthentication
     /**
      * Validates the signed passkey for the given challenge details.
      *
-     *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException
      */
@@ -149,7 +147,6 @@ trait PasskeyBasedAuthentication
 
     /**
      * Resolve the User that is being authenticated using the passkey.
-     *
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */

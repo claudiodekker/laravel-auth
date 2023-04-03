@@ -35,6 +35,8 @@ abstract class CredentialsController
     /**
      * Handle an incoming request to view the credential overview page.
      *
+     * @see static::sendOverviewPageResponse()
+     *
      * @return mixed
      */
     public function index(Request $request)
@@ -46,6 +48,9 @@ abstract class CredentialsController
 
     /**
      * Delete a multi-factor credential.
+     *
+     * @see static::sendCredentialNotFoundResponse()
+     * @see static::sendCredentialDeletedResponse()
      *
      * @param  string  $id
      * @return mixed

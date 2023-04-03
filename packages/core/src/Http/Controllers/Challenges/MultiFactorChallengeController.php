@@ -32,7 +32,7 @@ abstract class MultiFactorChallengeController
     /**
      * Sends a response indicating that the multi-factor challenge has succeeded.
      */
-    public function handleChallengeSuccessfulResponse(Request $request): mixed
+    protected function handleChallengeSuccessfulResponse(Request $request): mixed
     {
         $user = $this->authenticate($request);
 
@@ -64,6 +64,9 @@ abstract class MultiFactorChallengeController
     /**
      * Handle an incoming request to view the multi-factor challenge page.
      *
+     * @see static::sendAuthenticatedResponse()
+     * @see static::sendChallengePageResponse()
+     *
      * @return mixed
      */
     public function create(Request $request)
@@ -83,6 +86,11 @@ abstract class MultiFactorChallengeController
 
     /**
      * Handle an incoming multi-factor challenge confirmation request.
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendInvalidPublicKeyChallengeStateResponse()
+     * @see static::sendChallengeFailedResponse()
+     * @see static::sendAuthenticatedResponse()
      *
      * @return mixed
      */

@@ -116,7 +116,6 @@ trait PublicKeyChallenge
     /**
      * Validate the public key challenge confirmation request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePublicKeyChallengeRequest(Request $request): void
@@ -194,7 +193,6 @@ trait PublicKeyChallenge
 
     /**
      * Validates the signed public key credential for the given public key challenge details.
-     *
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException

@@ -32,7 +32,6 @@ trait PasswordBasedRegistration
     /**
      * Validate a password based user registration request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePasswordBasedRequest(Request $request): void

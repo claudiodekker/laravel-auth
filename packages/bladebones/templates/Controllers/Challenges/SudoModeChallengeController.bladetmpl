@@ -39,6 +39,9 @@ class SudoModeChallengeController extends BaseController
 @endif
     /**
      * Display the sudo-mode challenge view.
+     *
+     * {!! '@' !!}see static::sendConfirmationNotRequiredResponse()
+     * {!! '@' !!}see static::sendChallengePageResponse()
      */
     public function create(Request $request): View
     {
@@ -47,6 +50,15 @@ class SudoModeChallengeController extends BaseController
 
     /**
      * Verify the sudo-mode confirmation request.
+     *
+     * {!! '@' !!}see static::sendConfirmationNotRequiredResponse()
+@if (!$withoutRateLimiting)
+     * {!! '@' !!}see static::sendRateLimitedResponse()
+@endif
+     * {!! '@' !!}see static::sendPasswordChallengeFailedResponse()
+     * {!! '@' !!}see static::sendInvalidPublicKeyChallengeStateResponse()
+     * {!! '@' !!}see static::sendPublicKeyChallengeFailedResponse()
+     * {!! '@' !!}see static::sendSudoModeEnabledResponse()
      */
     public function store(Request $request): JsonResponse
     {
