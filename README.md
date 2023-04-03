@@ -5,7 +5,7 @@ Rich authentication scaffolding for any blade-based Laravel application.
     <a href="https://github.com/claudiodekker/laravel-auth/actions"><img src="https://github.com/claudiodekker/laravel-auth/actions/workflows/app-tests.yml/badge.svg" alt="Build Status"></a>
     <a href="https://packagist.org/packages/claudiodekker/laravel-auth-core"><img src="https://img.shields.io/packagist/dt/claudiodekker/laravel-auth-core" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/claudiodekker/laravel-auth-core"><img src="https://img.shields.io/packagist/v/claudiodekker/laravel-auth-core" alt="Latest Stable Version"></a>
-    <a href="https://packagist.org/packages/claudiodekker/laravel-auth-core"><img src="https://img.shields.io/packagist/l/claudiodekker/laravel-auth" alt="License"></a>
+    <a href="https://packagist.org/packages/claudiodekker/laravel-auth-core"><img src="https://img.shields.io/packagist/l/claudiodekker/laravel-auth-core" alt="License"></a>
 </p>
 
 ## About Laravel Auth
