@@ -1,7 +1,7 @@
 <h1>Authenticated as {{ Auth::user()->name }}</h1>
 
-@if (! Auth::user()->recovery_codes)
-  <h3 style="color: #FF0000;">You currently do not have any recovery codes configured</h3>
+@if (($indicator = Auth::user()->accountSecurityIndicator()) && $indicator->hasIssues())
+  <h3 style="padding: 4px; color: #FFFFFF; background-color: {{ $indicator->color() === 'RED' ? '#FF0000': '#FFA500' }};">{{ $indicator->message() }}</h3>
 @endif
 
 <a href="{{ route('auth.settings') }}">View Authentication Settings</a>
