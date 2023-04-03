@@ -66,7 +66,6 @@ trait PasswordBasedAuthentication
     /**
      * Validate the password based authentication request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePasswordBasedRequest(Request $request): void

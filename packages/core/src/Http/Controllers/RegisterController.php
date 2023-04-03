@@ -40,6 +40,11 @@ abstract class RegisterController
     /**
      * Handle an incoming registration request.
      *
+     * @see static::sendPasskeyBasedRegistrationInitializedResponse()
+     * @see static::sendInvalidPasskeyRegistrationStateResponse()
+     * @see static::sendInvalidPasskeyResponse()
+     * @see static::sendRegisteredResponse()
+     *
      * @return mixed
      */
     public function store(Request $request)
@@ -53,6 +58,9 @@ abstract class RegisterController
 
     /**
      * Handle an incoming registration cancellation request.
+     *
+     * @see static::sendInvalidPasskeyRegistrationStateResponse()
+     * @see static::sendPasskeyRegistrationCancelledResponse()
      *
      * @return mixed
      */

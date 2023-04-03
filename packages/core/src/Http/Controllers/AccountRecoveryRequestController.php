@@ -42,8 +42,8 @@ abstract class AccountRecoveryRequestController
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method (by default)
      * is also called when the user has not been found, and when the recovery has already been requested.
      *
-     * @see sendNoSuchUserResponse
-     * @see sendRecoveryAlreadyRequestedResponse
+     * @see static::sendNoSuchUserResponse()
+     * @see static::sendRecoveryAlreadyRequestedResponse()
      *
      * @return mixed
      */
@@ -61,6 +61,11 @@ abstract class AccountRecoveryRequestController
 
     /**
      * Handle an incoming request to receive an account recovery link.
+     *
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendNoSuchUserResponse()
+     * @see static::sendRecoveryAlreadyRequestedResponse()
+     * @see static::sendRecoveryLinkSentResponse()
      *
      * @return mixed
      */
@@ -92,7 +97,6 @@ abstract class AccountRecoveryRequestController
 
     /**
      * Validate the account recovery request.
-     *
      *
      * @throws \Illuminate\Validation\ValidationException
      */

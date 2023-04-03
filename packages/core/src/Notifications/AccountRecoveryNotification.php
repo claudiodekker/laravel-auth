@@ -19,7 +19,7 @@ class AccountRecoveryNotification extends ResetPasswordNotification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::get('Account Recovery Notification'))
             ->line(Lang::get('You are receiving this email because we received a request to regain access to your account.'))
             ->action('Recover Account', $this->resetUrl($notifiable))

@@ -33,6 +33,9 @@ abstract class VerifyEmailController
     /**
      * Handle an incoming request to (re)send the verification email.
      *
+     * @see static::sendEmailAlreadyVerifiedResponse()
+     * @see static::sendEmailVerificationSentResponse()
+     *
      * @return mixed
      */
     public function store(Request $request)
@@ -48,6 +51,9 @@ abstract class VerifyEmailController
 
     /**
      * Handle an incoming request to confirm the email verification.
+     *
+     * @see static::sendEmailAlreadyVerifiedResponse()
+     * @see static::sendEmailSuccessfullyVerifiedResponse()
      *
      * @return mixed
      */

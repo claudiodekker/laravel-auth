@@ -21,6 +21,8 @@ abstract class ChangePasswordController
     /**
      * Change the current user's password.
      *
+     * @see static::sendPasswordChangedResponse()
+     *
      * @return mixed
      */
     public function update(Request $request)
@@ -37,7 +39,6 @@ abstract class ChangePasswordController
 
     /**
      * Validate the password change request.
-     *
      *
      * @throws \Illuminate\Validation\ValidationException
      */

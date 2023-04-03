@@ -30,7 +30,6 @@ interface WebAuthnContract
     /**
      * Loads, parses and validates the incoming authenticator attestation response.
      *
-     *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException
      */
@@ -52,7 +51,6 @@ interface WebAuthnContract
 
     /**
      * Validates the signed public key credential challenge for the given options.
-     *
      *
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException

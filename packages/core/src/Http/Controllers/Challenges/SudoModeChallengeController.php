@@ -46,6 +46,9 @@ abstract class SudoModeChallengeController
     /**
      * Display the sudo-mode challenge view.
      *
+     * @see static::sendConfirmationNotRequiredResponse()
+     * @see static::sendChallengePageResponse()
+     *
      * @return mixed
      */
     public function create(Request $request)
@@ -68,7 +71,14 @@ abstract class SudoModeChallengeController
     /**
      * Verify the sudo-mode confirmation request.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @see static::sendConfirmationNotRequiredResponse()
+     * @see static::sendRateLimitedResponse()
+     * @see static::sendPasswordChallengeFailedResponse()
+     * @see static::sendInvalidPublicKeyChallengeStateResponse()
+     * @see static::sendPublicKeyChallengeFailedResponse()
+     * @see static::sendSudoModeEnabledResponse()
+     *
+     * @return mixed
      */
     public function store(Request $request)
     {

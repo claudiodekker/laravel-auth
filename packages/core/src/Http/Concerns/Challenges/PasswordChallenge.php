@@ -55,7 +55,6 @@ trait PasswordChallenge
     /**
      * Validate the password challenge confirmation request.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function validatePasswordChallengeRequest(Request $request): void

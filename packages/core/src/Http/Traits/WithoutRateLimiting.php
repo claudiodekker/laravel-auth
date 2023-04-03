@@ -25,7 +25,6 @@ trait WithoutRateLimiting
     /**
      * Sends a response indicating that the user's requests have been rate limited.
      *
-     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendRateLimitedResponse(Request $request, int $availableInSeconds): void

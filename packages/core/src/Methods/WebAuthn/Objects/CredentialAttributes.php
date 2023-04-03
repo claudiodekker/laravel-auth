@@ -24,7 +24,6 @@ class CredentialAttributes implements JsonSerializable, Jsonable
     /**
      * Decode the given JSON back into an instance.
      *
-     *
      * @throws JsonException
      */
     public static function fromJson(string $json): static
