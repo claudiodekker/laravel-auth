@@ -79,7 +79,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['credential' => ['The credential field is required.']], $response->exception->errors());
+        $this->assertSame(['credential' => [__('validation.required', ['attribute' => 'credential'])]], $response->exception->errors());
         $this->assertTrue(Session::has('auth.login.passkey_authentication_options'));
         $this->assertGuest();
         Event::assertNothingDispatched();

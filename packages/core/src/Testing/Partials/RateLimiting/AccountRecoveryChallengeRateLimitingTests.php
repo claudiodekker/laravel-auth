@@ -3,6 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
@@ -15,6 +16,7 @@ trait AccountRecoveryChallengeRateLimitingTests
     /** @test */
     public function account_recovery_challenge_requests_are_rate_limited_after_too_many_failed_requests(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class]);
         $user = $this->generateUser(['recovery_codes' => $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
@@ -29,6 +31,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertSame($codes, $user->fresh()->recovery_codes);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Carbon::setTestNow();
     }
 
     /** @test */

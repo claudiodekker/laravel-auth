@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/claudiodekker/laravel-auth/compare/v0.1.2...HEAD)
 
+### Added
+
+- PHP 8.2 Support ([#23](https://github.com/claudiodekker/laravel-auth/pull/23))
+- Laravel 10 Support ([#23](https://github.com/claudiodekker/laravel-auth/pull/23))
+
 ### Changed
 
 - Moved `claudiodekker/laravel-auth` v0.1.0 into this monorepo
 - Moved `claudiodekker/laravel-auth-bladebones` v0.1.2 into this monorepo
 - Updated this `CHANGELOG.md` to reflect previous non-monorepo releases
+- Bladebones: Improved generator styling, as per Laravel Pint standards ([#23](https://github.com/claudiodekker/laravel-auth/pull/23))
+- Core: Improved tests to use translations instead of string matches ([#23](https://github.com/claudiodekker/laravel-auth/pull/23))
+
+### Fixed
+
+- Core: Fixed timing-related test regression ([#23](https://github.com/claudiodekker/laravel-auth/pull/23))
 
 ## [v0.1.2](https://github.com/claudiodekker/laravel-auth-bladebones/compare/v0.1.2...v0.1.1) - 2022-11-30
 

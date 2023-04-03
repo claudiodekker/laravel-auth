@@ -43,24 +43,24 @@ trait EmailBased
     protected function assertUsernameRequiredValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The email field is required.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
     }
 
     protected function assertUsernameMustBeValidValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The email must be a valid email address.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
     }
 
     protected function assertUsernameTooLongValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The email must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
     }
 
     protected function assertUsernameAlreadyExistsValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The email has already been taken.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.unique', ['attribute' => 'email'])]], $response->exception->errors());
     }
 }

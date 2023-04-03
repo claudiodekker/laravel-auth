@@ -269,7 +269,7 @@ trait ConfirmSudoModeUsingCredentialTests
             ->post(route('auth.sudo_mode'), []);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['credential' => ['The credential field is required.']], $response->exception->errors());
+        $this->assertSame(['credential' => [__('validation.required', ['attribute' => 'credential'])]], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');

@@ -50,7 +50,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name field is required.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -60,7 +60,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => 123]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name must be a string.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -70,7 +70,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => str_repeat('a', 256)]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['name' => ['The name must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -98,7 +98,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email field is required.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -108,7 +108,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => str_repeat('a', 256).'@example.com']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -118,7 +118,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => 'foo']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => ['The email must be a valid email address.']], $response->exception->errors());
+        $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -139,7 +139,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['password' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password field is required.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.required', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -149,7 +149,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['password_confirmation' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password confirmation does not match.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -159,7 +159,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt(['password_confirmation' => 'invalid-password-confirmation']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password confirmation does not match.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 
@@ -172,7 +172,7 @@ trait SubmitPasswordBasedRegistrationTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password must be at least 8 characters.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.min.string', ['attribute' => 'password', 'min' => 8])]], $response->exception->errors());
         $this->assertCount(0, User::all());
     }
 

@@ -11,8 +11,8 @@ jobs:
       fail-fast: true
       matrix:
         package: [ 'core', 'bladebones' ]
-        php: [ 8.1 ]
-        laravel: [ 9 ]
+        php: [ 8.1, 8.2 ]
+        laravel: [ 9, 10 ]
         stability: [ 'prefer-lowest', 'prefer-stable' ]
 
     name: ${{ matrix.package }} - PHP ${{ matrix.php }} L${{ matrix.laravel }} w/ ${{ matrix.stability }}

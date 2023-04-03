@@ -43,7 +43,7 @@ trait UsernameBased
     protected function assertUsernameRequiredValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The username field is required.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.required', ['attribute' => 'username'])]], $response->exception->errors());
     }
 
     protected function assertUsernameMustBeValidValidationError(TestResponse $response): void
@@ -55,12 +55,12 @@ trait UsernameBased
     protected function assertUsernameTooLongValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The username must not be greater than 255 characters.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.max.string', ['attribute' => 'username', 'max' => 255])]], $response->exception->errors());
     }
 
     protected function assertUsernameAlreadyExistsValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => ['The username has already been taken.']], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.unique', ['attribute' => 'username'])]], $response->exception->errors());
     }
 }

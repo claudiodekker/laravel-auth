@@ -68,7 +68,7 @@ trait SubmitPasswordBasedAuthenticationTests
         $response = $this->submitPasswordBasedLoginAttempt(['password' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password field is required.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.required', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertGuest();
     }
 
@@ -78,7 +78,7 @@ trait SubmitPasswordBasedAuthenticationTests
         $response = $this->submitPasswordBasedLoginAttempt(['password' => 123]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['password' => ['The password must be a string.']], $response->exception->errors());
+        $this->assertSame(['password' => [__('validation.string', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertGuest();
     }
 

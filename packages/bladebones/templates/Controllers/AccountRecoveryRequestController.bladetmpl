@@ -59,9 +59,6 @@ class AccountRecoveryRequestController extends BaseController
 @endif
     /**
      * Handle an incoming request to view the account recovery page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function create(Request $request): View
     {
@@ -70,9 +67,6 @@ class AccountRecoveryRequestController extends BaseController
 
     /**
      * Handle an incoming request to receive an account recovery link.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request): RedirectResponse
     {
@@ -87,9 +81,6 @@ class AccountRecoveryRequestController extends BaseController
      *
      * {!! '@' !!}see sendNoSuchUserResponse
      * {!! '@' !!}see sendRecoveryAlreadyRequestedResponse
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function sendRecoveryLinkSentResponse(Request $request): RedirectResponse
     {
@@ -101,10 +92,6 @@ class AccountRecoveryRequestController extends BaseController
      *
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
      * indicate that recovery has already been requested. Instead, it should always return the same response.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendRecoveryAlreadyRequestedResponse(Request $request, Authenticatable $user): RedirectResponse
     {
@@ -116,9 +103,6 @@ class AccountRecoveryRequestController extends BaseController
      *
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method should not
      * indicate that the account was not found. Instead, it should always return the same response.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendNoSuchUserResponse(Request $request): RedirectResponse
     {
@@ -128,10 +112,6 @@ class AccountRecoveryRequestController extends BaseController
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}param  int  $availableInSeconds
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */

@@ -14,9 +14,6 @@ class VerifyEmailController extends BaseController
 {
     /**
      * Sends a response indicating that the email verification link has been resent.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendEmailVerificationSentResponse(Request $request): RedirectResponse
     {
@@ -26,9 +23,6 @@ class VerifyEmailController extends BaseController
 
     /**
      * Sends a response indicating that the email has already been verified.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendEmailAlreadyVerifiedResponse(Request $request): RedirectResponse
     {
@@ -38,9 +32,6 @@ class VerifyEmailController extends BaseController
 
     /**
      * Sends a response indicating that the email has been successfully verified.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendEmailSuccessfullyVerifiedResponse(Request $request): RedirectResponse
     {
@@ -50,9 +41,6 @@ class VerifyEmailController extends BaseController
 
     /**
      * Handle an incoming request to (re)send the verification email.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request): RedirectResponse
     {
@@ -61,9 +49,6 @@ class VerifyEmailController extends BaseController
 
     /**
      * Handle an incoming request to confirm the email verification.
-     *
-     * {!! '@' !!}param  \Illuminate\Foundation\Auth\EmailVerificationRequest  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function update(EmailVerificationRequest $request): RedirectResponse
     {

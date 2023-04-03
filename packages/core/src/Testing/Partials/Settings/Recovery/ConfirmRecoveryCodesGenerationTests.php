@@ -41,7 +41,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'));
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code field is required.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertNull($user->fresh()->recovery_codes);
         Event::assertNothingDispatched();
     }
@@ -60,7 +60,7 @@ trait ConfirmRecoveryCodesGenerationTests
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['code' => ['The code must be a string.']], $response->exception->errors());
+        $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertNull($user->fresh()->recovery_codes);
         Event::assertNothingDispatched();
     }

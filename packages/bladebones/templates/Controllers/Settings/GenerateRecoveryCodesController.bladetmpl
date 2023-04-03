@@ -10,9 +10,6 @@ class GenerateRecoveryCodesController extends BaseController
 {
     /**
      * Prepare the configuration of fresh recovery codes.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function create(Request $request): View
     {
@@ -21,9 +18,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Display the view for confirming that the user has saved their recovery codes.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     public function confirm(Request $request): View
     {
@@ -32,9 +26,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Confirm and finalize the generation of the recovery codes.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request): RedirectResponse
     {
@@ -44,9 +35,7 @@ class GenerateRecoveryCodesController extends BaseController
     /**
      * Sends a response indicating that new recovery codes have been prepared.
      *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
      * {!! '@' !!}param  \ClaudioDekker\LaravelAuth\RecoveryCodeManager  $codes
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     protected function sendRecoveryCodesPreparedResponse(Request $request, $codes): View
     {
@@ -57,9 +46,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Sends a response that displays the recovery code confirmation page.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Contracts\View\View
      */
     protected function sendConfirmationPageResponse(Request $request): View
     {
@@ -68,9 +54,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Sends a response indicating that the new recovery codes have been configured.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return \Illuminate\Http\RedirectResponse
      */
     protected function sendRecoveryCodesConfiguredResponse(Request $request): RedirectResponse
     {
@@ -79,9 +62,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Sends a response indicating that the recovery codes configuration state is invalid.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -92,9 +72,6 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Sends a response indicating that the provided confirmation code is invalid.
-     *
-     * {!! '@' !!}param  \Illuminate\Http\Request  $request
-     * {!! '@' !!}return void
      *
      * {!! '@' !!}throws \Illuminate\Validation\ValidationException
      */
