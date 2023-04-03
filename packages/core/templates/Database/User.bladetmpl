@@ -1,5 +1,7 @@
 namespace App\Models;
 
+use ClaudioDekker\LaravelAuth\LaravelAuth;
+use ClaudioDekker\LaravelAuth\Support\AccountSecurityIndicator;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -47,4 +49,34 @@ class User extends Authenticatable
         'has_password' => 'boolean',
         'recovery_codes' => 'array',
     ];
+
+    /**
+     * Get all of the multi factor credentials for the user.
+     *
+     * {!! '@' !!}return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function multiFactorCredentials()
+    {
+        return $this->hasMany(LaravelAuth::multiFactorCredentialModel(), 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Determine the current account safety level.
+     */
+    public function accountSecurityIndicator(): AccountSecurityIndicator
+    {
+        if (! $this->recovery_codes && $this->multiFactorCredentials->isEmpty()) {
+            return AccountSecurityIndicator::NO_MFA_NO_RECOVERY_CODES;
+        }
+
+        if ($this->multiFactorCredentials->isEmpty()) {
+            return AccountSecurityIndicator::NO_MFA_HAS_RECOVERY_CODES;
+        }
+
+        if (! $this->recovery_codes) {
+            return AccountSecurityIndicator::HAS_MFA_NO_RECOVERY_CODES;
+        }
+
+        return AccountSecurityIndicator::HAS_MFA_HAS_RECOVERY_CODES;
+    }
 }

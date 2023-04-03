@@ -25,7 +25,7 @@ return [
         'totp' => 'The provided one-time-password code is incorrect.',
     ],
     'settings' => [
-        'credential-deleted' => 'The two-factor credential has been deleted.',
+        'credential-deleted' => 'The multi-factor credential has been deleted.',
         'password-changed' => 'Your password has been changed successfully.',
         'public-key-registered' => 'Public key credential successfully registered.',
         'recovery-configured' => 'Account recovery codes successfully configured.',
@@ -40,5 +40,10 @@ return [
         'sent' => 'A verification link has been sent to the email address you provided during registration.',
         'verified' => 'Your email address has been verified.',
     ],
-
+    'security-indicator' => [
+        'no-mfa-no-recovery-codes' => 'Your account is vulnerable. Please enable multi-factor authentication and set up account recovery codes.',
+        'no-mfa-has-recovery-codes' => 'Your account is vulnerable without multi-factor authentication. Please enable it to secure your account.',
+        'has-mfa-no-recovery-codes' => 'Your account could be compromised if someone gains access to your email account. Protect yourself by setting up account recovery codes.',
+        'has-mfa-has-recovery-codes' => 'Your account is well-protected.',
+    ],
 ];
