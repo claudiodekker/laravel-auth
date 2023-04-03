@@ -72,6 +72,12 @@ abstract class AccountRecoveryChallengeController
             return $this->sendInvalidRecoveryLinkResponse($request);
         }
 
+        if (! $this->hasRecoveryCodes($request, $user)) {
+            $this->invalidateRecoveryLink($request, $user);
+
+            return $this->handleAccountRecoveredResponse($request, $user);
+        }
+
         return $this->sendChallengePageResponse($request, $token);
     }
 
@@ -103,6 +109,12 @@ abstract class AccountRecoveryChallengeController
             $this->incrementRateLimitingCounter($request);
 
             return $this->sendInvalidRecoveryLinkResponse($request);
+        }
+
+        if (! $this->hasRecoveryCodes($request, $user)) {
+            $this->invalidateRecoveryLink($request, $user);
+
+            return $this->handleAccountRecoveredResponse($request, $user);
         }
 
         if (! $this->hasValidRecoveryCode($request, $user)) {
@@ -162,11 +174,19 @@ abstract class AccountRecoveryChallengeController
     }
 
     /**
+     * Determine whether the user has recovery codes.
+     */
+    protected function hasRecoveryCodes(Request $request, Authenticatable $user): bool
+    {
+        return (bool) $user->recovery_codes;
+    }
+
+    /**
      * Determine whether the user has entered a valid confirmation code.
      */
     protected function hasValidRecoveryCode(Request $request, Authenticatable $user): bool
     {
-        return RecoveryCodeManager::from($user->recovery_codes ?? [])->contains($request->input('code'));
+        return RecoveryCodeManager::from($user->recovery_codes)->contains($request->input('code'));
     }
 
     /**
