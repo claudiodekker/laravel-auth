@@ -7,6 +7,7 @@ use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -42,6 +43,7 @@ trait SubmitAccountRecoveryChallengeTests
     /** @test */
     public function the_account_recovery_challenge_code_verification_request_accepts_any_code_when_the_users_recovery_codes_are_cleared(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
         $user = $this->generateUser(['recovery_codes' => null]);
         $repository = Password::getRepository();
@@ -61,6 +63,7 @@ trait SubmitAccountRecoveryChallengeTests
         Event::assertDispatched(AccountRecovered::class, fn ($event) => $event->user->is($user) && $event->request === request());
         Event::assertNotDispatched(AccountRecoveryFailed::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
+        Carbon::setTestNow();
     }
 
     /** @test */
