@@ -13,6 +13,28 @@ use Illuminate\Http\Request;
 class VerifyEmailController extends BaseController
 {
     /**
+     * Handle an incoming request to (re)send the verification email.
+     *
+     * {!! '@' !!}see static::sendEmailAlreadyVerifiedResponse()
+     * {!! '@' !!}see static::sendEmailVerificationSentResponse()
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        return parent::store($request);
+    }
+
+    /**
+     * Handle an incoming request to confirm the email verification.
+     *
+     * {!! '@' !!}see static::sendEmailAlreadyVerifiedResponse()
+     * {!! '@' !!}see static::sendEmailSuccessfullyVerifiedResponse()
+     */
+    public function update(EmailVerificationRequest $request): RedirectResponse
+    {
+        return parent::update($request);
+    }
+
+    /**
      * Sends a response indicating that the email verification link has been resent.
      */
     protected function sendEmailVerificationSentResponse(Request $request): RedirectResponse
@@ -37,21 +59,5 @@ class VerifyEmailController extends BaseController
     {
         return redirect()->to(RouteServiceProvider::HOME ?? '/')
             ->with('status', __('laravel-auth::auth.verification.verified'));
-    }
-
-    /**
-     * Handle an incoming request to (re)send the verification email.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        return parent::store($request);
-    }
-
-    /**
-     * Handle an incoming request to confirm the email verification.
-     */
-    public function update(EmailVerificationRequest $request): RedirectResponse
-    {
-        return parent::update($request);
     }
 }

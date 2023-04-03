@@ -10,6 +10,8 @@ class GenerateRecoveryCodesController extends BaseController
 {
     /**
      * Prepare the configuration of fresh recovery codes.
+     *
+     * {!! '@' !!}see static::sendRecoveryCodesPreparedResponse()
      */
     public function create(Request $request): View
     {
@@ -18,6 +20,9 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Display the view for confirming that the user has saved their recovery codes.
+     *
+     * {!! '@' !!}see static::sendInvalidConfigurationStateResponse()
+     * {!! '@' !!}see static::sendConfirmationPageResponse()
      */
     public function confirm(Request $request): View
     {
@@ -26,6 +31,10 @@ class GenerateRecoveryCodesController extends BaseController
 
     /**
      * Confirm and finalize the generation of the recovery codes.
+     *
+     * {!! '@' !!}see static::sendInvalidConfigurationStateResponse()
+     * {!! '@' !!}see static::sendInvalidRecoveryCodeResponse()
+     * {!! '@' !!}see static::sendRecoveryCodesConfiguredResponse()
      */
     public function store(Request $request): RedirectResponse
     {

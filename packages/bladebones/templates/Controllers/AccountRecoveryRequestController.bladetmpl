@@ -67,6 +67,13 @@ class AccountRecoveryRequestController extends BaseController
 
     /**
      * Handle an incoming request to receive an account recovery link.
+     *
+@if (!$withoutRateLimiting)
+     * {!! '@' !!}see static::sendRateLimitedResponse()
+@endif
+     * {!! '@' !!}see static::sendNoSuchUserResponse()
+     * {!! '@' !!}see static::sendRecoveryAlreadyRequestedResponse()
+     * {!! '@' !!}see static::sendRecoveryLinkSentResponse()
      */
     public function store(Request $request): RedirectResponse
     {
@@ -79,8 +86,8 @@ class AccountRecoveryRequestController extends BaseController
      * NOTE: To prevent malicious visitors from probing the system for valid email addresses, this method (by default)
      * is also called when the user has not been found, and when the recovery has already been requested.
      *
-     * {!! '@' !!}see sendNoSuchUserResponse
-     * {!! '@' !!}see sendRecoveryAlreadyRequestedResponse
+     * {!! '@' !!}see static::sendNoSuchUserResponse()
+     * {!! '@' !!}see static::sendRecoveryAlreadyRequestedResponse()
      */
     public function sendRecoveryLinkSentResponse(Request $request): RedirectResponse
     {

@@ -29,14 +29,25 @@ class AccountRecoveryChallengeController extends BaseController
 @endif
     /**
      * Handle an incoming request to view the account recovery challenge page.
+     *
+     * {!! '@' !!}see static::sendAccountRecoveredResponse()
+     * {!! '@' !!}see static::sendChallengePageResponse()
+     * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
      */
-    public function create(Request $request, string $token): View
+    public function create(Request $request, string $token): RedirectResponse|View
     {
         return parent::create($request, $token);
     }
 
     /**
      * Handle an incoming account recovery challenge response.
+     *
+@if (!$withoutRateLimiting)
+     * {!! '@' !!}see static::sendRateLimitedResponse()
+@endif
+     * {!! '@' !!}see static::sendAccountRecoveredResponse()
+     * {!! '@' !!}see static::sendInvalidRecoveryCodeResponse()
+     * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
      */
     public function store(Request $request, string $token): RedirectResponse
     {

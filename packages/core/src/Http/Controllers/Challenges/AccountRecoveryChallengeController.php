@@ -78,10 +78,10 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handle an incoming account recovery challenge response.
      *
+     * @see static::sendRateLimitedResponse()
      * @see static::sendAccountRecoveredResponse()
      * @see static::sendInvalidRecoveryCodeResponse()
      * @see static::sendInvalidRecoveryLinkResponse()
-     * @see static::sendRateLimitedResponse()
      *
      * @return mixed
      */
