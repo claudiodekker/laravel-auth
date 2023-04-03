@@ -6,6 +6,7 @@ use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -17,6 +18,7 @@ trait SudoModeRateLimitingTests
     /** @test */
     public function password_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
@@ -32,6 +34,7 @@ trait SudoModeRateLimitingTests
         $this->assertSame(['password' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 75])]], $response->exception->errors());
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Carbon::setTestNow();
     }
 
     /** @test */
@@ -71,6 +74,7 @@ trait SudoModeRateLimitingTests
     /** @test */
     public function credential_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
@@ -99,6 +103,7 @@ trait SudoModeRateLimitingTests
         $this->assertSame(['password' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 75])]], $response->exception->errors());
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Carbon::setTestNow();
     }
 
     /** @test */

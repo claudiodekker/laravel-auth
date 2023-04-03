@@ -8,6 +8,7 @@ use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\Totp\GoogleTwoFactorAuthenticator;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,6 +19,7 @@ trait MultiFactorChallengeRateLimitingTests
     /** @test */
     public function the_public_key_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
@@ -50,11 +52,13 @@ trait MultiFactorChallengeRateLimitingTests
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Carbon::setTestNow();
     }
 
     /** @test */
     public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
@@ -71,6 +75,7 @@ trait MultiFactorChallengeRateLimitingTests
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Carbon::setTestNow();
     }
 
     /** @test */
