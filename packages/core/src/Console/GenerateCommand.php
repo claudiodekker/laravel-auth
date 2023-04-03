@@ -4,6 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\View;
 
 abstract class GenerateCommand extends Command
@@ -69,6 +70,7 @@ abstract class GenerateCommand extends Command
             'withoutEmailVerification' => $this->option('register-without-email-verification') || ! ($this->option('yes') || $this->confirm('Do you want to send a verification email when users register?', true)),
             'withoutViews' => $this->option('without-views'),
             'flavor' => $this->option('kind') && in_array($this->option('kind'), $flavors, true) ? $this->option('kind') : ($this->option('yes') ? 'email-based' : $this->choice('What flavor of user accounts do you want to use?', $flavors, 0)),
+            'useStrictTypes' => version_compare(App::version(), '10.0', '>='),
         ];
 
         $this->install();
@@ -105,6 +107,7 @@ abstract class GenerateCommand extends Command
      */
     protected function installTests(): void
     {
+        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
         $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
     }
 
@@ -132,6 +135,7 @@ abstract class GenerateCommand extends Command
      */
     protected function installCoreOverrides(): void
     {
+        $this->rawGenerate('Console.Kernel', app_path('Console/Kernel.php'));
         $this->rawGenerate('Database.User', app_path('Models/User.php'));
         $this->rawGenerate('Database.UserFactory', database_path('factories/UserFactory.php'));
         $this->rawGenerate('Database.2014_10_12_000000_create_users_table', database_path('migrations/2014_10_12_000000_create_users_table.php'));
