@@ -14,7 +14,7 @@
   <input type="hidden" name="email" value="{{ request()->input('email') }}" />
   <label>
     <span>Recovery Code</span>
-    <input type="text" name="code" placeholder="XXXXX-XXXXX" minlength="10" maxlength="10" required />
+    <input type="text" name="code" placeholder="XXXXX-XXXXX" minlength="10" maxlength="11" required />
   </label>
   <button type="submit">
     Verify
