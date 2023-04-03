@@ -96,14 +96,17 @@ abstract class GenerateCommand extends Command
     abstract protected function installRoutes(): void;
 
     /**
-     * Installs the extending package's authentication tests.
-     */
-    abstract protected function installTests(): void;
-
-    /**
      * Installs the extending package's authentication views.
      */
     abstract protected function installViews(): void;
+
+    /**
+     * Installs the extending package's authentication tests.
+     */
+    protected function installTests(): void
+    {
+        $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
+    }
 
     /**
      * Installs the extending package's authentication controllers.

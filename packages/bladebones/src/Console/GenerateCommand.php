@@ -27,6 +27,8 @@ class GenerateCommand extends BaseGenerateCommand
      */
     protected function installTests(): void
     {
+        parent::installTests();
+
         $this->generate('Tests.AuthenticationTest', base_path('tests/Feature/AuthenticationTest.php'));
     }
 
