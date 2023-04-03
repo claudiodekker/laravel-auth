@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/claudiodekker/laravel-auth/compare/v0.2.0...HEAD)
 
+### Fixed
+
+- Core: Fixed timing-related test regression ([#24](https://github.com/claudiodekker/laravel-auth/pull/24))
+
 ## [v0.2.0](https://github.com/claudiodekker/laravel-auth/compare/v0.1.2...v0.2.0) - 2023-04-03
 
 ### Added
