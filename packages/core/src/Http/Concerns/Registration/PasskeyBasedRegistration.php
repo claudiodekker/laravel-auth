@@ -45,7 +45,6 @@ trait PasskeyBasedRegistration
     /**
      * Sends a response indicating that the passkey-based registration process has been cancelled.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     abstract protected function sendPasskeyRegistrationCancelledResponse(Request $request);
@@ -114,7 +113,6 @@ trait PasskeyBasedRegistration
     /**
      * Cancel the passkey based registration process.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     protected function cancelPasskeyRegistration(Request $request)
@@ -168,7 +166,6 @@ trait PasskeyBasedRegistration
     /**
      * Releases (read: deletes) a passkey-based user account.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $userId
      * @return bool
      */

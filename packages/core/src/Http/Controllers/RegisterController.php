@@ -54,7 +54,6 @@ abstract class RegisterController
     /**
      * Handle an incoming registration cancellation request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function destroy(Request $request)

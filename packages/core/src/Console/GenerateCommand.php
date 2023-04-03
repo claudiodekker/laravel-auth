@@ -70,7 +70,7 @@ abstract class GenerateCommand extends Command
             'withoutEmailVerification' => $this->option('register-without-email-verification') || ! ($this->option('yes') || $this->confirm('Do you want to send a verification email when users register?', true)),
             'withoutViews' => $this->option('without-views'),
             'flavor' => $this->option('kind') && in_array($this->option('kind'), $flavors, true) ? $this->option('kind') : ($this->option('yes') ? 'email-based' : $this->choice('What flavor of user accounts do you want to use?', $flavors, 0)),
-            'useStrictTypes' => version_compare(App::version(), "10.0", ">="),
+            'useStrictTypes' => version_compare(App::version(), '10.0', '>='),
         ];
 
         $this->install();
