@@ -9,6 +9,7 @@ use ClaudioDekker\LaravelAuth\Events\MultiFactorChallengeFailed;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
+use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -23,7 +24,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
@@ -49,6 +50,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
     }
 
     /** @test */
@@ -56,9 +58,9 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
 
@@ -80,6 +82,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->assertSame('The current authentication challenge state is invalid.', $response->exception->getMessage());
         $this->assertPartlyAuthenticatedAs($response, $user);
         $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNothingDispatched();
     }
 
@@ -90,7 +93,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = LaravelAuth::multiFactorCredential()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
-            'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
@@ -113,6 +116,42 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertPartlyAuthenticatedAs($response, $user);
         $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
+        Event::assertNotDispatched(Authenticated::class);
+        Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
+    }
+
+    /** @test */
+    public function it_fails_the_multi_factor_challenge_when_the_provided_public_key_credential_signature_is_valid_but_has_a_signature_counter_mismatch(): void
+    {
+        Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
+        $user = $this->generateUser(['id' => 1]);
+        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+            'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":123,"userHandle":"1","transports":[]}',
+        ]);
+        $this->preAuthenticate($user);
+        $this->mockPublicKeyRequestOptions([$credential]);
+
+        $response = $this->postJson(route('login.challenge.multi_factor'), [
+            'credential' => [
+                'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
+                'type' => 'public-key',
+                'rawId' => 'eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==',
+                'response' => [
+                    'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJHMEpiTExuZGVmM2EwSXkzUzJzU1FBOHVPNFNPX3plNkZaTUF1UEk2LXhJIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0MyIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ',
+                    'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAew',
+                    'signature' => 'MEUCIEY/vcNkbo/LdMTfLa24ZYLlMMVMRd8zXguHBvqud9AJAiEAwCwpZpvcMaqCrwv85w/8RGiZzE+gOM61ffxmgEDeyhM=',
+                    'userHandle' => null,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
+        $this->assertPartlyAuthenticatedAs($response, $user);
+        $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
     }
@@ -124,7 +163,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
@@ -147,6 +186,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertPartlyAuthenticatedAs($response, $user);
         $this->assertTrue(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->assertSame(117, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::PUBLIC_KEY);
         Event::assertNotDispatched(Authenticated::class);
     }
@@ -158,7 +198,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user, ['remember' => 'on']);
         $this->mockPublicKeyRequestOptions([$credential]);
@@ -181,6 +221,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertHasRememberCookie($response, $user);
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
     }
@@ -193,7 +234,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
@@ -217,10 +258,47 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
         $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
         Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function it_increments_the_signature_counter_when_the_user_completes_the_multi_factor_challenge_using_a_public_key_credential(): void
+    {
+        Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
+        $user = $this->generateUser(['id' => 1]);
+        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+            'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
+        ]);
+        $this->preAuthenticate($user);
+        $this->mockPublicKeyRequestOptions([$credential]);
+
+        $response = $this->postJson(route('login.challenge.multi_factor'), [
+            'credential' => [
+                'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
+                'type' => 'public-key',
+                'rawId' => 'eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==',
+                'response' => [
+                    'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJHMEpiTExuZGVmM2EwSXkzUzJzU1FBOHVPNFNPX3plNkZaTUF1UEk2LXhJIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0MyIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ',
+                    'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAew',
+                    'signature' => 'MEUCIEY/vcNkbo/LdMTfLa24ZYLlMMVMRd8zXguHBvqud9AJAiEAwCwpZpvcMaqCrwv85w/8RGiZzE+gOM61ffxmgEDeyhM=',
+                    'userHandle' => null,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
+        $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertMissingRememberCookie($response, $user);
+        $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
     }
 
     /** @test */
@@ -230,7 +308,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
         $this->assertNotEmpty($previousId = session()->getId());
@@ -254,6 +332,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertNotSame($previousId, session()->getId());
         $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertSame(123, CredentialAttributes::fromJson($credential->fresh()->secret)->signCount());
     }
 
     /** @test */
@@ -264,7 +343,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
 
         $credentialA = MultiFactorCredential::factory()->publicKey()->forUser($userA)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":0,"userHandle":"1","transports":[]}',
+            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         MultiFactorCredential::factory()->publicKey()->forUser($userB)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',

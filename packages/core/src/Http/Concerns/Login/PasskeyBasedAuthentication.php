@@ -3,7 +3,9 @@
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Login;
 
 use App\Models\User;
+use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException;
@@ -12,6 +14,7 @@ use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCred
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ServerRequestInterface;
 
 trait PasskeyBasedAuthentication
@@ -67,6 +70,7 @@ trait PasskeyBasedAuthentication
 
         $this->clearPasskeyAuthenticationOptions($request);
         $this->resetRateLimitingCounter($request);
+        $this->updatePasskeyCredential($request, $credential);
         $this->authenticate($user, $this->isRememberingUser($request));
         $this->enableSudoMode($request);
         $this->emitAuthenticatedEvent($request, $user);
@@ -84,6 +88,17 @@ trait PasskeyBasedAuthentication
         $request->validate([
             'credential' => 'required',
         ]);
+    }
+
+    /**
+     * Update the passkey credential using the latest attributes, such as the signature counter.
+     */
+    protected function updatePasskeyCredential(Request $request, CredentialAttributes $attributes): void
+    {
+        LaravelAuth::multiFactorCredential()->query()
+            ->where('type', CredentialType::PUBLIC_KEY->value)
+            ->findOrFail(CredentialType::PUBLIC_KEY->value.'-'.Base64UrlSafe::encodeUnpadded($attributes->id()))
+            ->update(['secret' => $attributes->toJson()]);
     }
 
     /**
