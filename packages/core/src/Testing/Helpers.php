@@ -143,7 +143,7 @@ trait Helpers
         );
     }
 
-    protected function mockPasskeyCreationOptions(User $user): PublicKeyCredentialCreationOptions
+    protected function mockPasskeyCreationOptions($user): PublicKeyCredentialCreationOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'spomky-webauthn.herokuapp.com');
         $this->mockWebauthnChallenge('oFUGhUevQHX7J6o4OFau5PbncCATaHwjHDLLzCTpiyw');
@@ -165,7 +165,7 @@ trait Helpers
         return App::make(WebAuthnContract::class)->generatePasskeyRequestOptions();
     }
 
-    protected function mockPublicKeyCreationOptions(User $user, array $excludedCredentials = []): PublicKeyCredentialCreationOptions
+    protected function mockPublicKeyCreationOptions($user, array $excludedCredentials = []): PublicKeyCredentialCreationOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('9WqgpRIYvGMCUYiFT20o1U7hSD193k11zu4tKP7wRcrE26zs1zc4LHyPinvPGS86wu6bDvpwbt8Xp2bQ3VBRSQ');
