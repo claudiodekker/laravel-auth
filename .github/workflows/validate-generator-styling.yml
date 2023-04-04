@@ -2,6 +2,9 @@ name: Validate Core Generator Styling
 
 on:
   push:
+    branches:
+      - master
+      - '*.x'
   pull_request:
 
 jobs:
