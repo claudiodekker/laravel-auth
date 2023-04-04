@@ -1,0 +1,8 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - ./packages/bladebones/src
+        - ./packages/core/src
+    level: 0
