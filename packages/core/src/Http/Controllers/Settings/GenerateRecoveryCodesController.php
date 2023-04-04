@@ -40,6 +40,13 @@ abstract class GenerateRecoveryCodesController
     abstract protected function sendInvalidConfigurationStateResponse(Request $request);
 
     /**
+     * Sends a response indicating that the provided confirmation code is invalid.
+     *
+     * @return mixed
+     */
+    abstract protected function sendInvalidRecoveryCodeResponse(Request $request);
+
+    /**
      * Prepare the configuration of fresh recovery codes.
      *
      * @see static::sendRecoveryCodesPreparedResponse()
@@ -52,13 +59,6 @@ abstract class GenerateRecoveryCodesController
 
         return $this->sendRecoveryCodesPreparedResponse($request, $codes);
     }
-
-    /**
-     * Sends a response indicating that the provided confirmation code is invalid.
-     *
-     * @return mixed
-     */
-    abstract protected function sendInvalidRecoveryCodeResponse(Request $request);
 
     /**
      * Display the view for confirming that the user has saved their recovery codes.

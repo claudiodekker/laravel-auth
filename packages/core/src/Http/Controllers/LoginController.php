@@ -88,14 +88,6 @@ abstract class LoginController
     }
 
     /**
-     * Determine whether the authentication attempt is password based.
-     */
-    protected function isPasswordBasedAuthenticationAttempt(Request $request): bool
-    {
-        return $request->input('type') !== 'passkey';
-    }
-
-    /**
      * Sign the user out of the application.
      *
      * @see static::sendLoggedOutResponse()
@@ -107,6 +99,14 @@ abstract class LoginController
         $this->logout($request);
 
         return $this->sendLoggedOutResponse($request);
+    }
+
+    /**
+     * Determine whether the authentication attempt is password based.
+     */
+    protected function isPasswordBasedAuthenticationAttempt(Request $request): bool
+    {
+        return $request->input('type') !== 'passkey';
     }
 
     /**
