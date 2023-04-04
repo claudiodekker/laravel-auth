@@ -34,6 +34,10 @@ class LaravelAuthServiceProvider extends ServiceProvider
 
         $this->app->bind(TotpContract::class, GoogleTwoFactorAuthenticator::class);
         $this->app->bind(WebAuthnContract::class, SpomkyWebAuthn::class);
+
+        LaravelAuth::useUserModel(
+            config('laravel-auth.models.user')
+        );
     }
 
     /**

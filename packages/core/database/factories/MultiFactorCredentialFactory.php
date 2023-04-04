@@ -4,6 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Database\Factories;
 
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
@@ -25,13 +26,15 @@ class MultiFactorCredentialFactory extends Factory
      */
     public function definition()
     {
+        $userModelClass = LaravelAuth::userModel();
+
         return [
             'id' => fn () => 'unknown-'.Str::orderedUuid(),
             'name' => $this->faker->ean13(),
             'type' => fn () => Arr::random([CredentialType::TOTP, CredentialType::PUBLIC_KEY]),
             'secret' => 'super-secret-value',
             'created_at' => $this->faker->dateTime(),
-            'user_id' => fn () => User::factory(),
+            'user_id' => fn () => $userModelClass::factory(),
         ];
     }
 

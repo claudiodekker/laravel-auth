@@ -4,12 +4,15 @@ namespace ClaudioDekker\LaravelAuth\Testing;
 
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\SpomkyWebAuthn;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -34,9 +37,11 @@ trait Helpers
         return RateLimiter::attempts("auth::$key");
     }
 
-    protected function generateUser($overrides = []): User
+    protected function generateUser($overrides = []): Model&Authenticatable
     {
-        return User::factory()->create(array_merge([
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::factory()->create(array_merge([
             $this->usernameField() => $this->defaultUsername(),
             'email' => 'claudio@ubient.net',
             'password' => Hash::make('password'),

@@ -167,7 +167,9 @@ trait PasskeyBasedAuthentication
      */
     protected function resolveUserFromPasskey(Request $request, CredentialAttributes $credential): Authenticatable
     {
-        return User::query()
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::query()
             ->where('has_password', false)
             ->findOrFail($credential->userHandle());
     }

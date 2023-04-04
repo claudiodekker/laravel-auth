@@ -5,6 +5,7 @@ namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -113,7 +114,9 @@ abstract class AccountRecoveryRequestController
      */
     protected function getUser(Request $request)
     {
-        return User::query()
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::query()
             ->where('email', $request->input('email'))
             ->first();
     }

@@ -153,7 +153,9 @@ trait PasskeyBasedRegistration
      */
     protected function claimPasswordlessUser(Request $request): Authenticatable
     {
-        return User::create([
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::create([
             'email' => $request->input('email'),
             $this->usernameField() => $request->input($this->usernameField()),
             'name' => $request->name,
@@ -170,7 +172,9 @@ trait PasskeyBasedRegistration
      */
     protected function releaseClaimedPasswordlessUser(Request $request, $userId)
     {
-        return User::where('id', $userId)->firstOrFail()->delete();
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::where('id', $userId)->firstOrFail()->delete();
     }
 
     /**
@@ -240,7 +244,9 @@ trait PasskeyBasedRegistration
      */
     protected function resolveUserFromPasskeyCreationOptions(PublicKeyCredentialCreationOptions $options): Authenticatable
     {
-        return User::findOrFail($options->user()->id());
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::findOrFail($options->user()->id());
     }
 
     /**

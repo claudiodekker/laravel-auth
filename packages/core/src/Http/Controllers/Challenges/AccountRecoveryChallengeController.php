@@ -8,6 +8,7 @@ use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -145,7 +146,9 @@ abstract class AccountRecoveryChallengeController
      */
     protected function resolveUser(Request $request)
     {
-        return User::query()
+        $userModelClass = LaravelAuth::userModel();
+
+        return $userModelClass::query()
             ->where('email', $request->input('email'))
             ->first();
     }

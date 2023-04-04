@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use Illuminate\Auth\Events\Registered;
@@ -22,14 +23,16 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_claims_the_user_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         Event::fake(Registered::class);
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         Config::set('laravel-auth.webauthn.relying_party.name', 'Laravel Auth Package');
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
         $response = $this->initializePasskeyBasedRegisterAttempt();
 
         $this->assertGuest();
-        $user = tap(User::firstOrFail(), function (User $user) {
+        $user = tap($userModelClass::firstOrFail(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});
             $this->assertTrue(password_verify('AUTOMATICALLY-GENERATED-PASSWORD-HASH', $user->password));
@@ -74,110 +77,130 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_cannot_initialize_passkey_based_registration_when_authenticated(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $this->actingAs($this->generateUser());
 
         $response = $this->initializePasskeyBasedRegisterAttempt();
 
         $response->assertRedirect(RouteServiceProvider::HOME);
         $response->assertSessionMissing('auth.register.passkey_creation_options');
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_name_is_required_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_name_is_a_string_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => 123]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_name_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => str_repeat('a', 256)]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_username_is_required_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameRequiredValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_username_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => $this->tooLongUsername()]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameTooLongValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_email_is_required_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_email_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => str_repeat('a', 256).'@example.com']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_email_is_valid_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => 'foo']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, $userModelClass::all());
     }
 
     /** @test */
     public function it_validates_that_the_user_does_not_already_exist_when_initializing_passkey_based_registration(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $this->generateUser([$this->usernameField() => $this->defaultUsername()]);
 
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => $this->defaultUsername()]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameAlreadyExistsValidationError($response);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, $userModelClass::all());
     }
 
     /** @test */
@@ -219,6 +242,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_cannot_confirm_passkey_based_registration_when_authenticated(): void
     {
+        $userModelClass = LaravelAuth::userModel();
+
         $this->actingAs($this->generateUser());
 
         $response = $this->postJson(route('register'), [
@@ -235,7 +260,7 @@ trait SubmitPasskeyBasedRegistrationTests
         ]);
 
         $response->assertRedirect(RouteServiceProvider::HOME);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, $userModelClass::all());
     }
 
     /** @test */

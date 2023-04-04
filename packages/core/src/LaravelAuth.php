@@ -2,6 +2,9 @@
 
 namespace ClaudioDekker\LaravelAuth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+
 class LaravelAuth
 {
     /**
@@ -15,6 +18,11 @@ class LaravelAuth
     public static string $multiFactorCredentialModel = MultiFactorCredential::class;
 
     /**
+     * The User model class name.
+     */
+    public static string $userModel;
+
+    /**
      * Configure Laravel Auth to not register its migrations.
      */
     public static function ignoreMigrations(): static
@@ -22,6 +30,22 @@ class LaravelAuth
         static::$runsMigrations = false;
 
         return new static();
+    }
+
+    /**
+     * Set the User model class name.
+     */
+    public static function useUserModel(string $model): void
+    {
+        static::$userModel = $model;
+    }
+
+    /**
+     * Get the User model class name.
+     */
+    public static function userModel(): string
+    {
+        return static::$userModel;
     }
 
     /**
