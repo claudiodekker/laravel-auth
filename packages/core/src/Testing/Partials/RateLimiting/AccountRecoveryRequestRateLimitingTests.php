@@ -4,10 +4,8 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 trait AccountRecoveryRequestRateLimitingTests
@@ -18,7 +16,7 @@ trait AccountRecoveryRequestRateLimitingTests
         Carbon::setTestNow(now());
         Notification::fake();
         Event::fake([Lockout::class]);
-        Collection::times(5)->each(fn () => RateLimiter::hit('account-recovery|127.0.0.1'));
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->post(route('recover-account'), [
             'email' => 'foo@example.com',
@@ -34,12 +32,14 @@ trait AccountRecoveryRequestRateLimitingTests
     /** @test */
     public function it_increments_the_rate_limiter_when_an_account_recovery_request_is_made(): void
     {
-        $this->assertSame(0, RateLimiter::attempts('account-recovery|127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
 
         $this->post(route('recover-account'), [
             'email' => 'foo@example.com',
         ]);
 
-        $this->assertSame(1, RateLimiter::attempts('account-recovery|127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 }

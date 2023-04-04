@@ -18,6 +18,7 @@ trait SubmitAccountRecoveryChallengeTests
     /** @test */
     public function the_user_account_can_be_recovered(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $repository = Password::getRepository();
@@ -38,6 +39,7 @@ trait SubmitAccountRecoveryChallengeTests
         Event::assertDispatched(AccountRecovered::class, fn ($event) => $event->user->is($user) && $event->request === request());
         Event::assertNotDispatched(AccountRecoveryFailed::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
+        Carbon::setTestNow();
     }
 
     /** @test */

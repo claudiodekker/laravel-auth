@@ -10,6 +10,7 @@ use ClaudioDekker\LaravelAuth\Http\Concerns\Login\PasskeyBasedAuthentication;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Login\PasswordBasedAuthentication;
 use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -87,14 +88,6 @@ abstract class LoginController
     }
 
     /**
-     * Determine whether the authentication attempt is password based.
-     */
-    protected function isPasswordBasedAuthenticationAttempt(Request $request): bool
-    {
-        return $request->input('type') !== 'passkey';
-    }
-
-    /**
      * Sign the user out of the application.
      *
      * @see static::sendLoggedOutResponse()
@@ -106,6 +99,14 @@ abstract class LoginController
         $this->logout($request);
 
         return $this->sendLoggedOutResponse($request);
+    }
+
+    /**
+     * Determine whether the authentication attempt is password based.
+     */
+    protected function isPasswordBasedAuthenticationAttempt(Request $request): bool
+    {
+        return $request->input('type') !== 'passkey';
     }
 
     /**
@@ -138,10 +139,19 @@ abstract class LoginController
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Determine the rate limits that apply to the request.
      */
-    protected function throttleKey(Request $request): string
+    protected function rateLimits(Request $request): array
     {
-        return Str::transliterate(Str::lower($request->input($this->usernameField())).'|'.$request->ip());
+        $limits = [
+            Limit::perMinute(250),
+            Limit::perMinute(5)->by('ip::'.$request->ip()),
+        ];
+
+        if ($this->isPasswordBasedAuthenticationAttempt($request)) {
+            $limits[] = Limit::perMinute(5)->by('username::'.Str::transliterate(Str::lower($request->input($this->usernameField()))));
+        }
+
+        return $limits;
     }
 }

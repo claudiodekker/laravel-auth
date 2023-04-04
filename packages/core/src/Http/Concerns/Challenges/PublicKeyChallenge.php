@@ -85,7 +85,7 @@ trait PublicKeyChallenge
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitingExpiresInSeconds($request));
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
         if (! $options = $this->getPublicKeyChallengeOptions($request)) {

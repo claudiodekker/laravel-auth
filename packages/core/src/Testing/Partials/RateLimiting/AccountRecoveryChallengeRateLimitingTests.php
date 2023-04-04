@@ -4,10 +4,8 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -20,7 +18,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         Event::fake([Lockout::class]);
         $user = $this->generateUser(['recovery_codes' => $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
-        Collection::times(5)->each(fn () => RateLimiter::hit($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -39,7 +37,7 @@ trait AccountRecoveryChallengeRateLimitingTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => 'nonexistent-user@example.com',
@@ -49,7 +47,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $response->assertForbidden();
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
     }
 
     /** @test */
@@ -58,7 +56,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $userA = $this->generateUser(['id' => 1, 'email' => 'claudio@ubient.net']);
         $userB = $this->generateUser(['id' => 2, 'email' => 'another@example.com', $this->usernameField() => $this->anotherUsername()]);
         $token = Password::getRepository()->create($userA);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $userB->getEmailForPasswordReset(),
@@ -68,14 +66,14 @@ trait AccountRecoveryChallengeRateLimitingTests
         $response->assertForbidden();
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
     }
 
     /** @test */
     public function it_increments_the_account_recovery_challenge_rate_limiter_when_the_recovery_token_does_not_exist(): void
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
 
         $response = $this->post(route('recover-account.challenge', ['token' => 'invalid-token']), [
             'email' => $user->getEmailForPasswordReset(),
@@ -85,7 +83,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $response->assertForbidden();
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
     }
 
     /** @test */
@@ -94,7 +92,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         Event::fake([Lockout::class]);
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -103,7 +101,7 @@ trait AccountRecoveryChallengeRateLimitingTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.recovery')]], $response->exception->errors());
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         Event::assertNothingDispatched();
     }
 
@@ -113,8 +111,10 @@ trait AccountRecoveryChallengeRateLimitingTests
         Event::fake([Lockout::class]);
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
-        RateLimiter::hit($throttlingKey = 'account-recovery-challenge|127.0.0.1');
-        $this->assertSame(1, RateLimiter::attempts($throttlingKey));
+        $this->hitRateLimiter(1, '');
+        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -123,7 +123,8 @@ trait AccountRecoveryChallengeRateLimitingTests
 
         $response->assertRedirect(route('auth.settings'));
         $this->assertFullyAuthenticatedAs($response, $user);
-        $this->assertSame(0, RateLimiter::attempts($throttlingKey));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
         Event::assertNothingDispatched();
     }
 }
