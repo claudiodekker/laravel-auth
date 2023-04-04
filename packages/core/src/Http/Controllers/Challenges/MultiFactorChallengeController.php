@@ -10,6 +10,7 @@ use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -185,14 +186,6 @@ abstract class MultiFactorChallengeController
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
-     */
-    protected function throttleKey(Request $request): string
-    {
-        return $request->session()->get('auth.mfa.throttle_key');
-    }
-
-    /**
      * Resolve the User instance that is being authenticated.
      */
     protected function resolveUser(Request $request): Authenticatable
@@ -228,7 +221,18 @@ abstract class MultiFactorChallengeController
     {
         $request->session()->remove('auth.mfa.intended_location');
         $request->session()->remove('auth.mfa.remember');
-        $request->session()->remove('auth.mfa.throttle_key');
         $request->session()->remove('auth.mfa.user_id');
+    }
+
+    /**
+     * Determine the rate limits that apply to the request.
+     */
+    protected function rateLimits(Request $request): array
+    {
+        return [
+            Limit::perMinute(250),
+            Limit::perMinute(5)->by('ip::'.$request->ip()),
+            Limit::perMinute(5)->by('user_id::'.$request->session()->get('auth.mfa.user_id')),
+        ];
     }
 }

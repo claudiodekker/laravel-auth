@@ -9,7 +9,6 @@ use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 abstract class AccountRecoveryRequestController
 {
@@ -76,7 +75,7 @@ abstract class AccountRecoveryRequestController
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitingExpiresInSeconds($request));
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
         $this->incrementRateLimitingCounter($request);
@@ -147,13 +146,5 @@ abstract class AccountRecoveryRequestController
     protected function sendRecoveryLinkNotification(Request $request, mixed $user, string $token): void
     {
         $user->notify(new AccountRecoveryNotification($token));
-    }
-
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
-    protected function throttleKey(Request $request): string
-    {
-        return Str::lower('account-recovery|'.$request->ip());
     }
 }

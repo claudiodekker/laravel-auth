@@ -4,10 +4,10 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
-use Carbon\Carbon;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 

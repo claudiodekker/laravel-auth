@@ -229,7 +229,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
     /** @test */
     public function it_automatically_enables_sudo_mode_when_the_user_completes_the_multi_factor_challenge_using_a_public_key_credential(): void
     {
-        Carbon::setTestNow('2021-01-01 00:00:00');
+        Carbon::setTestNow(now());
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser(['id' => 1]);
         $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([

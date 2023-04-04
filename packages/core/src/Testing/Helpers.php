@@ -10,11 +10,11 @@ use ClaudioDekker\LaravelAuth\Methods\WebAuthn\SpomkyWebAuthn;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -22,17 +22,16 @@ use Mockery\MockInterface;
 
 trait Helpers
 {
-    protected function predictableRateLimitingKey(Authenticatable $user = null): string
+    protected function hitRateLimiter(int $times, string $key): void
     {
-        $username = $user->{$this->usernameField()} ?? $this->defaultUsername();
-        $ipAddress = '127.0.0.1';
-
-        return "$username|$ipAddress";
+        foreach (range(1, $times) as $i) {
+            RateLimiter::hit("auth::$key");
+        }
     }
 
-    protected function predictableSudoRateLimitingKey(Authenticatable $user): string
+    protected function getRateLimitAttempts($key): int
     {
-        return $user->getAuthIdentifier().'|127.0.0.1|sudo';
+        return RateLimiter::attempts("auth::$key");
     }
 
     protected function generateUser($overrides = []): User
@@ -104,7 +103,6 @@ trait Helpers
 
         $response->assertSessionMissing('auth.mfa.user_id');
         $response->assertSessionMissing('auth.mfa.remember');
-        $response->assertSessionMissing('auth.mfa.throttle_key');
     }
 
     protected function assertPartlyAuthenticatedAs(TestResponse $response, $user): void
@@ -114,7 +112,6 @@ trait Helpers
         }), 'Authenticated session cookie found.');
 
         $response->assertSessionHas('auth.mfa.user_id', $user->id);
-        $response->assertSessionHas('auth.mfa.throttle_key', $this->predictableRateLimitingKey($user));
     }
 
     protected function assertHasRememberCookie(TestResponse $response, $user): void
