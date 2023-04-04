@@ -17,6 +17,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ServerRequestInterface;
 
 trait PublicKeyChallenge
@@ -45,14 +46,6 @@ trait PublicKeyChallenge
      * @return mixed
      */
     abstract protected function sendPublicKeyChallengeSuccessfulResponse(Request $request);
-
-    /**
-     * Determine the identifier used to track the public key challenge options state.
-     */
-    protected function publicKeyChallengeOptionsKey(Request $request): string
-    {
-        return 'laravel-auth::public_key_challenge_request_options';
-    }
 
     /**
      * Resolve the User instance that the challenge is for.
@@ -100,15 +93,16 @@ trait PublicKeyChallenge
         }
 
         try {
-            $this->validatePublicKeyCredential($request, $options);
+            $credential = $this->validatePublicKeyCredential($request, $options);
         } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
             $this->incrementRateLimitingCounter($request);
 
             return $this->sendPublicKeyChallengeFailedResponse($request);
         }
 
-        $this->resetRateLimitingCounter($request);
         $this->clearPublicKeyChallengeOptions($request);
+        $this->resetRateLimitingCounter($request);
+        $this->updatePublicKeyCredential($request, $credential);
 
         return $this->sendPublicKeyChallengeSuccessfulResponse($request);
     }
@@ -138,6 +132,17 @@ trait PublicKeyChallenge
     }
 
     /**
+     * Update the public key credential using the latest attributes, such as the signature counter.
+     */
+    protected function updatePublicKeyCredential(Request $request, CredentialAttributes $attributes): void
+    {
+        LaravelAuth::multiFactorCredential()->query()
+            ->where('type', CredentialType::PUBLIC_KEY->value)
+            ->findOrFail(CredentialType::PUBLIC_KEY->value.'-'.Base64UrlSafe::encodeUnpadded($attributes->id()))
+            ->update(['secret' => $attributes->toJson()]);
+    }
+
+    /**
      * Generate the challenge details used to perform the public key challenge.
      *
      * @link https://www.w3.org/TR/webauthn-2/#sctn-verifying-assertion
@@ -148,6 +153,14 @@ trait PublicKeyChallenge
         $webAuthn = App::make(WebAuthn::class);
 
         return $webAuthn->generatePublicKeyRequestOptions($allowedCredentials);
+    }
+
+    /**
+     * Determine the identifier used to track the public key challenge options state.
+     */
+    protected function publicKeyChallengeOptionsKey(Request $request): string
+    {
+        return 'laravel-auth::public_key_challenge_request_options';
     }
 
     /**
