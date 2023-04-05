@@ -9,20 +9,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Laravel Auth Models
-    |--------------------------------------------------------------------------
-    |
-    | This configuration value allows you to customize the models
-    | that should be used by the laravel-auth's internal methods.
-    |
-    */
-
-    'models' => [
-        'user' => \App\Models\User::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Laravel Auth Public Key Credential Settings (WebAuthn)
     |--------------------------------------------------------------------------
     |

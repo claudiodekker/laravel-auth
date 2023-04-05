@@ -31,7 +31,7 @@ class LaravelAuthServiceProvider extends ServiceProvider
         $this->app->bind(WebAuthnContract::class, SpomkyWebAuthn::class);
 
         LaravelAuth::useUserModel(
-            config('laravel-auth.models.user')
+            config('auth.providers.users.model', 'App\\Models\\User')
         );
     }
 
