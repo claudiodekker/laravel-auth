@@ -3,9 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Challenges;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
-use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException;
@@ -22,8 +20,6 @@ use Psr\Http\Message\ServerRequestInterface;
 
 trait PublicKeyChallenge
 {
-    use EmailBased;
-    use EmitsAuthenticationEvents;
     use InteractsWithRateLimiting;
 
     /**

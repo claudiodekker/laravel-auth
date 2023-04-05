@@ -3,7 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
 use App\Models\User;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Password;
 abstract class AccountRecoveryRequestController
 {
     use InteractsWithRateLimiting;
-    use EmitsAuthenticationEvents;
+    use EmitsLockoutEvent;
 
     /**
      * Handles the situation in which account recovery has already been requested.
@@ -114,8 +114,10 @@ abstract class AccountRecoveryRequestController
      */
     protected function getUser(Request $request)
     {
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = LaravelAuth::userModel()::query();
 
-        return LaravelAuth::userModel()::query()
+        return $query
             ->where('email', $request->input('email'))
             ->first();
     }

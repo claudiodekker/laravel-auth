@@ -3,9 +3,10 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 
 use App\Providers\RouteServiceProvider;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
+use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Challenges\PasswordChallenge;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Challenges\PublicKeyChallenge;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
@@ -13,11 +14,12 @@ use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCred
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 
 abstract class SudoModeChallengeController
 {
-    use EmitsAuthenticationEvents;
     use EmailBased;
+    use EmitsLockoutEvent;
     use EnablesSudoMode;
     use PasswordChallenge;
     use PublicKeyChallenge;
@@ -107,6 +109,14 @@ abstract class SudoModeChallengeController
     protected function isPasswordBasedConfirmationRequest(Request $request): bool
     {
         return $request->has('password') && $this->supportsPasswordBasedConfirmation($request);
+    }
+
+    /**
+     * Emits an event indicating that sudo-mode was enabled.
+     */
+    protected function emitSudoModeEnabledEvent(Request $request): void
+    {
+        Event::dispatch(new SudoModeEnabled($request, $request->user()));
     }
 
     /**
