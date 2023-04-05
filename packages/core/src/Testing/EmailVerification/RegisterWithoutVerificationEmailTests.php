@@ -13,7 +13,6 @@ trait RegisterWithoutVerificationEmailTests
     /** @test */
     public function it_does_not_send_a_verification_email_for_password_based_registration_requests(): void
     {
-
         Notification::fake();
         $this->assertCount(0, LaravelAuth::userModel()::all());
 

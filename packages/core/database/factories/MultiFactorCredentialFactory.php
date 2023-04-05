@@ -26,7 +26,6 @@ class MultiFactorCredentialFactory extends Factory
      */
     public function definition()
     {
-
         return [
             'id' => fn () => 'unknown-'.Str::orderedUuid(),
             'name' => $this->faker->ean13(),

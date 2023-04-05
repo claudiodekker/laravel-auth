@@ -14,7 +14,6 @@ trait CancelPasskeyBasedRegistrationTests
     /** @test */
     public function it_releases_the_claimed_user_when_canceling_passkey_based_registration(): void
     {
-
         Event::fake([Registered::class]);
         $this->initializePasskeyBasedRegisterAttempt();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
@@ -39,7 +38,6 @@ trait CancelPasskeyBasedRegistrationTests
     /** @test */
     public function it_cannot_cancel_passkey_based_registration_when_authenticated(): void
     {
-
         Event::fake([Registered::class]);
         $this->initializePasskeyBasedRegisterAttempt();
         $this->assertCount(1, $users = LaravelAuth::userModel()::all());
