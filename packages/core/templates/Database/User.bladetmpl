@@ -84,7 +84,7 @@ class User extends Authenticatable
     /**
      * Get the prunable model query.
      *
-     * {!! ! '@' !!}return \Illuminate\Database\Eloquent\Builder
+     * {!! '@' !!}return \Illuminate\Database\Eloquent\Builder
      */
     public function prunable()
     {

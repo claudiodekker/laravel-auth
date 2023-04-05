@@ -15,14 +15,9 @@ class LaravelAuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadTranslationsFrom(__DIR__.'/../lang', 'laravel-auth');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/../config/laravel-auth.php' => config_path('laravel-auth.php')], 'laravel-auth-package');
-            $this->publishes([__DIR__.'/../lang' => $this->languagePath('vendor/laravel-auth')], 'laravel-auth-package');
-
-            $this->registerMigrations();
-        }
+        $this->registerResources();
+        $this->registerMigrations();
+        $this->registerPublishing();
     }
 
     /**
@@ -41,20 +36,40 @@ class LaravelAuthServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the Laravel Auth resources.
+     */
+    protected function registerResources(): void
+    {
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'laravel-auth');
+    }
+
+    /**
      * Register the Laravel Auth migration files.
      */
     protected function registerMigrations(): void
     {
-        if (LaravelAuth::$runsMigrations) {
+        if ($this->app->runningInConsole() && LaravelAuth::$runsMigrations) {
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
     }
 
     /**
-     * Determines the path to the application's language files.
+     * Register the package's publishable resources.
      */
-    protected function languagePath(string $path): string
+    protected function registerPublishing(): void
     {
-        return function_exists('lang_path') ? lang_path($path) : resource_path('lang/'.$path);
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/laravel-auth.php' => config_path('laravel-auth.php'),
+            ], 'laravel-auth-config');
+
+            $this->publishes([
+                __DIR__.'/../lang' => lang_path('vendor/laravel-auth'),
+            ], 'laravel-auth-translations');
+
+            $this->publishes([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'laravel-auth-migrations');
+        }
     }
 }
