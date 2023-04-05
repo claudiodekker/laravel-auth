@@ -4,6 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Http\Concerns\Login;
 
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
@@ -19,6 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 trait PasskeyBasedAuthentication
 {
+    use EmitsLockoutEvent;
     use InteractsWithRateLimiting;
 
     /**

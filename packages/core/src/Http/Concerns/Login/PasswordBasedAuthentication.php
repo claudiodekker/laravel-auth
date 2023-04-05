@@ -4,15 +4,19 @@ namespace ClaudioDekker\LaravelAuth\Http\Concerns\Login;
 
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
+use ClaudioDekker\LaravelAuth\Events\MultiFactorChallenged;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 
 trait PasswordBasedAuthentication
 {
+    use EmitsLockoutEvent;
     use InteractsWithRateLimiting;
 
     /**
@@ -125,6 +129,18 @@ trait PasswordBasedAuthentication
     }
 
     /**
+     * Determines the preferred multi-factor authentication method.
+     */
+    protected function determinePreferredMultiFactorMethod(Authenticatable $user, Collection $credentials): CredentialType
+    {
+        if ($credentials->pluck('type')->contains(CredentialType::PUBLIC_KEY)) {
+            return CredentialType::PUBLIC_KEY;
+        }
+
+        return CredentialType::TOTP;
+    }
+
+    /**
      * Prepares the details necessary for multi-factor authentication.
      */
     protected function prepareMultiFactorAuthenticationDetails(Request $request, Authenticatable $user): void
@@ -135,14 +151,10 @@ trait PasswordBasedAuthentication
     }
 
     /**
-     * Determines the preferred multi-factor authentication method.
+     * Emits an event indicating the user received a multi-factor authentication challenge.
      */
-    protected function determinePreferredMultiFactorMethod(Authenticatable $user, Collection $credentials): CredentialType
+    protected function emitMultiFactorChallengedEvent(Request $request, Authenticatable $user): void
     {
-        if ($credentials->pluck('type')->contains(CredentialType::PUBLIC_KEY)) {
-            return CredentialType::PUBLIC_KEY;
-        }
-
-        return CredentialType::TOTP;
+        Event::dispatch(new MultiFactorChallenged($request, $user));
     }
 }

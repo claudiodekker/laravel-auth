@@ -3,7 +3,9 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
+use ClaudioDekker\LaravelAuth\Events\Authenticated;
+use ClaudioDekker\LaravelAuth\Events\AuthenticationFailed;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsAuthenticatedEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\HandlesLogouts;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Login\PasskeyBasedAuthentication;
@@ -14,12 +16,13 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 
 abstract class LoginController
 {
     use EmailBased;
-    use EmitsAuthenticationEvents;
+    use EmitsAuthenticatedEvent;
     use EnablesSudoMode;
     use HandlesLogouts;
     use PasskeyBasedAuthentication;
@@ -123,6 +126,17 @@ abstract class LoginController
     protected function isRememberingUser(Request $request): bool
     {
         return $request->boolean('remember');
+    }
+
+    /**
+     * Emits an event indicating that the authentication attempt has failed.
+     */
+    protected function emitAuthenticationFailedEvent(Request $request): void
+    {
+        /** @var string|null $username */
+        $username = $request->input($this->usernameField());
+
+        Event::dispatch(new AuthenticationFailed($request, $username));
     }
 
     /**

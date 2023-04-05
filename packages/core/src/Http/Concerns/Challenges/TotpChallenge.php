@@ -3,7 +3,6 @@
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Challenges;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\Totp\Contracts\TotpContract as Totp;
@@ -14,7 +13,6 @@ use Illuminate\Support\Facades\App;
 
 trait TotpChallenge
 {
-    use EmitsAuthenticationEvents;
     use InteractsWithRateLimiting;
 
     /**

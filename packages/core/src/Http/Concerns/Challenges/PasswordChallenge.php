@@ -2,14 +2,12 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Challenges;
 
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 trait PasswordChallenge
 {
-    use EmitsAuthenticationEvents;
     use InteractsWithRateLimiting;
 
     /**
