@@ -5,10 +5,11 @@ on:
     branches:
       - master
       - '*.x'
+  pull_request:
 
 jobs:
   pint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code

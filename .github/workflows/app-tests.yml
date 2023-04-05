@@ -11,7 +11,8 @@ on:
 
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     strategy:
       fail-fast: true
       matrix:
@@ -48,6 +49,11 @@ jobs:
           max_attempts: 5
           command: composer create-project laravel/laravel app "${{ matrix.laravel }}.x" --remove-vcs --prefer-dist --no-interaction
 
+      - name: Downgrade Laravel dependencies to lowest supported versions
+        run: composer update --prefer-lowest --prefer-dist --no-interaction
+        working-directory: ./app
+        if: matrix.stability == 'prefer-lowest'
+
       - name: Set Laravel Environment
         run: |
           sed -i "s/APP_DEBUG=.*/APP_DEBUG=true/" .env
@@ -64,7 +70,7 @@ jobs:
           composer config minimum-stability dev
           composer config repositories.library path ../monorepo/packages/core
           composer config repositories.adapter path ../monorepo/packages/bladebones
-          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones --${{ matrix.stability }}
+          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones -W --${{ matrix.stability }}
         working-directory: ./app
 
       - name: Generate Auth Scaffolding

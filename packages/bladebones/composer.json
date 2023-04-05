@@ -30,7 +30,7 @@
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
-        "orchestra/testbench": "^7.24|^8.2",
+        "orchestra/testbench": "^7.0|^8.0",
         "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {

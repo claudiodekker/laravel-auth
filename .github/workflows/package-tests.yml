@@ -9,7 +9,8 @@ on:
 
 jobs:
   package-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     strategy:
       fail-fast: true
       matrix:
@@ -46,7 +47,7 @@ jobs:
           max_attempts: 5
           command: |
             cd ./packages/${{ matrix.package }}
-            composer require laravel/framework:^${{ matrix.laravel }} --no-update
+            composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
             composer update --${{ matrix.stability }} --no-interaction
 
       - name: Execute tests
