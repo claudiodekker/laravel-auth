@@ -85,7 +85,10 @@ trait PasswordBasedAuthentication
      */
     protected function resolvePasswordBasedUser(Request $request): ?Authenticatable
     {
-        return User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query
             ->where('has_password', true)
             ->where($this->usernameField(), $request->input($this->usernameField()))
             ->first();

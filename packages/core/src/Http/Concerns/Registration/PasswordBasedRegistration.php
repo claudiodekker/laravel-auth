@@ -48,7 +48,10 @@ trait PasswordBasedRegistration
      */
     protected function createPasswordBasedUser(Request $request): Authenticatable
     {
-        return User::create([
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query->create([
             'email' => $request->input('email'),
             $this->usernameField() => $request->input($this->usernameField()),
             'name' => $request->name,

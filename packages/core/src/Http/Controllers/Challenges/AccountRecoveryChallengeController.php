@@ -145,7 +145,10 @@ abstract class AccountRecoveryChallengeController
      */
     protected function resolveUser(Request $request)
     {
-        return User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query
             ->where('email', $request->input('email'))
             ->first();
     }

@@ -113,7 +113,10 @@ abstract class AccountRecoveryRequestController
      */
     protected function getUser(Request $request)
     {
-        return User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query
             ->where('email', $request->input('email'))
             ->first();
     }

@@ -169,7 +169,10 @@ trait PasskeyBasedAuthentication
      */
     protected function resolveUserFromPasskey(Request $request, CredentialAttributes $credential): Authenticatable
     {
-        return User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query
             ->where('has_password', false)
             ->findOrFail($credential->userHandle());
     }
