@@ -88,12 +88,4 @@ class MultiFactorCredential extends Model
 
         return $this->belongsTo($model, 'user_id', (new $model())->getKeyName());
     }
-
-    /**
-     * Get the current connection name for the model.
-     */
-    public function getConnectionName(): ?string
-    {
-        return Config::get('laravel-auth.database.connection') ?? $this->connection;
-    }
 }

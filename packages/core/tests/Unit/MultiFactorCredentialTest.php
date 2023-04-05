@@ -44,16 +44,6 @@ class MultiFactorCredentialTest extends TestCase
     }
 
     /** @test */
-    public function it_can_customize_the_database_connection(): void
-    {
-        $this->assertSame('testbench', (new MultiFactorCredential())->getConnectionName());
-
-        config(['laravel-auth.database.connection' => null]);
-
-        $this->assertNull((new MultiFactorCredential())->getConnectionName());
-    }
-
-    /** @test */
     public function it_does_not_expose_the_secret_when_serialized(): void
     {
         $token = MultiFactorCredential::factory()->create([

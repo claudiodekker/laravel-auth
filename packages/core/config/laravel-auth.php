@@ -9,20 +9,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Laravel Auth Database Connection
-    |--------------------------------------------------------------------------
-    |
-    | This configuration value allows you to customize the database connection
-    | that should be used by the laravel-auth's internal database models.
-    |
-    */
-
-    'database' => [
-        'connection' => env('DB_CONNECTION', 'mysql'),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Laravel Auth Public Key Credential Settings (WebAuthn)
     |--------------------------------------------------------------------------
     |
