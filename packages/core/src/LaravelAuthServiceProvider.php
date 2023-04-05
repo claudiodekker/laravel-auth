@@ -15,6 +15,10 @@ class LaravelAuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        LaravelAuth::useUserModel(
+            config('auth.providers.users.model', 'App\\Models\\User')
+        );
+
         $this->registerResources();
         $this->registerMigrations();
         $this->registerPublishing();
@@ -29,10 +33,6 @@ class LaravelAuthServiceProvider extends ServiceProvider
 
         $this->app->bind(TotpContract::class, GoogleTwoFactorAuthenticator::class);
         $this->app->bind(WebAuthnContract::class, SpomkyWebAuthn::class);
-
-        LaravelAuth::useUserModel(
-            config('auth.providers.users.model', 'App\\Models\\User')
-        );
     }
 
     /**
