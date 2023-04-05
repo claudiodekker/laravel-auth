@@ -3,18 +3,18 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Registration\PasskeyBasedRegistration;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Registration\PasswordBasedRegistration;
 use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 
 abstract class RegisterController
 {
-    use EmitsAuthenticationEvents;
     use EmailBased;
     use EnablesSudoMode;
     use PasskeyBasedRegistration;
@@ -101,5 +101,13 @@ abstract class RegisterController
     protected function sendEmailVerificationNotification(Authenticatable $user): void
     {
         $user->sendEmailVerificationNotification();
+    }
+
+    /**
+     * Emits an event indicating that the user has been registered.
+     */
+    protected function emitRegisteredEvent(Authenticatable $user): void
+    {
+        Event::dispatch(new Registered($user));
     }
 }

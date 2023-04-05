@@ -1,0 +1,13 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - ./packages/bladebones/src
+        - ./packages/core/src
+    level: 0
+
+    ignoreErrors:
+        - '#Unsafe usage of new static\(\)\.#'
+        - '#Call to static method query\(\) on an unknown class App\\Models\\User\.#'
+        - '#Access to constant HOME on an unknown class App\\Providers\\RouteServiceProvider\.#'

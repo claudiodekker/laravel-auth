@@ -153,7 +153,10 @@ trait PasskeyBasedRegistration
      */
     protected function claimPasswordlessUser(Request $request): Authenticatable
     {
-        return User::create([
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query->create([
             'email' => $request->input('email'),
             $this->usernameField() => $request->input($this->usernameField()),
             'name' => $request->name,
@@ -170,7 +173,10 @@ trait PasskeyBasedRegistration
      */
     protected function releaseClaimedPasswordlessUser(Request $request, $userId)
     {
-        return User::where('id', $userId)->firstOrFail()->delete();
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query->where('id', $userId)->firstOrFail()->delete();
     }
 
     /**
@@ -240,7 +246,10 @@ trait PasskeyBasedRegistration
      */
     protected function resolveUserFromPasskeyCreationOptions(PublicKeyCredentialCreationOptions $options): Authenticatable
     {
-        return User::findOrFail($options->user()->id());
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query->findOrFail($options->user()->id());
     }
 
     /**

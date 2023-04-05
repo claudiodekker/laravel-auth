@@ -3,6 +3,9 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsAuthenticatedEvent;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
+use ClaudioDekker\LaravelAuth\Events\MultiFactorChallengeFailed;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Challenges\PublicKeyChallenge;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Challenges\TotpChallenge;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
@@ -15,10 +18,13 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 
 abstract class MultiFactorChallengeController
 {
     use EmailBased;
+    use EmitsAuthenticatedEvent;
+    use EmitsLockoutEvent;
     use EnablesSudoMode;
     use PublicKeyChallenge;
     use TotpChallenge;
@@ -110,6 +116,14 @@ abstract class MultiFactorChallengeController
     protected function isPublicKeyConfirmationRequest(Request $request): bool
     {
         return $request->has('credential');
+    }
+
+    /**
+     * Emits an event indicating that the multi-factor challenge attempt has failed.
+     */
+    protected function emitMultiFactorChallengeFailedEvent(Request $request, Authenticatable $user, CredentialType $type): void
+    {
+        Event::dispatch(new MultiFactorChallengeFailed($request, $user, $type));
     }
 
     /**

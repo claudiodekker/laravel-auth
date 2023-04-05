@@ -5,7 +5,7 @@ namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 use App\Models\User;
 use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EmitsAuthenticationEvents;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
@@ -17,8 +17,8 @@ use Illuminate\Support\Facades\Password;
 
 abstract class AccountRecoveryChallengeController
 {
+    use EmitsLockoutEvent;
     use EnablesSudoMode;
-    use EmitsAuthenticationEvents;
     use InteractsWithRateLimiting;
 
     /**
@@ -145,7 +145,10 @@ abstract class AccountRecoveryChallengeController
      */
     protected function resolveUser(Request $request)
     {
-        return User::query()
+        /** @var \Illuminate\Database\Eloquent\Builder $query */
+        $query = User::query();
+
+        return $query
             ->where('email', $request->input('email'))
             ->first();
     }

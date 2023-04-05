@@ -21,7 +21,8 @@
         "orchestra/testbench": "^6.5|^7.0",
         "phpunit/phpunit": "^8.4|^9.5.8",
         "roave/security-advisories": "dev-latest",
-        "symplify/monorepo-builder": "11.2.2.72"
+        "symplify/monorepo-builder": "11.2.2.72",
+        "nunomaduro/larastan": "^2.0"
     },
     "autoload": {
         "psr-4": {
