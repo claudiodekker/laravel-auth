@@ -1,4 +1,4 @@
-name: static analysis
+name: Larastan Static Analysis
 
 on:
   push:
@@ -8,10 +8,8 @@ on:
   pull_request:
 
 jobs:
-  types:
-    runs-on: ubuntu-22.04
-
-    continue-on-error: true
+  larastan:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -22,7 +20,6 @@ jobs:
         with:
           php-version: 8.1
           tools: composer:v2
-          coverage: none
 
       - name: Install dependencies
         uses: nick-fields/retry@v2
@@ -31,5 +28,5 @@ jobs:
           max_attempts: 5
           command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
 
-      - name: Execute type checking
+      - name: Run Larastan
         run: vendor/bin/phpstan
