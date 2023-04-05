@@ -81,9 +81,8 @@ trait PasswordBasedAuthentication
      */
     protected function resolvePasswordBasedUser(Request $request): ?Authenticatable
     {
-        $userModelClass = LaravelAuth::userModel();
 
-        return $userModelClass::query()
+        return LaravelAuth::userModel()::query()
             ->where('has_password', true)
             ->where($this->usernameField(), $request->input($this->usernameField()))
             ->first();

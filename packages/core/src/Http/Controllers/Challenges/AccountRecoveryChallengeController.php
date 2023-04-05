@@ -146,9 +146,8 @@ abstract class AccountRecoveryChallengeController
      */
     protected function resolveUser(Request $request)
     {
-        $userModelClass = LaravelAuth::userModel();
 
-        return $userModelClass::query()
+        return LaravelAuth::userModel()::query()
             ->where('email', $request->input('email'))
             ->first();
     }

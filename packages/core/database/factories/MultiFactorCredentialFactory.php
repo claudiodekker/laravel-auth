@@ -26,7 +26,6 @@ class MultiFactorCredentialFactory extends Factory
      */
     public function definition()
     {
-        $userModelClass = LaravelAuth::userModel();
 
         return [
             'id' => fn () => 'unknown-'.Str::orderedUuid(),
@@ -34,7 +33,7 @@ class MultiFactorCredentialFactory extends Factory
             'type' => fn () => Arr::random([CredentialType::TOTP, CredentialType::PUBLIC_KEY]),
             'secret' => 'super-secret-value',
             'created_at' => $this->faker->dateTime(),
-            'user_id' => fn () => $userModelClass::factory(),
+            'user_id' => fn () => LaravelAuth::userModel()::factory(),
         ];
     }
 

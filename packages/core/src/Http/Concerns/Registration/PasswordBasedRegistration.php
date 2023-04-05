@@ -49,9 +49,8 @@ trait PasswordBasedRegistration
      */
     protected function createPasswordBasedUser(Request $request): Authenticatable
     {
-        $userModelClass = LaravelAuth::userModel();
 
-        return $userModelClass::create([
+        return LaravelAuth::userModel()::create([
             'email' => $request->input('email'),
             $this->usernameField() => $request->input($this->usernameField()),
             'name' => $request->name,

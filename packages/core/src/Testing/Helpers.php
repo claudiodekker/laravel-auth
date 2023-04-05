@@ -39,9 +39,8 @@ trait Helpers
 
     protected function generateUser($overrides = []): Model&Authenticatable
     {
-        $userModelClass = LaravelAuth::userModel();
 
-        return $userModelClass::factory()->create(array_merge([
+        return LaravelAuth::userModel()::factory()->create(array_merge([
             $this->usernameField() => $this->defaultUsername(),
             'email' => 'claudio@ubient.net',
             'password' => Hash::make('password'),

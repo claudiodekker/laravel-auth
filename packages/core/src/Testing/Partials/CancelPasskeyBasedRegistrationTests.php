@@ -14,13 +14,12 @@ trait CancelPasskeyBasedRegistrationTests
     /** @test */
     public function it_releases_the_claimed_user_when_canceling_passkey_based_registration(): void
     {
-        $userModelClass = LaravelAuth::userModel();
 
         Event::fake([Registered::class]);
         $this->initializePasskeyBasedRegisterAttempt();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
         $this->assertGuest();
-        $this->assertCount(1, $users = $userModelClass::all());
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
         tap($users->first(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});
@@ -33,18 +32,17 @@ trait CancelPasskeyBasedRegistrationTests
         $response->assertStatus(200);
         $response->assertJson(['message' => 'The passkey registration has been cancelled.']);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, $userModelClass::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
         Event::assertNothingDispatched();
     }
 
     /** @test */
     public function it_cannot_cancel_passkey_based_registration_when_authenticated(): void
     {
-        $userModelClass = LaravelAuth::userModel();
 
         Event::fake([Registered::class]);
         $this->initializePasskeyBasedRegisterAttempt();
-        $this->assertCount(1, $users = $userModelClass::all());
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
         $this->actingAs($users->first());
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
 
@@ -52,7 +50,7 @@ trait CancelPasskeyBasedRegistrationTests
 
         $response->assertRedirect(RouteServiceProvider::HOME);
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(1, $userModelClass::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
         Event::assertNothingDispatched();
     }
 
