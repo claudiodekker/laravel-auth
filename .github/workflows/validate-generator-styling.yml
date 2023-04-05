@@ -9,8 +9,9 @@ on:
 
 jobs:
   validator:
+    runs-on: ubuntu-22.04
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+
     strategy:
       fail-fast: true
       matrix:
