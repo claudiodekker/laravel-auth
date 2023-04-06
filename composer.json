@@ -21,8 +21,7 @@
         "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^7.0|^8.0",
         "phpunit/phpunit": "^9.5.10",
-        "roave/security-advisories": "dev-latest",
-        "symplify/monorepo-builder": "11.2.2.72"
+        "roave/security-advisories": "dev-latest"
     },
     "autoload": {
         "psr-4": {
