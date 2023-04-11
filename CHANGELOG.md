@@ -18,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Improved dev-dependencies ([#39](https://github.com/claudiodekker/laravel-auth/pull/39))
 - Remove ext-json requirement ([#41](https://github.com/claudiodekker/laravel-auth/pull/41))
-- Update Changelog & add changelog auto-updater ([#43](https://github.com/claudiodekker/laravel-auth/pull/43))
 
 ### Fixed
 
