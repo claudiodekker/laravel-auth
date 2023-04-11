@@ -123,7 +123,12 @@ class SpomkyWebAuthn implements WebAuthnContract
         );
 
         try {
-            $publicKeyCredentialSource = $validator->check($authenticatorResponse, $creationOptions, $request);
+            $publicKeyCredentialSource = $validator->check(
+                $authenticatorResponse,
+                $creationOptions,
+                $request,
+                Config::get('laravel-auth.webauthn.secured_relying_parties')
+            );
         } catch (Throwable $exception) {
             throw new InvalidPublicKeyCredentialException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -206,6 +211,7 @@ class SpomkyWebAuthn implements WebAuthnContract
                 $requestOptions,
                 $request,
                 $user?->id(),
+                Config::get('laravel-auth.webauthn.secured_relying_parties')
             );
         } catch (Throwable $exception) {
             throw new InvalidPublicKeyCredentialException($exception->getMessage(), $exception->getCode(), $exception);

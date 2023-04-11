@@ -45,6 +45,16 @@ return [
         ],
 
         /**
+         * These option is only intended for development purposes, and should not be used in production environment.
+         * It is important for scenarios where you want to test the WebAuthn flow on localhost, but you don't have
+         * a valid SSL certificate. In this case, you can use this option to bypass the SSL requirement.
+         */
+        'secured_relying_parties' => 
+            env('AUTH_RP_ID', Str::after(config('app.url'), '://')) === 'localhost' && env('APP_ENV') === 'local'
+                ? ['localhost']
+                : [],
+
+        /**
          * These options are used to configure the preferences for multi-factor authentication.
          *
          * In contrast to Passkeys (or client-side discoverable credentials), the credentials used during
