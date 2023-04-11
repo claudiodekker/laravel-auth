@@ -476,7 +476,7 @@
 <div id="app">JavaScript is required to create an account.</div>
 <script type="text/x-template" id="vue-register-root">
   <passkey-based-register-form v-if="isWebAuthnSupported && passkeyBased" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @toggleForm="toggleForm"  />
-  <password-based-register-form v-else :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" :is-webauthn-supported="isWebAuthnSupported" @toggleForm="toggleForm" />
+  <password-based-register-form v-else :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" :is-web-authn-supported="isWebAuthnSupported" @toggleForm="toggleForm" />
 </script>
 <script>
   const { createApp } = Vue
