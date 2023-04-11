@@ -348,7 +348,7 @@
   <h2>Password-based registration</h2>
   <p>
     This form allows you to register a new account using an username and password combination.
-    <template v-if="isWebAuthnSupported">
+    <template v-if="isWebauthnSupported">
       While this is what most people are still used to, we highly recommended to <a href="#" @click.prevent="toggleForm">register using a passkey instead</a>.
     </template>
   </p>
@@ -394,7 +394,7 @@
         type: Object,
         default: () => ({}),
       },
-      isWebAuthnSupported: {
+      isWebauthnSupported: {
         type: Boolean,
         required: true,
       },
@@ -486,8 +486,8 @@
 <!-- Root Page Component -->
 <div id="app">JavaScript is required to create an account.</div>
 <script type="text/x-template" id="vue-register-root">
-  <passkey-based-register-form v-if="isWebAuthnSupported && passkeyBased" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @toggleForm="toggleForm"  />
-  <password-based-register-form v-else :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" :is-web-authn-supported="isWebAuthnSupported" @toggleForm="toggleForm" />
+  <passkey-based-register-form v-if="isWebauthnSupported && passkeyBased" :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" @toggleForm="toggleForm"  />
+  <password-based-register-form v-else :endpoint="bladeVariables.endpoint" :headers="bladeVariables.headers" :is-webauthn-supported="isWebauthnSupported" @toggleForm="toggleForm" />
 </script>
 <script>
   const { createApp } = Vue
@@ -506,7 +506,7 @@
       /*
        * Determines whether this browser supports WebAuthn (passkey credentials).
        */
-      isWebAuthnSupported() {
+      isWebauthnSupported() {
         return typeof navigator.credentials !== 'undefined' && typeof window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable === 'function'
       },
     },
