@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core: Fixed timing-related test regression ([#24](https://github.com/claudiodekker/laravel-auth/pull/24))
 - Bladebones: Recovery Code must be exactly 10 characters ([#28](https://github.com/claudiodekker/laravel-auth/pull/28))
 - Core: Public Key Challenge - Update signature count ([#31](https://github.com/claudiodekker/laravel-auth/pull/31))
+- Fix is-web-authn-supported attribute ([#46](https://github.com/claudiodekker/laravel-auth/pull/46))
 
 ### Changed
 
