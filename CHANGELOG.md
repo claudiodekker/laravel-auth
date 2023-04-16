@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core: Add support for pruning "claimed" users that never finish sign-up ([#27](https://github.com/claudiodekker/laravel-auth/pull/27))
 - Add docblock-level `@see`-references ([#29](https://github.com/claudiodekker/laravel-auth/pull/29))
 - Core: Skip the recovery code challenge when no codes exist ([#30](https://github.com/claudiodekker/laravel-auth/pull/30))
+- Local dev: Allow marking origins as "potentially trustworthy" ([#45](https://github.com/claudiodekker/laravel-auth/pull/45))
 
 ### Optimized
 
