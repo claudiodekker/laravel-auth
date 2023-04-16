@@ -152,10 +152,32 @@ trait Helpers
         return App::make(WebAuthnContract::class)->generatePasskeyCreationOptions($userEntity);
     }
 
+    protected function mockPasskeyCreationOptionsTwo(User $user): PublicKeyCredentialCreationOptions
+    {
+        Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
+        $this->mockWebauthnChallenge('ImJ9UcKWlxQeb8V4MxSrrg');
+
+        $userEntity = new PublicKeyCredentialUserEntity(
+            $user->id,
+            $user->{$this->usernameField()},
+            $user->name
+        );
+
+        return App::make(WebAuthnContract::class)->generatePasskeyCreationOptions($userEntity);
+    }
+
     protected function mockPasskeyRequestOptions(): PublicKeyCredentialRequestOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'authtest.wrp.app');
         $this->mockWebauthnChallenge('R9KnmyTxs6zHJB75bhLKgw');
+
+        return App::make(WebAuthnContract::class)->generatePasskeyRequestOptions();
+    }
+
+    protected function mockPasskeyRequestOptionsTwo(): PublicKeyCredentialRequestOptions
+    {
+        Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
+        $this->mockWebauthnChallenge('ImJ9UcKWlxQeb8V4MxSrrg');
 
         return App::make(WebAuthnContract::class)->generatePasskeyRequestOptions();
     }
