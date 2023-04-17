@@ -36,7 +36,7 @@ class LaravelAuth
     /**
      * Set the User model class name.
      */
-    public static function useUserModel(string $model): void
+    public static function useUserModel(string $model = null): void
     {
         static::$userModel = $model;
     }

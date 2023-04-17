@@ -10,9 +10,6 @@ use ClaudioDekker\LaravelAuth\Tests\TestCase;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * @backupStaticAttributes enabled
- */
 class LaravelAuthTest extends TestCase
 {
     /**
@@ -29,6 +26,8 @@ class LaravelAuthTest extends TestCase
     protected function tearDown(): void
     {
         LaravelAuth::$runsMigrations = true;
+        LaravelAuth::useMultiFactorCredentialModel(MultiFactorCredential::class);
+        LaravelAuth::useUserModel();
 
         parent::tearDown();
     }
