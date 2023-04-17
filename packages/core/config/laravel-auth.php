@@ -42,6 +42,20 @@ return [
              * The name of your application.
              */
             'name' => env('AUTH_RP_NAME', config('app.name', 'Laravel')),
+
+            /**
+             * This setting allows you to mark specific origins as "potentially trustworthy", enabling you
+             * to bypass strict requirements for HTTPS and authentication. This can be helpful on local
+             * environments where HTTPS may not be accessible. This feature is only available when
+             * the APP_DEBUG option is set to true, as it should NOT be used in production.
+             *
+             * @link https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-origin
+             * @link https://www.w3.org/TR/secure-contexts/#localhost
+             */
+            'potentially_trustworthy_origins' => [
+                'localhost',
+            ],
+
         ],
 
         /**

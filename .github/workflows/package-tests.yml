@@ -9,7 +9,8 @@ on:
 
 jobs:
   package-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     strategy:
       fail-fast: true
       matrix:
@@ -39,17 +40,6 @@ jobs:
         working-directory: ./packages/${{ matrix.package }}
         if: matrix.package != 'core'
 
-      - name: Set Minimum PHP 8.1 Versions
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: |
-            cd ./packages/${{ matrix.package }}
-            composer require phpunit/phpunit:^9.5.8 --dev --${{ matrix.stability }} --no-update --no-interaction
-            composer require vlucas/phpdotenv:^5.3.1 --${{ matrix.stability }} --no-update --no-interaction
-        if: matrix.php >= 8.1 && matrix.stability == 'prefer-lowest'
-
       - name: Install dependencies
         uses: nick-fields/retry@v2
         with:
@@ -57,6 +47,7 @@ jobs:
           max_attempts: 5
           command: |
             cd ./packages/${{ matrix.package }}
+            composer require "illuminate/contracts=^${{ matrix.laravel }}" --no-update
             composer update --${{ matrix.stability }} --no-interaction
 
       - name: Execute tests

@@ -325,6 +325,106 @@ trait SubmitPasskeyBasedRegistrationTests
     }
 
     /** @test */
+    public function it_confirms_passkey_based_registration_on_an_insecure_origin_that_has_been_manually_marked_as_trustworthy(): void
+    {
+        Event::fake(Registered::class);
+        Config::set('app.debug', true);
+        Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['localhost']);
+        $user = $this->generateUser(['id' => 1, 'has_password' => false]);
+        $options = $this->mockPasskeyCreationOptionsTwo($user);
+        Session::put('auth.register.passkey_creation_options', serialize($options));
+
+        $response = $this->postJson(route('register'), [
+            'type' => 'passkey',
+            'credential' => [
+                'id' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'rawId' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'response' => [
+                    'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiSW1KOVVjS1dseFFlYjhWNE14U3JyZyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3QifQ',
+                    'attestationObject' => 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCA_whW46e5nw7iOM8BHvuPf4NfvpQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR_D-Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4',
+                ],
+                'type' => 'public-key',
+            ],
+        ]);
+
+        $response->assertCreated();
+        $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
+        $this->assertAuthenticatedAs($user);
+        $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
+        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        tap($credentials->first(), function (MultiFactorCredential $key) use ($user) {
+            $this->assertSame('public-key-ID_CFbjp7mfDuI4zwEe-49_g1-8', $key->id);
+            $this->assertSame($user->id, $key->user_id);
+            $this->assertEquals(CredentialType::PUBLIC_KEY, $key->type);
+            $this->assertEquals('User Passkey', $key->name);
+            $this->assertSame('{"id":"ID\/CFbjp7mfDuI4zwEe+49\/g1+8=","publicKey":"pQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR\/D+Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4=","signCount":0,"userHandle":"1","transports":[]}', $key->secret);
+        });
+        Event::assertDispatched(Registered::class, fn (Registered $event) => $event->user->is($user));
+    }
+
+    /** @test */
+    public function it_cannot_confirm_passkey_based_registration_on_an_insecure_origin_that_has_been_manually_marked_as_trustworthy_when_debug_is_disabled(): void
+    {
+        Event::fake(Registered::class);
+        Config::set('app.debug', false);
+        Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['localhost']);
+        $user = $this->generateUser(['id' => 1, 'has_password' => false]);
+        $options = $this->mockPasskeyCreationOptionsTwo($user);
+        Session::put('auth.register.passkey_creation_options', serialize($options));
+
+        $response = $this->postJson(route('register'), [
+            'type' => 'passkey',
+            'credential' => [
+                'id' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'rawId' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'response' => [
+                    'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiSW1KOVVjS1dseFFlYjhWNE14U3JyZyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3QifQ',
+                    'attestationObject' => 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCA_whW46e5nw7iOM8BHvuPf4NfvpQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR_D-Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4',
+                ],
+                'type' => 'public-key',
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
+        $this->assertGuest();
+        $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
+        $this->assertCount(0, MultiFactorCredential::all());
+        Event::assertNothingDispatched();
+    }
+
+    /** @test */
+    public function it_cannot_confirm_passkey_based_registration_on_an_insecure_origin_when_it_has_not_been_manually_marked_as_trustworthy(): void
+    {
+        Event::fake(Registered::class);
+        Config::set('app.debug', true);
+        Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['foo.com']);
+        $user = $this->generateUser(['id' => 1, 'has_password' => false]);
+        $options = $this->mockPasskeyCreationOptionsTwo($user);
+        Session::put('auth.register.passkey_creation_options', serialize($options));
+
+        $response = $this->postJson(route('register'), [
+            'type' => 'passkey',
+            'credential' => [
+                'id' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'rawId' => 'ID_CFbjp7mfDuI4zwEe-49_g1-8',
+                'response' => [
+                    'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiSW1KOVVjS1dseFFlYjhWNE14U3JyZyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3QifQ',
+                    'attestationObject' => 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViYSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCA_whW46e5nw7iOM8BHvuPf4NfvpQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR_D-Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4',
+                ],
+                'type' => 'public-key',
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
+        $this->assertGuest();
+        $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
+        $this->assertCount(0, MultiFactorCredential::all());
+        Event::assertNothingDispatched();
+    }
+
+    /** @test */
     public function it_automatically_enables_sudo_mode_when_the_passkey_based_user_is_registered(): void
     {
         Carbon::setTestNow(now());

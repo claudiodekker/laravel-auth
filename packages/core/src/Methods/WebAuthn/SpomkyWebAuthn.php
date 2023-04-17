@@ -34,6 +34,7 @@ use Cose\Algorithm\Signature\RSA\RS384;
 use Cose\Algorithm\Signature\RSA\RS512;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -123,7 +124,12 @@ class SpomkyWebAuthn implements WebAuthnContract
         );
 
         try {
-            $publicKeyCredentialSource = $validator->check($authenticatorResponse, $creationOptions, $request);
+            $publicKeyCredentialSource = $validator->check(
+                $authenticatorResponse,
+                $creationOptions,
+                $request,
+                $this->potentiallyTrustworthyOrigins(),
+            );
         } catch (Throwable $exception) {
             throw new InvalidPublicKeyCredentialException($exception->getMessage(), $exception->getCode(), $exception);
         }
@@ -206,6 +212,7 @@ class SpomkyWebAuthn implements WebAuthnContract
                 $requestOptions,
                 $request,
                 $user?->id(),
+                $this->potentiallyTrustworthyOrigins(),
             );
         } catch (Throwable $exception) {
             throw new InvalidPublicKeyCredentialException($exception->getMessage(), $exception->getCode(), $exception);
@@ -484,5 +491,21 @@ class SpomkyWebAuthn implements WebAuthnContract
             Ed256::create(),
             Ed512::create(),
         );
+    }
+
+    /**
+     * The RP ID's that are considered to be potentially trustworthy.
+     * Used to bypass strict requirements for HTTPS and authentication on local environments.
+     *
+     * @link https://w3c.github.io/webappsec-secure-contexts/#potentially-trustworthy-origin
+     * @link https://www.w3.org/TR/secure-contexts/#localhost
+     */
+    protected function potentiallyTrustworthyOrigins(): array
+    {
+        if (! App::hasDebugModeEnabled()) {
+            return [];
+        }
+
+        return Config::get('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', []);
     }
 }
