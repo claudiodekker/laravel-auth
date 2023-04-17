@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;

@@ -81,6 +81,10 @@ class MultiFactorCredential extends Model
      */
     public function user()
     {
-        return $this->belongsTo(LaravelAuth::userModel(), 'user_id');
+        return $this->belongsTo(
+            LaravelAuth::userModel(),
+            'user_id',
+            LaravelAuth::user()->getKeyName()
+        );
     }
 }

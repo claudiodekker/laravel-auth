@@ -3,6 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Settings\Totp;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\Totp\Contracts\TotpContract as Authenticator;
 use ClaudioDekker\LaravelAuth\Methods\Totp\GoogleTwoFactorAuthenticator;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
@@ -27,7 +28,7 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $response->assertRedirect(route('auth.settings'));
         $this->assertFalse(Session::has('auth.mfa_setup.pending_totp_secret'));
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         tap($credentials->first(), function (MultiFactorCredential $credential) use ($secret) {
             $this->assertSame(Auth::id(), $credential->user_id);
             $this->assertSame(CredentialType::TOTP, $credential->type);
@@ -49,7 +50,7 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -66,7 +67,7 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -83,7 +84,7 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.size.string', ['attribute' => 'code', 'size' => 6])]], $response->exception->errors());
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -100,7 +101,7 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -114,7 +115,7 @@ trait ConfirmTotpCredentialRegistrationTests
             ]);
 
         $response->assertStatus(428);
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -130,6 +131,6 @@ trait ConfirmTotpCredentialRegistrationTests
 
         $response->assertRedirect(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('auth.mfa_setup.pending_totp_secret'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 }

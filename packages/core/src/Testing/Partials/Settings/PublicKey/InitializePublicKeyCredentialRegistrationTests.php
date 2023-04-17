@@ -3,7 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Settings\PublicKey;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
@@ -18,7 +18,7 @@ trait InitializePublicKeyCredentialRegistrationTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         Config::set('laravel-auth.webauthn.relying_party.name', 'Laravel Auth Package');
         $user = $this->generateUser();
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => CredentialType::PUBLIC_KEY->value.'-'.'mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB_MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1-RIuTF9DUtEJZEEK',
             'secret' => '{"id":"mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB\/MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1+RIuTF9DUtEJZEEK","publicKey":"pQECAyYgASFYIBw\/HArIcANWNOBOxq3hH8lrHo9a17nQDxlqwybjDpHEIlggu3QUKIbALqsGuHfJI3LTKJSNmk0YCFb5oz1hjJidRMk=","signCount":0,"userHandle":"1","transports":[]}',
             'name' => 'existing-registration',

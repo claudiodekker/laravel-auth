@@ -2,9 +2,8 @@
 
 namespace ClaudioDekker\LaravelAuth\Tests\Unit;
 
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Tests\TestCase;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Factories\UserFactory;
 
@@ -17,11 +16,11 @@ class MultiFactorCredentialTest extends TestCase
     {
         $user = UserFactory::new()->create();
 
-        $credential = MultiFactorCredential::factory()->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $this->assertInstanceOf(User::class, $credential->user);
+        $this->assertInstanceOf(LaravelAuth::userModel(), $credential->user);
         $this->assertTrue($credential->user->is($user));
     }
 
@@ -31,22 +30,22 @@ class MultiFactorCredentialTest extends TestCase
         config([
             'auth.defaults.guard' => 'foo',
             'auth.guards.foo.provider' => 'bar',
-            'auth.providers.bar.model' => User::class,
+            'auth.providers.bar.model' => LaravelAuth::userModel(),
         ]);
         $user = UserFactory::new()->create();
 
-        $credential = MultiFactorCredential::factory()->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->create([
             'user_id' => $user->id,
         ]);
 
-        $this->assertInstanceOf(User::class, $credential->user);
+        $this->assertInstanceOf(LaravelAuth::userModel(), $credential->user);
         $this->assertTrue($credential->user->is($user));
     }
 
     /** @test */
     public function it_does_not_expose_the_secret_when_serialized(): void
     {
-        $token = MultiFactorCredential::factory()->create([
+        $token = LaravelAuth::multiFactorCredentialModel()::factory()->create([
             'user_id' => 1,
             'secret' => 'foo',
         ]);

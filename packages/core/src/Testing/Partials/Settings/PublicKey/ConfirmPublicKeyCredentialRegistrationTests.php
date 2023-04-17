@@ -3,6 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Settings\PublicKey;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -32,7 +33,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
 
         $response->assertCreated();
         $this->assertFalse(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         tap($credentials->first(), function (MultiFactorCredential $key) {
             $this->assertSame('public-key-mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB_MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1-RIuTF9DUtEJZEEK', $key->id);
             $this->assertSame(Auth::id(), $key->user_id);
@@ -66,7 +67,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
             'name' => 'The name field is required.',
         ]);
 
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         $this->assertTrue(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
     }
 
@@ -86,7 +87,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
             'credential' => 'The credential field is required.',
         ]);
 
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         $this->assertTrue(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
     }
 
@@ -110,7 +111,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         ]);
 
         $response->assertStatus(428);
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         $this->assertFalse(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
     }
 
@@ -119,7 +120,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
     {
         $this->enableSudoMode();
         $user = $this->generateUser(['id' => 1]);
-        $existingCredential = MultiFactorCredential::factory()->publicKey()->create([
+        $existingCredential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->create([
             'id' => 'public-key-mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB_MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1-RIuTF9DUtEJZEEK',
             'name' => 'existing-registration',
             'secret' => '{"id":"mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB\/MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1+RIuTF9DUtEJZEEK","publicKey":"pQECAyYgASFYIBw\/HArIcANWNOBOxq3hH8lrHo9a17nQDxlqwybjDpHEIlggu3QUKIbALqsGuHfJI3LTKJSNmk0YCFb5oz1hjJidRMk=","signCount":0,"userHandle":"1","transports":[]}',
@@ -144,7 +145,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertTrue(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
 
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         $this->assertTrue($credentials->first()->is($existingCredential));
     }
 
@@ -173,7 +174,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         $response->assertJsonValidationErrors(['credential' => [__('laravel-auth::auth.challenge.public-key')]]);
         $this->assertTrue(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
 
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
     }
 
     /** @test */
@@ -198,7 +199,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
 
         $response->assertForbidden();
         $response->assertExactJson(['message' => 'Sudo-mode required.']);
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         $this->assertTrue(Session::has('auth.mfa_setup.public_key_credential_creation_options'));
     }
 }

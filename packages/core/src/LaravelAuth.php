@@ -16,12 +16,12 @@ class LaravelAuth
     /**
      * The Multi-Factor Credential model class name.
      */
-    public static string $multiFactorCredentialModel = MultiFactorCredential::class;
+    protected static string $multiFactorCredentialModel = MultiFactorCredential::class;
 
     /**
      * The User model class name.
      */
-    public static string $userModel;
+    protected static ?string $userModel = null;
 
     /**
      * Configure Laravel Auth to not register its migrations.
@@ -36,14 +36,8 @@ class LaravelAuth
     /**
      * Set the User model class name.
      */
-    public static function useUserModel(?string $model = null): void
+    public static function useUserModel(string $model): void
     {
-        if ($model === null) {
-            $guard = Config::get('auth.defaults.guard');
-            $provider = Config::get('auth.guards.'.$guard.'.provider');
-            $model = Config::get('auth.providers.'.$provider.'.model');
-        }
-
         static::$userModel = $model;
     }
 
@@ -52,15 +46,24 @@ class LaravelAuth
      */
     public static function userModel(): string
     {
-        return static::$userModel;
+        if (! is_null(static::$userModel)) {
+            return static::$userModel;
+        }
+
+        $guard = Config::get('auth.defaults.guard');
+        $provider = Config::get('auth.guards.'.$guard.'.provider');
+
+        return Config::get('auth.providers.'.$provider.'.model');
     }
 
     /**
-     * Get a new instance of the User model.
+     * Get a new Multi-Factor Credential model instance.
      */
-    public static function newUserModel(): Model&Authenticatable
+    public static function user(): Model&Authenticatable
     {
-        return new static::$userModel();
+        $model = static::userModel();
+
+        return new $model();
     }
 
     /**
@@ -86,6 +89,8 @@ class LaravelAuth
      */
     public static function multiFactorCredential()
     {
-        return new static::$multiFactorCredentialModel();
+        $model = static::multiFactorCredentialModel();
+
+        return new $model();
     }
 }

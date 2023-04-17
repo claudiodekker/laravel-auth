@@ -2,12 +2,12 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 
@@ -109,10 +109,8 @@ abstract class AccountRecoveryRequestController
 
     /**
      * Resolve the User that should be recovered.
-     *
-     * @return \Illuminate\Contracts\Auth\CanResetPassword|null
      */
-    protected function getUser(Request $request)
+    protected function getUser(Request $request): CanResetPassword|null
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = LaravelAuth::userModel()::query();
@@ -124,20 +122,16 @@ abstract class AccountRecoveryRequestController
 
     /**
      * Determines whether the given user has already requested a recovery link recently.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      */
-    protected function recoveryRecentlyRequested(mixed $user): bool
+    protected function recoveryRecentlyRequested(CanResetPassword $user): bool
     {
         return Password::getRepository()->recentlyCreatedToken($user);
     }
 
     /**
      * Create a new recovery token for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      */
-    protected function createRecoveryToken(mixed $user): string
+    protected function createRecoveryToken(CanResetPassword $user): string
     {
         return Password::getRepository()->create($user);
     }

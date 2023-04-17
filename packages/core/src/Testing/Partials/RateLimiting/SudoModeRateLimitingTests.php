@@ -4,7 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -98,7 +98,7 @@ trait SudoModeRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
@@ -131,7 +131,7 @@ trait SudoModeRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->hitRateLimiter(5, 'user_id::1');
@@ -164,7 +164,7 @@ trait SudoModeRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
@@ -197,7 +197,7 @@ trait SudoModeRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);

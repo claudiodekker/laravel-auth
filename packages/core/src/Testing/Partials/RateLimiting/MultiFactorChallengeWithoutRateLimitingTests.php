@@ -5,7 +5,6 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 use ClaudioDekker\LaravelAuth\Events\Authenticated;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallengeFailed;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -18,7 +17,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser(['id' => 1]);
-        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -55,7 +54,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
     {
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
         $mock = RateLimiter::spy();
 
@@ -75,7 +74,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
     public function it_does_not_increment_the_rate_limiter_when_the_public_key_multi_factor_challenge_fails(): void
     {
         $user = $this->generateUser(['id' => 1]);
-        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -107,7 +106,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
     public function it_does_not_increment_the_rate_limiter_when_the_time_based_one_time_password_multi_factor_challenge_fails(): void
     {
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
         $mock = RateLimiter::spy();
 

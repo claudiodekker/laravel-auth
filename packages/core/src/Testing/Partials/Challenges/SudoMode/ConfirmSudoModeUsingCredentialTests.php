@@ -5,7 +5,7 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\Challenges\SudoMode;
 use ClaudioDekker\LaravelAuth\Events\SudoModeChallenged;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -24,7 +24,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         Redirect::setIntendedUrl($redirectsTo = '/intended');
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
@@ -64,7 +64,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Event::fake([SudoModeChallenged::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
@@ -103,7 +103,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Event::fake([SudoModeChallenged::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -143,11 +143,11 @@ trait ConfirmSudoModeUsingCredentialTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $userA = $this->generateUser(['id' => 1]);
         $userB = $this->generateUser(['id' => 2, $this->usernameField() => $this->anotherUsername()]);
-        MultiFactorCredential::factory()->publicKey()->forUser($userB)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($userB)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
-        MultiFactorCredential::factory()->publicKey()->forUser($userA)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($userA)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -187,7 +187,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         Redirect::setIntendedUrl($redirectsTo = '/intended');
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -228,7 +228,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         Redirect::setIntendedUrl('/intended');
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);

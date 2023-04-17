@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;

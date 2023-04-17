@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract;
@@ -83,7 +82,7 @@ trait Helpers
         ], $overrides));
     }
 
-    protected function preAuthenticate($user, $overrides = []): TestResponse
+    protected function preAuthenticate(Authenticatable $user, $overrides = []): TestResponse
     {
         $this->assertPartlyAuthenticatedAs($response = $this->submitPasswordBasedLoginAttempt($overrides), $user);
 
@@ -97,7 +96,7 @@ trait Helpers
         return $this;
     }
 
-    protected function assertFullyAuthenticatedAs(TestResponse $response, $user): void
+    protected function assertFullyAuthenticatedAs(TestResponse $response, Authenticatable $user): void
     {
         $this->assertAuthenticatedAs($user);
         $this->assertTrue(Collection::make(session()->all())->keys()->contains(function ($key) {
@@ -108,7 +107,7 @@ trait Helpers
         $response->assertSessionMissing('auth.mfa.remember');
     }
 
-    protected function assertPartlyAuthenticatedAs(TestResponse $response, $user): void
+    protected function assertPartlyAuthenticatedAs(TestResponse $response, Authenticatable $user): void
     {
         $this->assertFalse(Collection::make(session()->all())->keys()->contains(function ($key) {
             return Str::startsWith($key, 'login_web_');
@@ -117,7 +116,7 @@ trait Helpers
         $response->assertSessionHas('auth.mfa.user_id', $user->id);
     }
 
-    protected function assertHasRememberCookie(TestResponse $response, $user): void
+    protected function assertHasRememberCookie(TestResponse $response, Authenticatable $user): void
     {
         $this->assertNotNull($user->fresh()->remember_token, 'Remember token not set');
         $this->assertTrue(Collection::make($response->headers->all()['set-cookie'] ?? [])->contains(function ($key) {
@@ -125,7 +124,7 @@ trait Helpers
         }), 'Remember cookie not found.');
     }
 
-    protected function assertMissingRememberCookie(TestResponse $response, $user): void
+    protected function assertMissingRememberCookie(TestResponse $response, Authenticatable $user): void
     {
         $this->assertNull($user->fresh()->remember_token, 'Remember token was set');
         $this->assertFalse(Collection::make($response->headers->all()['set-cookie'] ?? [])->contains(function ($key) {
@@ -141,7 +140,7 @@ trait Helpers
         );
     }
 
-    protected function mockPasskeyCreationOptions($user): PublicKeyCredentialCreationOptions
+    protected function mockPasskeyCreationOptions(Authenticatable $user): PublicKeyCredentialCreationOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'spomky-webauthn.herokuapp.com');
         $this->mockWebauthnChallenge('oFUGhUevQHX7J6o4OFau5PbncCATaHwjHDLLzCTpiyw');
@@ -155,7 +154,7 @@ trait Helpers
         return App::make(WebAuthnContract::class)->generatePasskeyCreationOptions($userEntity);
     }
 
-    protected function mockPasskeyCreationOptionsTwo(User $user): PublicKeyCredentialCreationOptions
+    protected function mockPasskeyCreationOptionsTwo(Authenticatable $user): PublicKeyCredentialCreationOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('ImJ9UcKWlxQeb8V4MxSrrg');
@@ -185,7 +184,7 @@ trait Helpers
         return App::make(WebAuthnContract::class)->generatePasskeyRequestOptions();
     }
 
-    protected function mockPublicKeyCreationOptions($user, array $excludedCredentials = []): PublicKeyCredentialCreationOptions
+    protected function mockPublicKeyCreationOptions(Authenticatable $user, array $excludedCredentials = []): PublicKeyCredentialCreationOptions
     {
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('9WqgpRIYvGMCUYiFT20o1U7hSD193k11zu4tKP7wRcrE26zs1zc4LHyPinvPGS86wu6bDvpwbt8Xp2bQ3VBRSQ');

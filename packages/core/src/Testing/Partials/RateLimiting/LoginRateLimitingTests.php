@@ -6,7 +6,7 @@ use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\Events\Authenticated;
 use ClaudioDekker\LaravelAuth\Events\AuthenticationFailed;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallenged;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -214,7 +214,7 @@ trait LoginRateLimitingTests
     {
         Event::fake([Lockout::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);

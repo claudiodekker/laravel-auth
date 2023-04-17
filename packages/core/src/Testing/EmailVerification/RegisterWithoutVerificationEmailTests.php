@@ -3,7 +3,6 @@
 namespace ClaudioDekker\LaravelAuth\Testing\EmailVerification;
 
 use ClaudioDekker\LaravelAuth\LaravelAuth;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
@@ -42,7 +41,7 @@ trait RegisterWithoutVerificationEmailTests
             ],
         ]);
 
-        $this->assertCount(1, MultiFactorCredential::all());
+        $this->assertCount(1, LaravelAuth::multiFactorCredentialModel()::all());
         Notification::assertNothingSent();
     }
 }

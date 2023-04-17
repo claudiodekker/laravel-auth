@@ -15,8 +15,6 @@ class LaravelAuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        LaravelAuth::useUserModel();
-
         $this->registerResources();
         $this->registerMigrations();
         $this->registerPublishing();

@@ -3,7 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Challenges\SudoMode;
 
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Support\Facades\Session;
 
 trait ViewSudoModeChallengePageTests
@@ -13,7 +13,7 @@ trait ViewSudoModeChallengePageTests
     {
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->assertFalse(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
 
         $response = $this->actingAs($user)->get(route('auth.sudo_mode'));

@@ -11,7 +11,7 @@ trait RemoveCredentialTests
     {
         $this->enableSudoMode();
         $user = $this->generateUser();
-        $credential = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
 
         $response = $this->actingAs($user)
             ->delete(route('auth.credentials.destroy', ['id' => $credential->id]));
@@ -38,7 +38,7 @@ trait RemoveCredentialTests
         $this->enableSudoMode();
         $userA = $this->generateUser([$this->usernameField() => $this->defaultUsername()]);
         $userB = $this->generateUser([$this->usernameField() => $this->anotherUsername()]);
-        $credential = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($userA)->create();
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($userA)->create();
 
         $response = $this->actingAs($userB)
             ->delete(route('auth.credentials.destroy', ['id' => $credential->id]));
@@ -51,7 +51,7 @@ trait RemoveCredentialTests
     public function the_user_cannot_remove_a_credential_when_no_longer_in_sudo_mode(): void
     {
         $user = $this->generateUser();
-        $credential = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
 
         $response = $this->actingAs($user)
             ->delete(route('auth.credentials.destroy', ['id' => $credential->id]));
@@ -65,7 +65,7 @@ trait RemoveCredentialTests
     {
         $this->enableSudoMode();
         $user = $this->generateUser(['has_password' => false]);
-        $credential = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
 
         $response = $this->actingAs($user)
             ->delete(route('auth.credentials.destroy', ['id' => $credential->id]));

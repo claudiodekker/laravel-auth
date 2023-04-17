@@ -8,7 +8,7 @@ use ClaudioDekker\LaravelAuth\Events\AuthenticationFailed;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallenged;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -23,7 +23,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -91,7 +91,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -122,7 +122,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -157,7 +157,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -223,7 +223,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"2","transports":[]}',
         ]);
@@ -260,7 +260,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         Config::set('app.debug', true);
         Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['localhost']);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ID_CFbjp7mfDuI4zwEe-49_g1-8',
             'secret' => '{"id":"ID\/CFbjp7mfDuI4zwEe+49\/g1+8=","publicKey":"pQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR\/D+Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -298,7 +298,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         Config::set('app.debug', false);
         Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['localhost']);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ID_CFbjp7mfDuI4zwEe-49_g1-8',
             'secret' => '{"id":"ID\/CFbjp7mfDuI4zwEe+49\/g1+8=","publicKey":"pQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR\/D+Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -335,7 +335,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         Config::set('app.debug', true);
         Config::set('laravel-auth.webauthn.relying_party.potentially_trustworthy_origins', ['foo.com']);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ID_CFbjp7mfDuI4zwEe-49_g1-8',
             'secret' => '{"id":"ID\/CFbjp7mfDuI4zwEe+49\/g1+8=","publicKey":"pQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR\/D+Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -370,7 +370,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -408,7 +408,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         Redirect::setIntendedUrl($redirectsTo = '/intended');
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -445,7 +445,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         Carbon::setTestNow(now());
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class, SudoModeEnabled::class]);
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -483,7 +483,7 @@ trait SubmitPasskeyBasedAuthenticationTests
     public function the_session_identifier_gets_regenerated_to_prevent_session_fixation_attacks_when_passkey_based_authentication_succeeds(): void
     {
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-ea2KxTIqiH6GqbKePv4rwk8XWVE',
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);

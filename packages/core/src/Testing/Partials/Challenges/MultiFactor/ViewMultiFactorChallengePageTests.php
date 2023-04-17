@@ -18,7 +18,7 @@ trait ViewMultiFactorChallengePageTests
     public function the_multi_factor_challenge_page_can_be_viewed(): void
     {
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $response = $this->preAuthenticate($user);
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
         Config::set('laravel-auth.webauthn.relying_party.id', $rpId = 'configured.rpid');
@@ -48,7 +48,7 @@ trait ViewMultiFactorChallengePageTests
     {
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->forUser($user)->totp()->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->forUser($user)->totp()->create();
         $response = $this->preAuthenticate($user);
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
         $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
@@ -64,7 +64,7 @@ trait ViewMultiFactorChallengePageTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        $credential = LaravelAuth::multiFactorCredential()::factory()->forUser($user)->totp()->create();
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->forUser($user)->totp()->create();
         $response = $this->preAuthenticate($user);
         $intendedLocation = session()->get('auth.mfa.intended_location');
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);

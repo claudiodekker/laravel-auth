@@ -4,7 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials\RateLimiting;
 
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
@@ -52,7 +52,7 @@ trait SudoModeWithoutRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::partialMock();
@@ -82,7 +82,7 @@ trait SudoModeWithoutRateLimitingTests
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        MultiFactorCredential::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::spy();

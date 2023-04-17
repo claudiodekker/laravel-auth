@@ -16,9 +16,9 @@ trait MultiFactorChallengeViewTests
         Redirect::setIntendedUrl($redirectsTo = '/intended');
         $this->assertSame($redirectsTo, Session::get('url.intended'));
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->publicKey()->forUser($user)->create();
-        LaravelAuth::multiFactorCredential()::factory()->publicKey()->forUser($user)->create();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
         $this->assertNull(Session::get('url.intended'));
 

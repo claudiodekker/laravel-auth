@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Login;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallenged;

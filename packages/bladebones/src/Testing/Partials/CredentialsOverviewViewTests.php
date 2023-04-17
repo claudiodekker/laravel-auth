@@ -10,9 +10,9 @@ trait CredentialsOverviewViewTests
     public function the_credentials_overview_page_uses_blade_views(): void
     {
         $user = $this->generateUser();
-        $totpOne = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
-        $totpTwo = LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
-        $pubKeyOne = LaravelAuth::multiFactorCredential()::factory()->publicKey()->forUser($user)->create();
+        $totpOne = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
+        $totpTwo = LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
+        $pubKeyOne = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->enableSudoMode();
 
         $response = $this->actingAs($user)

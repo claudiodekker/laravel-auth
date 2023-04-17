@@ -22,7 +22,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     public function the_code_field_is_required_when_completing_the_multi_factor_challenge_using_a_time_based_one_time_password(): void
     {
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'));
@@ -37,7 +37,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), ['code' => true]);
@@ -53,7 +53,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -73,8 +73,8 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E')]);
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret]);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E')]);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret]);
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -93,8 +93,8 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret)]);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret)]);
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -113,7 +113,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
         Cache::put('auth.mfa.totp_timestamps.'.$user->getAuthIdentifier(), (int) floor(microtime(true) / 30));
 
@@ -133,7 +133,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     {
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user, ['remember' => 'on']);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -154,7 +154,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         Carbon::setTestNow(now());
         Event::fake([Authenticated::class, MultiFactorChallengeFailed::class, SudoModeEnabled::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -176,7 +176,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     public function it_regenerates_the_session_identifier_to_prevent_session_fixation_attacks_when_the_user_completes_the_multi_factor_challenge_using_a_time_based_one_time_password(): void
     {
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
         $this->assertNotEmpty($previousId = session()->getId());
 
