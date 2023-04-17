@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\EmailVerification;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Support\Facades\Notification;

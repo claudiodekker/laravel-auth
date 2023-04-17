@@ -6,7 +6,6 @@ use ClaudioDekker\LaravelAuth\Database\Factories\MultiFactorCredentialFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
 
 class MultiFactorCredential extends Model
 {

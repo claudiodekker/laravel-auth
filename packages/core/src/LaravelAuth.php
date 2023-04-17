@@ -38,7 +38,7 @@ class LaravelAuth
      */
     public static function useUserModel(?string $model = null): void
     {
-        if($model === null) {
+        if ($model === null) {
             $guard = Config::get('auth.defaults.guard');
             $provider = Config::get('auth.guards.'.$guard.'.provider');
             $model = Config::get('auth.providers.'.$provider.'.model');

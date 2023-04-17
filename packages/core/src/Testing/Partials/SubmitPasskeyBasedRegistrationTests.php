@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
