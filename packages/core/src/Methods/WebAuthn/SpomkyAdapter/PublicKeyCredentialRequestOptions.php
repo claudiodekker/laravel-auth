@@ -22,17 +22,17 @@ class PublicKeyCredentialRequestOptions extends PublicKeyCredentialRequestOption
             $options->getRpId(),
             new PublicKeyCredentialDescriptors(
                 ...Collection::make($options->getAllowCredentials())
-                ->map(fn (\Webauthn\PublicKeyCredentialDescriptor $descriptor) => PublicKeyCredentialDescriptor::fromSpomky($descriptor))
-                ->all()
+                    ->map(fn (\Webauthn\PublicKeyCredentialDescriptor $descriptor) => PublicKeyCredentialDescriptor::fromSpomky($descriptor))
+                    ->all()
             ),
             UserVerificationRequirement::tryFrom($options->getUserVerification() ?? UserVerificationRequirement::PREFERRED->value),
             new AuthenticationExtensionsClientInputs(
                 ...Collection::make($options->getExtensions())
-                ->map(fn (\Webauthn\AuthenticationExtensions\AuthenticationExtension $extension) => new ClientExtension(
-                    $extension->name(),
-                    $extension->value()
-                ))
-                ->all()
+                    ->map(fn (\Webauthn\AuthenticationExtensions\AuthenticationExtension $extension) => new ClientExtension(
+                        $extension->name(),
+                        $extension->value()
+                    ))
+                    ->all()
             )
         );
     }

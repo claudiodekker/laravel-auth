@@ -23,24 +23,24 @@ class PublicKeyCredentialCreationOptions extends PublicKeyCredentialCreationOpti
             $options->getChallenge(),
             new PublicKeyCredentialParametersCollection(
                 ...Collection::make($options->getPubKeyCredParams())
-                ->map(fn (\Webauthn\PublicKeyCredentialParameters $parameters) => PublicKeyCredentialParameters::fromSpomky($parameters))
-                ->all()
+                    ->map(fn (\Webauthn\PublicKeyCredentialParameters $parameters) => PublicKeyCredentialParameters::fromSpomky($parameters))
+                    ->all()
             ),
             $options->getTimeout(),
             AuthenticatorSelectionCriteria::fromSpomky($options->getAuthenticatorSelection()),
             new PublicKeyCredentialDescriptors(
                 ...Collection::make($options->getExcludeCredentials())
-                ->map(fn (\Webauthn\PublicKeyCredentialDescriptor $descriptor) => PublicKeyCredentialDescriptor::fromSpomky($descriptor))
-                ->all()
+                    ->map(fn (\Webauthn\PublicKeyCredentialDescriptor $descriptor) => PublicKeyCredentialDescriptor::fromSpomky($descriptor))
+                    ->all()
             ),
             AttestationConveyancePreference::from($options->getAttestation()),
             new AuthenticationExtensionsClientInputs(
                 ...Collection::make($options->getExtensions())
-                ->map(fn (\Webauthn\AuthenticationExtensions\AuthenticationExtension $extension) => new ClientExtension(
-                    $extension->name(),
-                    $extension->value()
-                ))
-                ->all()
+                    ->map(fn (\Webauthn\AuthenticationExtensions\AuthenticationExtension $extension) => new ClientExtension(
+                        $extension->name(),
+                        $extension->value()
+                    ))
+                    ->all()
             )
         );
     }

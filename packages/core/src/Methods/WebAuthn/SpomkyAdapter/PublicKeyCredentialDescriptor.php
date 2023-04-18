@@ -20,8 +20,8 @@ class PublicKeyCredentialDescriptor extends PublicKeyCredentialDescriptorContrac
             $descriptor->getId(),
             new AuthenticatorTransports(
                 ...Collection::make($descriptor->getTransports())
-                ->map(fn (string $transport) => AuthenticatorTransport::from($transport))
-                ->all()
+                    ->map(fn (string $transport) => AuthenticatorTransport::from($transport))
+                    ->all()
             )
         );
     }
