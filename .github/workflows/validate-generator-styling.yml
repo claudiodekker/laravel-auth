@@ -55,7 +55,7 @@ jobs:
           composer config minimum-stability dev
           composer config repositories.library path ../monorepo/packages/core
           composer config repositories.adapter path ../monorepo/packages/bladebones
-          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones
+          composer require claudiodekker/laravel-auth-core claudiodekker/laravel-auth-bladebones -W
         working-directory: ./app
 
       - name: Generate Auth Scaffolding
