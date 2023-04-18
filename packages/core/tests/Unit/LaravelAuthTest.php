@@ -5,6 +5,7 @@ namespace ClaudioDekker\LaravelAuth\Tests\Unit;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\LaravelAuthServiceProvider;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\Tests\_fixtures\FakeUser;
 use ClaudioDekker\LaravelAuth\Tests\TestCase;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Schema;
@@ -25,6 +26,8 @@ class LaravelAuthTest extends TestCase
     protected function tearDown(): void
     {
         LaravelAuth::$runsMigrations = true;
+        LaravelAuth::useMultiFactorCredentialModel(MultiFactorCredential::class);
+        LaravelAuth::useUserModel();
 
         parent::tearDown();
     }
@@ -62,7 +65,22 @@ class LaravelAuthTest extends TestCase
         LaravelAuth::useMultiFactorCredentialModel(User::class);
 
         $this->assertSame(LaravelAuth::multiFactorCredentialModel(), User::class);
-        $this->assertSame(LaravelAuth::$multiFactorCredentialModel, User::class);
         $this->assertInstanceOf(User::class, LaravelAuth::multiFactorCredential());
+    }
+
+    /** @test */
+    public function it_uses_the_authentication_guard_defined_user_model_by_default(): void
+    {
+        $this->assertSame(LaravelAuth::userModel(), User::class);
+        $this->assertInstanceOf(User::class, LaravelAuth::user());
+    }
+
+    /** @test */
+    public function it_can_customize_the_user_model(): void
+    {
+        LaravelAuth::useUserModel(FakeUser::class);
+
+        $this->assertSame(LaravelAuth::userModel(), FakeUser::class);
+        $this->assertInstanceOf(FakeUser::class, LaravelAuth::user());
     }
 }

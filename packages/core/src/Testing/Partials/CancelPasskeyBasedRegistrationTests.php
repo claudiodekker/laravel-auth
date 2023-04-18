@@ -2,8 +2,8 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
@@ -17,8 +17,8 @@ trait CancelPasskeyBasedRegistrationTests
         $this->initializePasskeyBasedRegisterAttempt();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
         $this->assertGuest();
-        $this->assertCount(1, $users = User::all());
-        tap($users->first(), function (User $user) {
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
+        tap($users->first(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});
             $this->assertTrue(password_verify('AUTOMATICALLY-GENERATED-PASSWORD-HASH', $user->password));
@@ -30,7 +30,7 @@ trait CancelPasskeyBasedRegistrationTests
         $response->assertStatus(200);
         $response->assertJson(['message' => 'The passkey registration has been cancelled.']);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -39,7 +39,7 @@ trait CancelPasskeyBasedRegistrationTests
     {
         Event::fake([Registered::class]);
         $this->initializePasskeyBasedRegisterAttempt();
-        $this->assertCount(1, $users = User::all());
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
         $this->actingAs($users->first());
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
 
@@ -47,7 +47,7 @@ trait CancelPasskeyBasedRegistrationTests
 
         $response->assertRedirect(RouteServiceProvider::HOME);
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
         Event::assertNothingDispatched();
     }
 

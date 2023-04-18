@@ -89,9 +89,9 @@ class User extends Authenticatable
     public function prunable()
     {
         return static::query()
-          ->where('has_password', false)
-          ->where('created_at', '<', now()->subHour())
-          ->where('created_at', '>', now()->subDay())
-          ->doesntHave('multiFactorCredentials');
+            ->where('has_password', false)
+            ->where('created_at', '<', now()->subHour())
+            ->where('created_at', '>', now()->subDay())
+            ->doesntHave('multiFactorCredentials');
     }
 }

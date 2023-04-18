@@ -2,7 +2,7 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\EmailVerification;
 
-use App\Models\User;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
@@ -13,11 +13,11 @@ trait RegisterWithVerificationEmailTests
     public function it_sends_a_verification_email_for_password_based_registration_requests(): void
     {
         Notification::fake();
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
 
         $this->submitPasswordBasedRegisterAttempt();
 
-        Notification::assertSentTo(User::first(), VerifyEmail::class);
+        Notification::assertSentTo(LaravelAuth::userModel()::first(), VerifyEmail::class);
     }
 
     /** @test */

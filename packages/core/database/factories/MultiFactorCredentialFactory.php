@@ -2,9 +2,10 @@
 
 namespace ClaudioDekker\LaravelAuth\Database\Factories;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -31,16 +32,14 @@ class MultiFactorCredentialFactory extends Factory
             'type' => fn () => Arr::random([CredentialType::TOTP, CredentialType::PUBLIC_KEY]),
             'secret' => 'super-secret-value',
             'created_at' => $this->faker->dateTime(),
-            'user_id' => fn () => User::factory(),
+            'user_id' => fn () => LaravelAuth::userModel()::factory(),
         ];
     }
 
     /**
      * Update the Factory state to generate a token for the specified user.
-     *
-     * @param  User  $user
      */
-    public function forUser($user): self
+    public function forUser(Authenticatable $user): self
     {
         return $this->state(['user_id' => $user]);
     }

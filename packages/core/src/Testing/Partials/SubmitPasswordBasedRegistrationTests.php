@@ -2,10 +2,10 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -17,11 +17,11 @@ trait SubmitPasswordBasedRegistrationTests
     public function it_registers_the_user_using_an_username_and_password(): void
     {
         Event::fake(Registered::class);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 
-        $this->assertCount(1, $users = User::all());
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
         $user = tap($users->first(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});
@@ -41,7 +41,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => '']);
 
         $response->assertRedirect(RouteServiceProvider::HOME);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -51,7 +51,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -61,7 +61,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -71,7 +71,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -80,7 +80,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => '']);
 
         $this->assertUsernameRequiredValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -89,7 +89,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => $this->tooLongUsername()]);
 
         $this->assertUsernameTooLongValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -99,7 +99,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -109,7 +109,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -119,7 +119,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -130,7 +130,7 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => $this->defaultUsername()]);
 
         $this->assertUsernameAlreadyExistsValidationError($response);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -140,7 +140,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.required', ['attribute' => 'password'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -150,7 +150,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -160,7 +160,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -173,7 +173,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.min.string', ['attribute' => 'password', 'min' => 8])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -184,7 +184,7 @@ trait SubmitPasswordBasedRegistrationTests
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 
-        $this->assertCount(1, $users = User::all());
+        $this->assertCount(1, $users = LaravelAuth::userModel()::all());
         $user = tap($users->first(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});

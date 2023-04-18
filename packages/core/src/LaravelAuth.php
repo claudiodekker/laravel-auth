@@ -2,6 +2,10 @@
 
 namespace ClaudioDekker\LaravelAuth;
 
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
+
 class LaravelAuth
 {
     /**
@@ -12,7 +16,12 @@ class LaravelAuth
     /**
      * The Multi-Factor Credential model class name.
      */
-    public static string $multiFactorCredentialModel = MultiFactorCredential::class;
+    protected static string $multiFactorCredentialModel = MultiFactorCredential::class;
+
+    /**
+     * The User model class name.
+     */
+    protected static ?string $userModel = null;
 
     /**
      * Configure Laravel Auth to not register its migrations.
@@ -22,6 +31,39 @@ class LaravelAuth
         static::$runsMigrations = false;
 
         return new static();
+    }
+
+    /**
+     * Set the User model class name.
+     */
+    public static function useUserModel(string $model = null): void
+    {
+        static::$userModel = $model;
+    }
+
+    /**
+     * Get the User model class name.
+     */
+    public static function userModel(): string
+    {
+        if (! is_null(static::$userModel)) {
+            return static::$userModel;
+        }
+
+        $guard = Config::get('auth.defaults.guard');
+        $provider = Config::get('auth.guards.'.$guard.'.provider');
+
+        return Config::get('auth.providers.'.$provider.'.model');
+    }
+
+    /**
+     * Get a new Multi-Factor Credential model instance.
+     */
+    public static function user(): Model&Authenticatable
+    {
+        $model = static::userModel();
+
+        return new $model();
     }
 
     /**
@@ -47,6 +89,8 @@ class LaravelAuth
      */
     public static function multiFactorCredential()
     {
-        return new static::$multiFactorCredentialModel();
+        $model = static::multiFactorCredentialModel();
+
+        return new $model();
     }
 }

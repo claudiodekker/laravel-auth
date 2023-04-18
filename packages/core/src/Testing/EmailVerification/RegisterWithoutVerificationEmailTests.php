@@ -2,8 +2,7 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\EmailVerification;
 
-use App\Models\User;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Session;
 
@@ -13,11 +12,11 @@ trait RegisterWithoutVerificationEmailTests
     public function it_does_not_send_a_verification_email_for_password_based_registration_requests(): void
     {
         Notification::fake();
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
 
         $this->submitPasswordBasedRegisterAttempt();
 
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
         Notification::assertNothingSent();
     }
 
@@ -42,7 +41,7 @@ trait RegisterWithoutVerificationEmailTests
             ],
         ]);
 
-        $this->assertCount(1, MultiFactorCredential::all());
+        $this->assertCount(1, LaravelAuth::multiFactorCredentialModel()::all());
         Notification::assertNothingSent();
     }
 }

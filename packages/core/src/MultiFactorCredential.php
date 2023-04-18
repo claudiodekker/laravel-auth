@@ -6,7 +6,6 @@ use ClaudioDekker\LaravelAuth\Database\Factories\MultiFactorCredentialFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Config;
 
 class MultiFactorCredential extends Model
 {
@@ -82,10 +81,10 @@ class MultiFactorCredential extends Model
      */
     public function user()
     {
-        $guard = Config::get('auth.defaults.guard');
-        $provider = Config::get('auth.guards.'.$guard.'.provider');
-        $model = Config::get('auth.providers.'.$provider.'.model');
-
-        return $this->belongsTo($model, 'user_id', (new $model())->getKeyName());
+        return $this->belongsTo(
+            LaravelAuth::userModel(),
+            'user_id',
+            LaravelAuth::user()->getKeyName()
+        );
     }
 }

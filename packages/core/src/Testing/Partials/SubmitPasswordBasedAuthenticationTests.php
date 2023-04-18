@@ -209,7 +209,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class, SudoModeEnabled::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 

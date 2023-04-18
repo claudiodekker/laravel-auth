@@ -2,12 +2,12 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -140,13 +140,11 @@ abstract class AccountRecoveryChallengeController
 
     /**
      * Resolves the User instance for which the account is being reset.
-     *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
-    protected function resolveUser(Request $request)
+    protected function resolveUser(Request $request): ?Authenticatable
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query
             ->where('email', $request->input('email'))

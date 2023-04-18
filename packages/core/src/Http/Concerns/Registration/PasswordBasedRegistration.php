@@ -2,7 +2,7 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
-use App\Models\User;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -49,7 +49,7 @@ trait PasswordBasedRegistration
     protected function createPasswordBasedUser(Request $request): Authenticatable
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query->create([
             'email' => $request->input('email'),

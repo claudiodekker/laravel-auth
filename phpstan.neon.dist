@@ -9,5 +9,4 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static\(\)\.#'
-        - '#Call to static method query\(\) on an unknown class App\\Models\\User\.#'
         - '#Access to constant HOME on an unknown class App\\Providers\\RouteServiceProvider\.#'

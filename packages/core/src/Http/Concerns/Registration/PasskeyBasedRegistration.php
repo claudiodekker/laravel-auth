@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
@@ -154,7 +153,7 @@ trait PasskeyBasedRegistration
     protected function claimPasswordlessUser(Request $request): Authenticatable
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query->create([
             'email' => $request->input('email'),
@@ -174,7 +173,7 @@ trait PasskeyBasedRegistration
     protected function releaseClaimedPasswordlessUser(Request $request, $userId)
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query->where('id', $userId)->firstOrFail()->delete();
     }
@@ -247,7 +246,7 @@ trait PasskeyBasedRegistration
     protected function resolveUserFromPasskeyCreationOptions(PublicKeyCredentialCreationOptions $options): Authenticatable
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query->findOrFail($options->user()->id());
     }

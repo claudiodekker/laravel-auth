@@ -1,6 +1,5 @@
 namespace Tests\Unit;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Carbon;
@@ -14,12 +13,12 @@ class PruneUnclaimedUsersTest extends TestCase
     public function it_prunes_unclaimed_users_after_an_hour(): void
     {
         Carbon::setTestNow('2022-01-01 00:00:00');
-        $userA = User::factory()->passwordless()->create();
-        $userB = User::factory()->passwordless()->create();
-        $userC = User::factory()->passwordless()->create();
+        $userA = LaravelAuth::userModel()::factory()->passwordless()->create();
+        $userB = LaravelAuth::userModel()::factory()->passwordless()->create();
+        $userC = LaravelAuth::userModel()::factory()->passwordless()->create();
         LaravelAuth::multiFactorCredentialModel()::factory()->forUser($userC)->publicKey()->create();
         Carbon::setTestNow('2022-01-01 00:45:00');
-        $userD = User::factory()->passwordless()->create();
+        $userD = LaravelAuth::userModel()::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-01 01:00:01');
 
         $this->artisan('model:prune');
@@ -35,11 +34,11 @@ class PruneUnclaimedUsersTest extends TestCase
     public function it_retains_seemingly_unclaimed_users_that_have_existed_for_a_while_as_a_data_integrity_precaution(): void
     {
         Carbon::setTestNow('2022-01-01 00:00:00');
-        $userA = User::factory()->passwordless()->create();
+        $userA = LaravelAuth::userModel()::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-02 00:00:01');
-        $userB = User::factory()->passwordless()->create();
+        $userB = LaravelAuth::userModel()::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-02 00:45:00');
-        $userC = User::factory()->passwordless()->create();
+        $userC = LaravelAuth::userModel()::factory()->passwordless()->create();
         Carbon::setTestNow('2022-01-02 01:00:02');
 
         $this->artisan('model:prune');

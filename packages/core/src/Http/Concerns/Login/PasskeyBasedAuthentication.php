@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Login;
 
-use App\Models\User;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
@@ -170,7 +169,7 @@ trait PasskeyBasedAuthentication
     protected function resolveUserFromPasskey(Request $request, CredentialAttributes $credential): Authenticatable
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = User::query();
+        $query = LaravelAuth::userModel()::query();
 
         return $query
             ->where('has_password', false)

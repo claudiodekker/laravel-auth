@@ -6,7 +6,6 @@ use ClaudioDekker\LaravelAuth\Events\Authenticated;
 use ClaudioDekker\LaravelAuth\Events\MultiFactorChallengeFailed;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\Totp\GoogleTwoFactorAuthenticator;
-use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
@@ -21,7 +20,7 @@ trait MultiFactorChallengeRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser(['id' => 1]);
-        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -58,7 +57,7 @@ trait MultiFactorChallengeRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
@@ -81,7 +80,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->submitPasswordBasedLoginAttempt();
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $user = $this->generateUser();
-        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
@@ -118,7 +117,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->submitPasswordBasedLoginAttempt();
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $user = $this->generateUser();
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
@@ -142,7 +141,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($userIdKey));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $credential = MultiFactorCredential::factory()->publicKey()->forUser($user)->create([
+        $credential = LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
@@ -183,7 +182,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($userIdKey));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        LaravelAuth::multiFactorCredential()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), [

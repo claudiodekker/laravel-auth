@@ -2,11 +2,11 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
-use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\MultiFactorCredential;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use Illuminate\Auth\Events\Registered;
@@ -25,11 +25,11 @@ trait SubmitPasskeyBasedRegistrationTests
         Event::fake(Registered::class);
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         Config::set('laravel-auth.webauthn.relying_party.name', 'Laravel Auth Package');
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
         $response = $this->initializePasskeyBasedRegisterAttempt();
 
         $this->assertGuest();
-        $user = tap(User::firstOrFail(), function (User $user) {
+        $user = tap(LaravelAuth::userModel()::firstOrFail(), function ($user) {
             $this->assertSame('Claudio Dekker', $user->name);
             $this->assertSame($this->defaultUsername(), $user->{$this->usernameField()});
             $this->assertTrue(password_verify('AUTOMATICALLY-GENERATED-PASSWORD-HASH', $user->password));
@@ -80,7 +80,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertRedirect(RouteServiceProvider::HOME);
         $response->assertSessionMissing('auth.register.passkey_creation_options');
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -91,7 +91,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -102,7 +102,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -113,7 +113,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -123,7 +123,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameRequiredValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -133,7 +133,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameTooLongValidationError($response);
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -144,7 +144,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -155,7 +155,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -165,7 +165,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
-        $this->assertCount(0, User::all());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -177,7 +177,7 @@ trait SubmitPasskeyBasedRegistrationTests
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
         $this->assertUsernameAlreadyExistsValidationError($response);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -205,7 +205,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertAuthenticatedAs($user);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         tap($credentials->first(), function (MultiFactorCredential $key) use ($user) {
             $this->assertSame('public-key-AFkzwaxVuCUz4qFPaNAgnYgoZKKTtvGIAaIASAbnlHGy8UktdI_jN0CetpIkiw9--R0AF9a6OJnHD-G4aIWur-Pxj-sI9xDE-AVeQKve', $key->id);
             $this->assertSame($user->id, $key->user_id);
@@ -235,7 +235,7 @@ trait SubmitPasskeyBasedRegistrationTests
         ]);
 
         $response->assertRedirect(RouteServiceProvider::HOME);
-        $this->assertCount(1, User::all());
+        $this->assertCount(1, LaravelAuth::userModel()::all());
     }
 
     /** @test */
@@ -258,7 +258,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertStatus(428);
         $this->assertGuest();
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -290,7 +290,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
         $this->assertGuest();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -319,7 +319,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
         $this->assertGuest();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -350,7 +350,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertAuthenticatedAs($user);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         tap($credentials->first(), function (MultiFactorCredential $key) use ($user) {
             $this->assertSame('public-key-ID_CFbjp7mfDuI4zwEe-49_g1-8', $key->id);
             $this->assertSame($user->id, $key->user_id);
@@ -388,7 +388,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
         $this->assertGuest();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -419,7 +419,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertJsonValidationErrors(['credential' => ['The credential field is invalid.']]);
         $this->assertGuest();
         $this->assertTrue(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(0, MultiFactorCredential::all());
+        $this->assertCount(0, LaravelAuth::multiFactorCredentialModel()::all());
         Event::assertNothingDispatched();
     }
 
@@ -451,7 +451,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
         $this->assertAuthenticatedAs($user);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
-        $this->assertCount(1, $credentials = MultiFactorCredential::all());
+        $this->assertCount(1, $credentials = LaravelAuth::multiFactorCredentialModel()::all());
         tap($credentials->first(), function (MultiFactorCredential $key) use ($user) {
             $this->assertSame('public-key-AFkzwaxVuCUz4qFPaNAgnYgoZKKTtvGIAaIASAbnlHGy8UktdI_jN0CetpIkiw9--R0AF9a6OJnHD-G4aIWur-Pxj-sI9xDE-AVeQKve', $key->id);
             $this->assertSame($user->id, $key->user_id);
