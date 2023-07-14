@@ -1,6 +1,6 @@
 <?php
 
-namespace ClaudioDekker\LaravelAuth\Http\Concerns\Challenges;
+namespace ClaudioDekker\LaravelAuth\Http\Mixins\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use Illuminate\Http\Request;

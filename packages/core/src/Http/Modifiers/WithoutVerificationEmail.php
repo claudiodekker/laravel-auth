@@ -1,6 +1,6 @@
 <?php
 
-namespace ClaudioDekker\LaravelAuth\Http\Traits;
+namespace ClaudioDekker\LaravelAuth\Http\Modifiers;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 

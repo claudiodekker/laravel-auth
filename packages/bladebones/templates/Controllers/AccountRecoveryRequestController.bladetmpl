@@ -3,15 +3,15 @@
 
     $traits = [];
     if ($withoutRateLimiting) {
-        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting";
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting";
     }
 
     if ($withoutEmailVerification) {
-        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail";
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail";
     }
 
     if ($flavor !== 'email-based') {
-        $traits[] = "ClaudioDekker\LaravelAuth\Http\Traits\\" . $flavorTrait;
+        $traits[] = "ClaudioDekker\LaravelAuth\Http\Modifiers\\" . $flavorTrait;
     }
 
     asort($traits);

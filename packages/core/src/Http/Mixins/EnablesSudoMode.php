@@ -1,6 +1,6 @@
 <?php
 
-namespace ClaudioDekker\LaravelAuth\Http\Concerns;
+namespace ClaudioDekker\LaravelAuth\Http\Mixins;
 
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use Illuminate\Http\Request;

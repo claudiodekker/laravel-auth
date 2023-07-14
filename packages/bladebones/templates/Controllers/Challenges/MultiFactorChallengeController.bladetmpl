@@ -6,10 +6,10 @@ namespace App\Http\Controllers\Auth\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\MultiFactorChallengeController as BaseController;
 @if ($flavor !== 'email-based')
-use ClaudioDekker\LaravelAuth\Http\Traits\{{ $flavorTrait }};
+use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
 @endif
 @if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
 @endif
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use Illuminate\Contracts\Auth\Authenticatable;
