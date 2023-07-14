@@ -15,7 +15,7 @@ trait PasswordBasedRegistration
      *
      * @return mixed
      */
-    protected function handlePasswordBasedRegistration(Request $request)
+    protected function handlePasswordBasedRegistrationRequest(Request $request)
     {
         $this->validatePasswordBasedRequest($request);
 

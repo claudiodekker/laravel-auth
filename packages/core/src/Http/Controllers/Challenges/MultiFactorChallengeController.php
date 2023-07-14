@@ -86,7 +86,7 @@ abstract class MultiFactorChallengeController
 
         $availableTypes = $this->filterAvailableCredentialTypes($credentials);
         $publicKeyCredentials = $this->filterPublicKeyCredentials($credentials);
-        $options = $this->initializePublicKeyChallenge($request, $publicKeyCredentials);
+        $options = $this->handlePublicKeyChallengeInitialization($request, $publicKeyCredentials);
 
         return $this->sendChallengePageResponse($request, $options, $availableTypes);
     }

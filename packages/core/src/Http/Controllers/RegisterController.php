@@ -50,10 +50,10 @@ abstract class RegisterController
     public function store(Request $request)
     {
         if ($this->isPasswordBasedRegistrationAttempt($request)) {
-            return $this->handlePasswordBasedRegistration($request);
+            return $this->handlePasswordBasedRegistrationRequest($request);
         }
 
-        return $this->handlePasskeyBasedRegistration($request);
+        return $this->handlePasskeyBasedRegistrationRequest($request);
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class RegisterController
      */
     public function destroy(Request $request)
     {
-        return $this->cancelPasskeyRegistration($request);
+        return $this->handlePasskeyBasedRegistrationCancellationRequest($request);
     }
 
     /**

@@ -59,7 +59,7 @@ abstract class SudoModeChallengeController
             return $this->sendConfirmationNotRequiredResponse($request);
         }
 
-        return $this->sendChallengePageResponse($request, $this->initializePublicKeyChallenge($request));
+        return $this->sendChallengePageResponse($request, $this->handlePublicKeyChallengeInitialization($request));
     }
 
     /**
@@ -126,7 +126,7 @@ abstract class SudoModeChallengeController
      */
     protected function sendPasswordChallengeSuccessfulResponse(Request $request)
     {
-        $this->clearPublicKeyChallengeOptions($request);
+        $this->handlePublicKeyChallengeInvalidation($request);
 
         $this->enableSudoMode($request);
         $this->emitSudoModeEnabledEvent($request);
