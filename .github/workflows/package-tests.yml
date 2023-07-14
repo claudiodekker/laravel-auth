@@ -26,6 +26,19 @@ jobs:
 
     name: ${{ matrix.package }} - PHP ${{ matrix.php }} L${{ matrix.laravel }} w/ ${{ matrix.stability }}
     steps:
+      - name: Get latest commit SHA
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        run: |
+          echo "HEAD_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Set commit status as pending
+        uses: myrotvorets/set-commit-status-action@master
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        with:
+          sha: ${{ env.HEAD_SHA }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -58,3 +71,11 @@ jobs:
       - name: Execute tests
         run: vendor/bin/phpunit
         working-directory: ./packages/${{ matrix.package }}
+
+      - name: Set commit status as ${{ job.status }}
+        uses: myrotvorets/set-commit-status-action@master
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        with:
+          sha: ${{ env.HEAD_SHA }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}

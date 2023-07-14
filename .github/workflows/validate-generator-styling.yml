@@ -28,6 +28,19 @@ jobs:
 
     name: Variant - ${{ matrix.variants }}
     steps:
+      - name: Get latest commit SHA
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        run: |
+          echo "HEAD_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Set commit status as pending
+        uses: myrotvorets/set-commit-status-action@master
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        with:
+          sha: ${{ env.HEAD_SHA }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+
       - name: Checkout code
         uses: actions/checkout@v3
         with:
@@ -88,3 +101,11 @@ jobs:
           git -c color.ui=always --no-pager diff
           exit 1
         working-directory: ./app
+
+      - name: Set commit status as ${{ job.status }}
+        uses: myrotvorets/set-commit-status-action@master
+        if: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️') }}
+        with:
+          sha: ${{ env.HEAD_SHA }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
