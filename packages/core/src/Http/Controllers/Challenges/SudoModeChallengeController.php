@@ -29,7 +29,7 @@ abstract class SudoModeChallengeController
      *
      * @return mixed
      */
-    abstract protected function sendChallengePageResponse(Request $request, ?PublicKeyCredentialRequestOptions $options);
+    abstract protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options);
 
     /**
      * Sends a response indicating that sudo-mode has been enabled.

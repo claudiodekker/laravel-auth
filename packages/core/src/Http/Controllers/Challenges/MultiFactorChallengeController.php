@@ -34,7 +34,7 @@ abstract class MultiFactorChallengeController
      *
      * @return mixed
      */
-    abstract protected function sendChallengePageResponse(Request $request, ?PublicKeyCredentialRequestOptions $options, Collection $availableCredentialTypes);
+    abstract protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options, Collection $availableCredentialTypes);
 
     /**
      * Sends a response indicating that the multi-factor challenge has succeeded.

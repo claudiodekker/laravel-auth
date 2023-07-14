@@ -110,7 +110,7 @@ abstract class AccountRecoveryRequestController
     /**
      * Resolve the User that should be recovered.
      */
-    protected function getUser(Request $request): ?CanResetPassword
+    protected function getUser(Request $request): CanResetPassword|null
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = LaravelAuth::userModel()::query();
