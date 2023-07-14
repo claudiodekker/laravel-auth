@@ -17,7 +17,7 @@ interface WebAuthnContract
      * @link https://www.w3.org/TR/webauthn-2/#server-side-public-key-credential-source
      * @link https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
      */
-    public function generatePublicKeyCreationOptions(PublicKeyCredentialUserEntity $user, ?Collection $excludeCredentials = null): PublicKeyCredentialCreationOptions;
+    public function generatePublicKeyCreationOptions(PublicKeyCredentialUserEntity $user, Collection $excludeCredentials = null): PublicKeyCredentialCreationOptions;
 
     /**
      * Prepares the challenge options used to create a new passkey credential.
@@ -40,7 +40,7 @@ interface WebAuthnContract
      *
      * @link https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
      */
-    public function generatePublicKeyRequestOptions(?Collection $allowCredentials = null): PublicKeyCredentialRequestOptions;
+    public function generatePublicKeyRequestOptions(Collection $allowCredentials = null): PublicKeyCredentialRequestOptions;
 
     /**
      * Prepares the challenge options used to authenticate a passkey credential.
@@ -55,5 +55,5 @@ interface WebAuthnContract
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException
      */
-    public function validateCredential(ServerRequestInterface $request, PublicKeyCredentialRequestOptions $publicKeyCredentialRequestOptions, ?PublicKeyCredentialUserEntity $user = null): CredentialAttributes;
+    public function validateCredential(ServerRequestInterface $request, PublicKeyCredentialRequestOptions $publicKeyCredentialRequestOptions, PublicKeyCredentialUserEntity $user = null): CredentialAttributes;
 }
