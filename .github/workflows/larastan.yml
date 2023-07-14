@@ -1,15 +1,21 @@
 name: Larastan Static Analysis
 
 on:
+  issue_comment:
+    types:
+      - created
+      - edited
   push:
     branches:
       - master
       - '*.x'
-  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   larastan:
     runs-on: ubuntu-22.04
+    if: ${{ (github.event_name != 'issue_comment') || (github.event.issue.pull_request && contains(github.event.comment.body, '⚡️')) }}
 
     steps:
       - name: Checkout code

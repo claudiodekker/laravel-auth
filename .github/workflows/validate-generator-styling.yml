@@ -1,16 +1,20 @@
 name: Validate Core Generator Styling
 
 on:
+  issue_comment:
+    types:
+      - created
+      - edited
+  pull_request:
   push:
     branches:
       - master
       - '*.x'
-  pull_request:
 
 jobs:
   validator:
     runs-on: ubuntu-22.04
-    if: github.event_name == 'pull_request'
+    if: ${{ (github.event_name == 'pull_request') || (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '⚡️')) }}
 
     strategy:
       fail-fast: true
