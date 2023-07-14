@@ -63,7 +63,7 @@ class SpomkyWebAuthn implements WebAuthnContract
      * @link https://www.w3.org/TR/webauthn-2/#server-side-public-key-credential-source
      * @link https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialcreationoptions
      */
-    public function generatePublicKeyCreationOptions(PublicKeyCredentialUserEntity $user, ?Collection $excludeCredentials = null): PublicKeyCredentialCreationOptionsContract
+    public function generatePublicKeyCreationOptions(PublicKeyCredentialUserEntity $user, Collection $excludeCredentials = null): PublicKeyCredentialCreationOptionsContract
     {
         $options = \Webauthn\PublicKeyCredentialCreationOptions::create(
             $this->relyingPartyEntity(),
@@ -151,7 +151,7 @@ class SpomkyWebAuthn implements WebAuthnContract
      *
      * @link https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
      */
-    public function generatePublicKeyRequestOptions(?Collection $allowCredentials = null): PublicKeyCredentialRequestOptionsContract
+    public function generatePublicKeyRequestOptions(Collection $allowCredentials = null): PublicKeyCredentialRequestOptionsContract
     {
         $options = \Webauthn\PublicKeyCredentialRequestOptions::create(
             $this->generateChallenge(),
@@ -186,7 +186,7 @@ class SpomkyWebAuthn implements WebAuthnContract
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException
      * @throws \ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\UnexpectedActionException
      */
-    public function validateCredential(ServerRequestInterface $request, PublicKeyCredentialRequestOptionsContract $publicKeyCredentialRequestOptions, ?PublicKeyCredentialUserEntity $user = null): CredentialAttributes
+    public function validateCredential(ServerRequestInterface $request, PublicKeyCredentialRequestOptionsContract $publicKeyCredentialRequestOptions, PublicKeyCredentialUserEntity $user = null): CredentialAttributes
     {
         $parsedBody = $request->getParsedBody();
         if (! is_array($parsedBody) || ! array_key_exists('credential', $parsedBody) || ! is_array($parsedBody['credential'])) {
