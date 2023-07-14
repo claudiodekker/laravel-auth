@@ -32,7 +32,7 @@ trait PasskeyBasedAuthentication
     /**
      * Initialize the passkey based authentication process by generating challenge details.
      */
-    protected function initializePasskeyAuthenticationOptions(Request $request): PublicKeyCredentialRequestOptions
+    protected function handlePasskeyBasedAuthenticationInitialization(Request $request): PublicKeyCredentialRequestOptions
     {
         return tap($this->generatePasskeyAuthenticationOptions($request), function ($options) use ($request) {
             $this->setPasskeyAuthenticationOptions($request, $options);
@@ -44,7 +44,7 @@ trait PasskeyBasedAuthentication
      *
      * @return mixed
      */
-    protected function handlePasskeyBasedAuthentication(Request $request)
+    protected function handlePasskeyBasedAuthenticationRequest(Request $request)
     {
         $this->validatePasskeyBasedRequest($request);
 

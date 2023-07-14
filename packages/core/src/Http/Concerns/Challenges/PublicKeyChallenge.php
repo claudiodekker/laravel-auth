@@ -52,21 +52,28 @@ trait PublicKeyChallenge
     }
 
     /**
-     * Initialize the public key challenge by generating challenge details.
+     * Handle the generation and initialization of the public key challenge details.
      *
      * When no credentials are found, NULL will be returned, indicating that the challenge is not available.
      */
-    protected function initializePublicKeyChallenge(Request $request, Collection $allowedCredentials = null): ?PublicKeyCredentialRequestOptions
+    protected function handlePublicKeyChallengeInitialization(Request $request, Collection $allowedCredentials = null): ?PublicKeyCredentialRequestOptions
     {
-        $allowedCredentials = $allowedCredentials ?: $this->getPublicKeyCredentials($this->resolveUser($request));
-
-        if ($allowedCredentials->isEmpty()) {
+        $credentials = $allowedCredentials ?? $this->getPublicKeyCredentials($this->resolveUser($request));
+        if ($credentials->isEmpty()) {
             return null;
         }
 
-        return tap($this->generatePublicKeyChallengeOptions($request, $allowedCredentials), function ($options) use ($request) {
+        return tap($this->generatePublicKeyChallengeOptions($request, $credentials), function ($options) use ($request) {
             $this->setPublicKeyChallengeOptions($request, $options);
         });
+    }
+
+    /**
+     * Invalidates the challenge details used to perform the public key challenge confirmation.
+     */
+    protected function handlePublicKeyChallengeInvalidation(Request $request): void
+    {
+        $request->session()->forget($this->publicKeyChallengeOptionsKey($request));
     }
 
     /**
@@ -96,7 +103,7 @@ trait PublicKeyChallenge
             return $this->sendPublicKeyChallengeFailedResponse($request);
         }
 
-        $this->clearPublicKeyChallengeOptions($request);
+        $this->handlePublicKeyChallengeInvalidation($request);
         $this->resetRateLimitingCounter($request);
         $this->updatePublicKeyCredential($request, $credential);
 
@@ -178,14 +185,6 @@ trait PublicKeyChallenge
         }
 
         return unserialize($array, [PublicKeyCredentialRequestOptions::class]);
-    }
-
-    /**
-     * Clear the temporarily stored challenge details used to perform the public key challenge confirmation.
-     */
-    protected function clearPublicKeyChallengeOptions(Request $request): void
-    {
-        $request->session()->forget($this->publicKeyChallengeOptionsKey($request));
     }
 
     /**

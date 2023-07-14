@@ -70,7 +70,7 @@ class MultiFactorChallengeController extends BaseController
     /**
      * Sends a response that displays the multi-factor challenge page.
      */
-    protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options, Collection $availableCredentialTypes): View
+    protected function sendChallengePageResponse(Request $request, ?PublicKeyCredentialRequestOptions $options, Collection $availableCredentialTypes): View
     {
         return view('auth.challenges.multi_factor', [
             'availableMethods' => $availableCredentialTypes,

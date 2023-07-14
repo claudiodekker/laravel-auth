@@ -68,7 +68,7 @@ class SudoModeChallengeController extends BaseController
     /**
      * Sends a response that displays the sudo-mode challenge page.
      */
-    protected function sendChallengePageResponse(Request $request, PublicKeyCredentialRequestOptions|null $options): View
+    protected function sendChallengePageResponse(Request $request, ?PublicKeyCredentialRequestOptions $options): View
     {
         return view('auth.challenges.sudo_mode', [
             'canUsePassword' => $this->supportsPasswordBasedConfirmation($request),

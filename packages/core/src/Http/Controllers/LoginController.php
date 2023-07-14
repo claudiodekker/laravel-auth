@@ -3,7 +3,6 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Events\Authenticated;
 use ClaudioDekker\LaravelAuth\Events\AuthenticationFailed;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsAuthenticatedEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
@@ -50,13 +49,6 @@ abstract class LoginController
     abstract protected function sendAuthenticationFailedResponse(Request $request);
 
     /**
-     * Sends a response indicating that the user has been signed out.
-     *
-     * @return mixed
-     */
-    abstract protected function sendLoggedOutResponse(Request $request);
-
-    /**
      * Handle an incoming request to view the login page.
      *
      * @see static::sendLoginPageResponse()
@@ -65,7 +57,7 @@ abstract class LoginController
      */
     public function create(Request $request)
     {
-        $options = $this->initializePasskeyAuthenticationOptions($request);
+        $options = $this->handlePasskeyBasedAuthenticationInitialization($request);
 
         return $this->sendLoginPageResponse($request, $options);
     }
@@ -84,10 +76,10 @@ abstract class LoginController
     public function store(Request $request)
     {
         if ($this->isPasswordBasedAuthenticationAttempt($request)) {
-            return $this->handlePasswordBasedAuthentication($request);
+            return $this->handlePasswordBasedAuthenticationRequest($request);
         }
 
-        return $this->handlePasskeyBasedAuthentication($request);
+        return $this->handlePasskeyBasedAuthenticationRequest($request);
     }
 
     /**
@@ -99,9 +91,7 @@ abstract class LoginController
      */
     public function destroy(Request $request)
     {
-        $this->logout($request);
-
-        return $this->sendLoggedOutResponse($request);
+        return $this->handleLogoutRequest($request);
     }
 
     /**

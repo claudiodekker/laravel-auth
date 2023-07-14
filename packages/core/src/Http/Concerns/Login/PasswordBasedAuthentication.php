@@ -30,7 +30,7 @@ trait PasswordBasedAuthentication
      *
      * @return mixed
      */
-    protected function handlePasswordBasedAuthentication(Request $request)
+    protected function handlePasswordBasedAuthenticationRequest(Request $request)
     {
         $this->validatePasswordBasedRequest($request);
 

@@ -53,13 +53,30 @@ trait PasskeyBasedRegistration
      *
      * @return mixed
      */
-    protected function handlePasskeyBasedRegistration(Request $request)
+    protected function handlePasskeyBasedRegistrationRequest(Request $request)
     {
         if (! $this->isPasskeyConfirmationRequest($request)) {
-            return $this->initializePasskeyRegistration($request);
+            return $this->initializePasskeyBasedRegistration($request);
         }
 
         return $this->confirmPasskeyBasedRegistration($request);
+    }
+
+    /**
+     * Cancel the passkey based registration process.
+     *
+     * @return mixed
+     */
+    protected function handlePasskeyBasedRegistrationCancellationRequest(Request $request)
+    {
+        if (! $options = $this->getPasskeyCreationOptions($request)) {
+            return $this->sendInvalidPasskeyRegistrationStateResponse($request);
+        }
+
+        $this->clearPasskeyCreationOptions($request);
+        $this->releaseClaimedPasswordlessUser($request, $options->user()->id());
+
+        return $this->sendPasskeyRegistrationCancelledResponse($request);
     }
 
     /**
@@ -67,9 +84,9 @@ trait PasskeyBasedRegistration
      *
      * @return mixed
      */
-    protected function initializePasskeyRegistration(Request $request)
+    protected function initializePasskeyBasedRegistration(Request $request)
     {
-        $this->validatePasskeyBasedInitializationRequest($request);
+        $this->validatePasskeyBasedRegistrationInitialization($request);
 
         $user = $this->claimPasswordlessUser($request);
 
@@ -110,23 +127,6 @@ trait PasskeyBasedRegistration
     }
 
     /**
-     * Cancel the passkey based registration process.
-     *
-     * @return mixed
-     */
-    protected function cancelPasskeyRegistration(Request $request)
-    {
-        if (! $options = $this->getPasskeyCreationOptions($request)) {
-            return $this->sendInvalidPasskeyRegistrationStateResponse($request);
-        }
-
-        $this->clearPasskeyCreationOptions($request);
-        $this->releaseClaimedPasswordlessUser($request, $options->user()->id());
-
-        return $this->sendPasskeyRegistrationCancelledResponse($request);
-    }
-
-    /**
      * Determine if the given request is a passkey-based registration confirmation request.
      */
     protected function isPasskeyConfirmationRequest(Request $request): bool
@@ -139,7 +139,7 @@ trait PasskeyBasedRegistration
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function validatePasskeyBasedInitializationRequest(Request $request): void
+    protected function validatePasskeyBasedRegistrationInitialization(Request $request): void
     {
         $request->validate([
             ...$this->registrationValidationRules(),
