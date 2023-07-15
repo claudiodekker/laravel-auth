@@ -1,6 +1,6 @@
 <?php
 
-namespace ClaudioDekker\LaravelAuth\Http\Concerns\Challenges;
+namespace ClaudioDekker\LaravelAuth\Http\Mixins\Challenges;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;

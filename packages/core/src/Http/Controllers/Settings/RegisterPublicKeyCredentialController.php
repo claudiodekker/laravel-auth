@@ -3,7 +3,7 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers\Settings;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
-use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\EmailBased;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException;

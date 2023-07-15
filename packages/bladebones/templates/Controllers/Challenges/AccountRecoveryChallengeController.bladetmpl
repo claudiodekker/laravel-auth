@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Auth\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\AccountRecoveryChallengeController as BaseController;
 @if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
 @endif
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;

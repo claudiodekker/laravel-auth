@@ -62,7 +62,7 @@ class GenerateCommandTest extends TestCase
         $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -162,7 +162,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -250,7 +250,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -337,7 +337,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -425,7 +425,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -513,7 +513,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -600,7 +600,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -688,7 +688,7 @@ EOF;
         $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
         $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
         $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
@@ -785,12 +785,12 @@ EOF;
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\UsernameBased;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\UsernameBased;\n", $contents);
             $this->assertStringContainsString("use UsernameBased;\n", $contents);
         });
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\UsernameBased;\n", $contents);
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutVerificationEmail;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\UsernameBased;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use UsernameBased;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
         });
@@ -875,7 +875,7 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Controllers\\$className as BaseController;\n", $contents);
 
             $this->assertStringContainsString("\n\nclass $relativeClassName extends BaseController\n{\n", $contents);
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;\n", $contents);
+            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;\n", $contents);
             $this->assertStringNotContainsString("use WithoutRateLimiting;\n", $contents);
 
             if ($callback) {
@@ -896,7 +896,7 @@ EOF;
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Controllers\\$className as BaseController;\n", $contents);
 
             $this->assertStringContainsString("\n\nclass $relativeClassName extends BaseController\n{\n", $contents);
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Traits\WithoutRateLimiting;\n", $contents);
+            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;\n", $contents);
             $this->assertStringContainsString("use WithoutRateLimiting;\n", $contents);
 
             if ($callback) {

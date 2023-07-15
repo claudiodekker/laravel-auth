@@ -3,10 +3,10 @@
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Http\Concerns\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Registration\PasskeyBasedRegistration;
 use ClaudioDekker\LaravelAuth\Http\Concerns\Registration\PasswordBasedRegistration;
-use ClaudioDekker\LaravelAuth\Http\Traits\EmailBased;
+use ClaudioDekker\LaravelAuth\Http\Mixins\EnablesSudoMode;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\EmailBased;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
