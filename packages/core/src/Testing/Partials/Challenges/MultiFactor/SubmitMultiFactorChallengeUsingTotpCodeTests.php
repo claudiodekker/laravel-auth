@@ -24,6 +24,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'));
 
@@ -39,6 +40,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), ['code' => true]);
 
@@ -55,6 +57,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -76,6 +79,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E')]);
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret]);
         $this->preAuthenticate($user);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -96,6 +100,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => strrev($secret)]);
         $this->preAuthenticate($user);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -116,6 +121,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
         Cache::put('auth.mfa.totp_timestamps.'.$user->getAuthIdentifier(), (int) floor(microtime(true) / 30));
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -135,6 +141,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user, ['remember' => 'on']);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -156,6 +163,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
@@ -179,6 +187,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
         $this->assertNotEmpty($previousId = session()->getId());
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),

@@ -26,6 +26,7 @@ trait SubmitPasskeyBasedRegistrationTests
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         Config::set('laravel-auth.webauthn.relying_party.name', 'Laravel Auth Package');
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->expectTimebox();
         $response = $this->initializePasskeyBasedRegisterAttempt();
 
         $this->assertGuest();
@@ -86,6 +87,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_is_required_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -97,6 +100,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_is_a_string_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => 123]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -108,6 +113,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['name' => str_repeat('a', 256)]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -119,6 +126,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_username_is_required_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -129,6 +138,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_username_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => $this->tooLongUsername()]);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -139,6 +150,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_is_required_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => '']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -150,6 +163,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_does_not_exceed_255_characters_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => str_repeat('a', 256).'@example.com']);
 
         $response->assertSessionMissing('auth.register.passkey_creation_options');
@@ -161,6 +176,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_is_valid_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->initializePasskeyBasedRegisterAttempt(['email' => 'foo']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -171,6 +188,8 @@ trait SubmitPasskeyBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_user_does_not_already_exist_when_initializing_passkey_based_registration(): void
     {
+        $this->expectTimebox();
+
         $this->generateUser([$this->usernameField() => $this->defaultUsername()]);
 
         $response = $this->initializePasskeyBasedRegisterAttempt([$this->usernameField() => $this->defaultUsername()]);
@@ -187,6 +206,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->submitPasskeyBasedRegisterAttempt();
 
@@ -220,6 +240,8 @@ trait SubmitPasskeyBasedRegistrationTests
     public function it_cannot_confirm_passkey_based_registration_when_no_options_were_initialized(): void
     {
         Event::fake(Registered::class);
+        $this->expectTimebox();
+
         $response = $this->submitPasskeyBasedRegisterAttempt();
 
         $response->assertStatus(428);
@@ -236,6 +258,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectTimebox();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -268,6 +291,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectTimebox();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -291,6 +315,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptionsTwo($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -329,6 +354,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptionsTwo($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectTimebox();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -360,6 +386,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptionsTwo($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectTimebox();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -390,6 +417,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->submitPasskeyBasedRegisterAttempt();
 

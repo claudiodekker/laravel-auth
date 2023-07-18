@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Timebox;
 
 trait TotpChallenge
 {
@@ -36,23 +37,26 @@ trait TotpChallenge
      */
     protected function handleTotpChallengeRequest(Request $request)
     {
-        $this->validateTotpChallengeRequest($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validateTotpChallengeRequest($request);
 
-        if ($this->isCurrentlyRateLimited($request)) {
-            $this->emitLockoutEvent($request);
+            if ($this->isCurrentlyRateLimited($request)) {
+                $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-        }
+                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+            }
 
-        if (! $this->hasValidTotpCode($request)) {
-            $this->incrementRateLimitingCounter($request);
+            if (! $this->hasValidTotpCode($request)) {
+                $this->incrementRateLimitingCounter($request);
 
-            return $this->sendTotpChallengeFailedResponse($request);
-        }
+                return $this->sendTotpChallengeFailedResponse($request);
+            }
 
-        $this->resetRateLimitingCounter($request);
+            $this->resetRateLimitingCounter($request);
+            $timebox->returnEarly();
 
-        return $this->sendTotpChallengeSuccessfulResponse($request);
+            return $this->sendTotpChallengeSuccessfulResponse($request);
+        }, 300 * 1000);
     }
 
     /**

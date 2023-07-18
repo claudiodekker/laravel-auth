@@ -27,6 +27,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -62,6 +63,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
         $this->preAuthenticate($user);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -96,6 +98,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -131,6 +134,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -166,6 +170,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -201,6 +206,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user, ['remember' => 'on']);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -237,6 +243,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -275,6 +282,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -312,6 +320,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->preAuthenticate($user);
         $this->assertNotEmpty($previousId = session()->getId());
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -352,11 +361,13 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         // This step emulates the attacker signing in to their account, but not completing the public-key credential challenge.
         // This places the public key challenge request object in the session, which includes all the allowed credentials.
         // (While we're not actually using the endpoints directly, the effect is identical when crafting requests)
+        $this->expectSuccessfulTimebox();
         $this->preAuthenticate($userA, [$this->usernameField() => $userA->{$this->usernameField()}]);
         $this->mockPublicKeyRequestOptions([$credentialA]);
 
         // Next, instead of completing the challenge, the attacker will take their session id / CSRF tokens etc., and crafts
         // a manual 'login' attempt to that signs in the victim, which returns a redirect to the victim's MFA challenge.
+        $this->expectSuccessfulTimebox();
         $craftedLogin = $this->preAuthenticate($userB, [$this->usernameField() => $userB->{$this->usernameField()}]);
         $craftedLogin->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
 

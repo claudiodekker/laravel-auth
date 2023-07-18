@@ -27,6 +27,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -60,6 +61,7 @@ trait MultiFactorChallengeRateLimitingTests
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
+        $this->expectTimebox();
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
 
@@ -86,6 +88,7 @@ trait MultiFactorChallengeRateLimitingTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -119,6 +122,7 @@ trait MultiFactorChallengeRateLimitingTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
+        $this->expectTimebox();
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
 
@@ -147,6 +151,7 @@ trait MultiFactorChallengeRateLimitingTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -184,6 +189,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
         $this->preAuthenticate($user);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),

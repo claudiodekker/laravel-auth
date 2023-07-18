@@ -5,7 +5,9 @@ namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Timebox;
 use Illuminate\Validation\Rules\Password;
 
 trait PasswordBasedRegistration
@@ -17,16 +19,19 @@ trait PasswordBasedRegistration
      */
     protected function handlePasswordBasedRegistrationRequest(Request $request)
     {
-        $this->validatePasswordBasedRequest($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validatePasswordBasedRequest($request);
 
-        $user = $this->createPasswordBasedUser($request);
+            $user = $this->createPasswordBasedUser($request);
 
-        $this->emitRegisteredEvent($user);
-        $this->sendEmailVerificationNotification($user);
-        $this->authenticate($user);
-        $this->enableSudoMode($request);
+            $this->emitRegisteredEvent($user);
+            $this->sendEmailVerificationNotification($user);
+            $this->authenticate($user);
+            $this->enableSudoMode($request);
+            $timebox->returnEarly();
 
-        return $this->sendRegisteredResponse($request, $user);
+            return $this->sendRegisteredResponse($request, $user);
+        }, 300 * 1000);
     }
 
     /**

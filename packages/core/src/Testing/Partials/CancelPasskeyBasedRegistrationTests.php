@@ -24,6 +24,7 @@ trait CancelPasskeyBasedRegistrationTests
             $this->assertTrue(password_verify('AUTOMATICALLY-GENERATED-PASSWORD-HASH', $user->password));
             $this->assertFalse($user->has_password);
         });
+        $this->expectTimebox();
 
         $response = $this->deleteJson(route('register'));
 
@@ -56,6 +57,7 @@ trait CancelPasskeyBasedRegistrationTests
     {
         Event::fake([Registered::class]);
         $this->assertFalse(Session::has('auth.register.passkey_creation_options'));
+        $this->expectTimebox();
 
         $response = $this->deleteJson(route('register'));
 

@@ -22,6 +22,7 @@ trait ConfirmSudoModeUsingPasswordTests
         $user = $this->generateUser();
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $this->actingAs($user)->get(route('auth.sudo_mode'));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->actingAs($user)
             ->post(route('auth.sudo_mode'), [
@@ -44,6 +45,7 @@ trait ConfirmSudoModeUsingPasswordTests
         Carbon::setTestNow(now());
         $user = $this->generateUser();
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)
             ->from(route('auth.sudo_mode'))
@@ -85,6 +87,7 @@ trait ConfirmSudoModeUsingPasswordTests
         Carbon::setTestNow(now());
         $user = $this->generateUser(['has_password' => false]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)
             ->post(route('auth.sudo_mode'), [

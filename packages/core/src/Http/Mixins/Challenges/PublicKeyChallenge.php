@@ -15,6 +15,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Timebox;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -83,31 +84,34 @@ trait PublicKeyChallenge
      */
     protected function handlePublicKeyChallengeRequest(Request $request)
     {
-        $this->validatePublicKeyChallengeRequest($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validatePublicKeyChallengeRequest($request);
 
-        if ($this->isCurrentlyRateLimited($request)) {
-            $this->emitLockoutEvent($request);
+            if ($this->isCurrentlyRateLimited($request)) {
+                $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-        }
+                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+            }
 
-        if (! $options = $this->getPublicKeyChallengeOptions($request)) {
-            return $this->sendInvalidPublicKeyChallengeStateResponse($request);
-        }
+            if (! $options = $this->getPublicKeyChallengeOptions($request)) {
+                return $this->sendInvalidPublicKeyChallengeStateResponse($request);
+            }
 
-        try {
-            $credential = $this->validatePublicKeyCredential($request, $options);
-        } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
-            $this->incrementRateLimitingCounter($request);
+            try {
+                $credential = $this->validatePublicKeyCredential($request, $options);
+            } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
+                $this->incrementRateLimitingCounter($request);
 
-            return $this->sendPublicKeyChallengeFailedResponse($request);
-        }
+                return $this->sendPublicKeyChallengeFailedResponse($request);
+            }
 
-        $this->handlePublicKeyChallengeInvalidation($request);
-        $this->resetRateLimitingCounter($request);
-        $this->updatePublicKeyCredential($request, $credential);
+            $this->handlePublicKeyChallengeInvalidation($request);
+            $this->resetRateLimitingCounter($request);
+            $this->updatePublicKeyCredential($request, $credential);
+            $timebox->returnEarly();
 
-        return $this->sendPublicKeyChallengeSuccessfulResponse($request);
+            return $this->sendPublicKeyChallengeSuccessfulResponse($request);
+        }, 300 * 1000);
     }
 
     /**

@@ -4,7 +4,9 @@ namespace ClaudioDekker\LaravelAuth\Http\Mixins\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Timebox;
 
 trait PasswordChallenge
 {
@@ -31,23 +33,26 @@ trait PasswordChallenge
      */
     protected function handlePasswordChallengeRequest(Request $request)
     {
-        $this->validatePasswordChallengeRequest($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validatePasswordChallengeRequest($request);
 
-        if ($this->isCurrentlyRateLimited($request)) {
-            $this->emitLockoutEvent($request);
+            if ($this->isCurrentlyRateLimited($request)) {
+                $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-        }
+                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+            }
 
-        if (! $this->hasValidPassword($request)) {
-            $this->incrementRateLimitingCounter($request);
+            if (! $this->hasValidPassword($request)) {
+                $this->incrementRateLimitingCounter($request);
 
-            return $this->sendPasswordChallengeFailedResponse($request);
-        }
+                return $this->sendPasswordChallengeFailedResponse($request);
+            }
 
-        $this->resetRateLimitingCounter($request);
+            $this->resetRateLimitingCounter($request);
+            $timebox->returnEarly();
 
-        return $this->sendPasswordChallengeSuccessfulResponse($request);
+            return $this->sendPasswordChallengeSuccessfulResponse($request);
+        }, 300 * 1000);
     }
 
     /**

@@ -13,8 +13,10 @@ use ClaudioDekker\LaravelAuth\Http\Modifiers\EmailBased;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Timebox;
 
 abstract class SudoModeChallengeController
 {
@@ -59,7 +61,9 @@ abstract class SudoModeChallengeController
             return $this->sendConfirmationNotRequiredResponse($request);
         }
 
-        return $this->sendChallengePageResponse($request, $this->handlePublicKeyChallengeInitialization($request));
+        return App::make(Timebox::class)->call(function () use ($request) {
+            return $this->sendChallengePageResponse($request, $this->handlePublicKeyChallengeInitialization($request));
+        }, 300 * 1000);
     }
 
     /**
