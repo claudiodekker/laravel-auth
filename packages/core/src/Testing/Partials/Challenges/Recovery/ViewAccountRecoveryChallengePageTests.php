@@ -19,6 +19,7 @@ trait ViewAccountRecoveryChallengePageTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
+        $this->expectSuccessfulTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
@@ -37,6 +38,7 @@ trait ViewAccountRecoveryChallengePageTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
@@ -70,6 +72,7 @@ trait ViewAccountRecoveryChallengePageTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
+        $this->expectTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
@@ -87,6 +90,7 @@ trait ViewAccountRecoveryChallengePageTests
         $userA = $this->generateUser(['id' => 1, 'email' => 'claudio@ubient.net', 'recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $userB = $this->generateUser(['id' => 2, 'email' => 'another@example.com', $this->usernameField() => $this->anotherUsername(), 'recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($userA);
+        $this->expectTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
@@ -102,6 +106,7 @@ trait ViewAccountRecoveryChallengePageTests
     public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_recovery_token_does_not_exist(): void
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
+        $this->expectTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => 'invalid-token',
@@ -120,6 +125,7 @@ trait ViewAccountRecoveryChallengePageTests
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
         Carbon::setTestNow(now()->addHour()->addSecond());
+        $this->expectTimebox();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,

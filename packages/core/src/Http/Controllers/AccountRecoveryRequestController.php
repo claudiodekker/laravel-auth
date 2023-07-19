@@ -9,7 +9,9 @@ use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Timebox;
 
 abstract class AccountRecoveryRequestController
 {
@@ -71,28 +73,30 @@ abstract class AccountRecoveryRequestController
      */
     public function store(Request $request)
     {
-        $this->validateRecoveryRequest($request);
+        return App::make(Timebox::class)->call(function () use ($request) {
+            $this->validateRecoveryRequest($request);
 
-        if ($this->isCurrentlyRateLimited($request)) {
-            $this->emitLockoutEvent($request);
+            if ($this->isCurrentlyRateLimited($request)) {
+                $this->emitLockoutEvent($request);
 
-            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-        }
+                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+            }
 
-        $this->incrementRateLimitingCounter($request);
+            $this->incrementRateLimitingCounter($request);
 
-        if (! $user = $this->getUser($request)) {
-            return $this->sendNoSuchUserResponse($request);
-        }
+            if (! $user = $this->getUser($request)) {
+                return $this->sendNoSuchUserResponse($request);
+            }
 
-        if ($this->recoveryRecentlyRequested($user)) {
-            return $this->sendRecoveryAlreadyRequestedResponse($request, $user);
-        }
+            if ($this->recoveryRecentlyRequested($user)) {
+                return $this->sendRecoveryAlreadyRequestedResponse($request, $user);
+            }
 
-        $token = $this->createRecoveryToken($user);
-        $this->sendRecoveryLinkNotification($request, $user, $token);
+            $token = $this->createRecoveryToken($user);
+            $this->sendRecoveryLinkNotification($request, $user, $token);
 
-        return $this->sendRecoveryLinkSentResponse($request);
+            return $this->sendRecoveryLinkSentResponse($request);
+        }, 300 * 1000);
     }
 
     /**

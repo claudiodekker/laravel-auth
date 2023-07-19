@@ -19,6 +19,7 @@ trait SubmitAccountRecoveryRequestTests
         Notification::fake();
         $repository = Password::getRepository();
         $user = $this->generateUser();
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => $user->email,
@@ -58,6 +59,7 @@ trait SubmitAccountRecoveryRequestTests
     public function it_validates_that_the_email_is_required_when_requesting_an_account_recovery_link(): void
     {
         Notification::fake();
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => '',
@@ -73,6 +75,7 @@ trait SubmitAccountRecoveryRequestTests
     public function it_cannot_send_an_account_recovery_link_to_an_user_that_does_not_exist(): void
     {
         Notification::fake();
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => 'foo@example.com',
@@ -93,6 +96,7 @@ trait SubmitAccountRecoveryRequestTests
         $repository->create($user);
         Carbon::setTestNow(now()->addSeconds(59));
         $this->assertTrue($repository->recentlyCreatedToken($user));
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => $user->email,

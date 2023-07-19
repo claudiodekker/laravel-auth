@@ -24,6 +24,7 @@ trait SubmitAccountRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -51,6 +52,7 @@ trait SubmitAccountRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
+        $this->expectSuccessfulTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -98,6 +100,7 @@ trait SubmitAccountRecoveryChallengeTests
         $user = $this->generateUser(['recovery_codes' => $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $repository = Password::getRepository();
         $token = $repository->create($user);
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => 'nonexistent-user@example.com',
@@ -123,6 +126,7 @@ trait SubmitAccountRecoveryChallengeTests
         $userB = $this->generateUser(['id' => 2, 'email' => 'another@example.com', 'recovery_codes' => $codes, $this->usernameField() => $this->anotherUsername()]);
         $repository = Password::getRepository();
         $token = $repository->create($userA);
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $userB->getEmailForPasswordReset(),
@@ -147,6 +151,7 @@ trait SubmitAccountRecoveryChallengeTests
         $user = $this->generateUser(['recovery_codes' => $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $repository = Password::getRepository();
         $token = $repository->create($user);
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => 'invalid-token']), [
             'email' => $user->getEmailForPasswordReset(),
@@ -172,6 +177,7 @@ trait SubmitAccountRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
