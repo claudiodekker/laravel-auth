@@ -19,7 +19,7 @@ trait ViewAccountRecoveryChallengePageTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
@@ -38,7 +38,7 @@ trait ViewAccountRecoveryChallengePageTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,

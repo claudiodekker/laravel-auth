@@ -18,7 +18,7 @@ trait SubmitPasswordBasedRegistrationTests
     {
         Event::fake(Registered::class);
         $this->assertCount(0, LaravelAuth::userModel()::all());
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 
@@ -208,7 +208,7 @@ trait SubmitPasswordBasedRegistrationTests
     {
         Carbon::setTestNow(now());
         Event::fake([Registered::class, SudoModeEnabled::class]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 

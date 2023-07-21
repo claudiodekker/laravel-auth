@@ -24,7 +24,7 @@ trait SubmitAccountRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -52,7 +52,7 @@ trait SubmitAccountRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),

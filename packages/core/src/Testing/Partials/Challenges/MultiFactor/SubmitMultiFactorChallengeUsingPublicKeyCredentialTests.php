@@ -27,7 +27,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -206,7 +206,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user, ['remember' => 'on']);
         $this->mockPublicKeyRequestOptions([$credential]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -243,7 +243,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -282,7 +282,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -320,7 +320,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->preAuthenticate($user);
         $this->assertNotEmpty($previousId = session()->getId());
         $this->mockPublicKeyRequestOptions([$credential]);
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
             'credential' => [
@@ -361,13 +361,13 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         // This step emulates the attacker signing in to their account, but not completing the public-key credential challenge.
         // This places the public key challenge request object in the session, which includes all the allowed credentials.
         // (While we're not actually using the endpoints directly, the effect is identical when crafting requests)
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
         $this->preAuthenticate($userA, [$this->usernameField() => $userA->{$this->usernameField()}]);
         $this->mockPublicKeyRequestOptions([$credentialA]);
 
         // Next, instead of completing the challenge, the attacker will take their session id / CSRF tokens etc., and crafts
         // a manual 'login' attempt to that signs in the victim, which returns a redirect to the victim's MFA challenge.
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
         $craftedLogin = $this->preAuthenticate($userB, [$this->usernameField() => $userB->{$this->usernameField()}]);
         $craftedLogin->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
 

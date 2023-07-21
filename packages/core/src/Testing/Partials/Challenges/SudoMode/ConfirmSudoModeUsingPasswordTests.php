@@ -22,7 +22,7 @@ trait ConfirmSudoModeUsingPasswordTests
         $user = $this->generateUser();
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->actingAs($user)
             ->post(route('auth.sudo_mode'), [

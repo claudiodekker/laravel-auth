@@ -73,16 +73,15 @@ abstract class AccountRecoveryRequestController
      */
     public function store(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         return App::make(Timebox::class)->call(function () use ($request) {
-            $this->validateRecoveryRequest($request);
-
-            if ($this->isCurrentlyRateLimited($request)) {
-                $this->emitLockoutEvent($request);
-
-                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-            }
-
             $this->incrementRateLimitingCounter($request);
+            $this->validateRecoveryRequest($request);
 
             if (! $user = $this->getUser($request)) {
                 return $this->sendNoSuchUserResponse($request);

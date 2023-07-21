@@ -33,14 +33,14 @@ trait PasswordChallenge
      */
     protected function handlePasswordChallengeRequest(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePasswordChallengeRequest($request);
-
-            if ($this->isCurrentlyRateLimited($request)) {
-                $this->emitLockoutEvent($request);
-
-                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-            }
 
             if (! $this->hasValidPassword($request)) {
                 $this->incrementRateLimitingCounter($request);

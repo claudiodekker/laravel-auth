@@ -98,13 +98,13 @@ abstract class AccountRecoveryChallengeController
      */
     public function store(Request $request, string $token)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request, $token) {
-            if ($this->isCurrentlyRateLimited($request)) {
-                $this->emitLockoutEvent($request);
-
-                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-            }
-
             if (! $user = $this->resolveUser($request)) {
                 $this->incrementRateLimitingCounter($request);
 

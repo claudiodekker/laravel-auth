@@ -47,14 +47,14 @@ trait PasskeyBasedAuthentication
      */
     protected function handlePasskeyBasedAuthenticationRequest(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePasskeyBasedRequest($request);
-
-            if ($this->isCurrentlyRateLimited($request)) {
-                $this->emitLockoutEvent($request);
-
-                return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
-            }
 
             if (! $options = $this->getPasskeyAuthenticationOptions($request)) {
                 return $this->sendInvalidPasskeyAuthenticationStateResponse($request);

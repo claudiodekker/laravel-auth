@@ -28,7 +28,7 @@ trait SubmitPasskeyBasedAuthenticationTests
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -272,7 +272,7 @@ trait SubmitPasskeyBasedAuthenticationTests
             'secret' => '{"id":"ID\/CFbjp7mfDuI4zwEe+49\/g1+8=","publicKey":"pQECAyYgASFYIFZSx3fc0szMDz38Eu4ZBWjeAQMP0dWR\/D+Dy3RA1tktIlggJzLmQt5ydTQ6PXRF4GFCgWyXJBT0giypbK0wducMmW4=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptionsTwo()));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -385,7 +385,7 @@ trait SubmitPasskeyBasedAuthenticationTests
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -424,7 +424,7 @@ trait SubmitPasskeyBasedAuthenticationTests
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -462,7 +462,7 @@ trait SubmitPasskeyBasedAuthenticationTests
             'secret' => '{"id":"ea2KxTIqiH6GqbKePv4rwk8XWVE=","publicKey":"pQECAyYgASFYIEOExHX5IQpnF2dCG1fpw51gD7va0WxmKonfkDMWIRG9Ilggj7YxOrVEYp6EAeGNYwOlpd8FUmsqYyk0L0JIpNa1\/3A=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -502,7 +502,7 @@ trait SubmitPasskeyBasedAuthenticationTests
         ]);
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
         $this->assertNotEmpty($previousId = session()->getId());
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',

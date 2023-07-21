@@ -21,7 +21,6 @@ trait LoginRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->hitRateLimiter(250, '');
-        $this->expectTimebox();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -41,7 +40,6 @@ trait LoginRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
-        $this->expectTimebox();
 
         $responseA = $this->submitPasswordBasedLoginAttempt();
 
@@ -52,8 +50,6 @@ trait LoginRateLimitingTests
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
-
-        $this->expectTimebox();
 
         $responseB = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => $this->nonExistentUsername()]);
         $this->assertInstanceOf(ValidationException::class, $responseB->exception);
@@ -67,7 +63,6 @@ trait LoginRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->hitRateLimiter(5, 'username::'.$this->defaultUsername());
-        $this->expectTimebox();
 
         $responseA = $this->submitPasswordBasedLoginAttempt();
 
@@ -116,7 +111,7 @@ trait LoginRateLimitingTests
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($usernameKey));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -134,7 +129,6 @@ trait LoginRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class]);
         $this->hitRateLimiter(250, '');
-        $this->expectTimebox();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -166,7 +160,6 @@ trait LoginRateLimitingTests
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
-        $this->expectTimebox();
 
         $responseA = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -235,7 +228,7 @@ trait LoginRateLimitingTests
         $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',

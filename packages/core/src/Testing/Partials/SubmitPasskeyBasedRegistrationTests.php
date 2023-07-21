@@ -206,7 +206,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasskeyBasedRegisterAttempt();
 
@@ -315,7 +315,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptionsTwo($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('register'), [
             'type' => 'passkey',
@@ -417,7 +417,7 @@ trait SubmitPasskeyBasedRegistrationTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasskeyBasedRegisterAttempt();
 

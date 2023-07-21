@@ -265,7 +265,7 @@ trait Helpers
         });
     }
 
-    protected function expectSuccessfulTimebox(): void
+    protected function expectTimeboxWithEarlyReturn(): void
     {
         $this->partialMock(Timebox::class, function (MockInterface $timebox) {
             $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {

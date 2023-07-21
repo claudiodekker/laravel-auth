@@ -22,7 +22,6 @@ trait SudoModeRateLimitingTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
-        $this->expectTimebox();
 
         $response = $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'password',
@@ -43,7 +42,6 @@ trait SudoModeRateLimitingTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
         $this->hitRateLimiter(5, 'user_id::1');
-        $this->expectTimebox();
 
         $response = $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'password',
@@ -83,7 +81,7 @@ trait SudoModeRateLimitingTests
         $user = $this->generateUser(['id' => 1]);
         $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
         $this->hitRateLimiter(1, $userKey = 'user_id::1');
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'password',
@@ -106,7 +104,6 @@ trait SudoModeRateLimitingTests
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
-        $this->expectTimebox();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -140,7 +137,6 @@ trait SudoModeRateLimitingTests
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->hitRateLimiter(5, 'user_id::1');
-        $this->expectTimebox();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -214,7 +210,7 @@ trait SudoModeRateLimitingTests
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
         $this->hitRateLimiter(1, $userKey = 'user_id::1');
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [

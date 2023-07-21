@@ -32,7 +32,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -199,7 +199,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('R9KnmyTxs6zHJB75bhLKgw');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
-        $this->expectSuccessfulTimebox();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
