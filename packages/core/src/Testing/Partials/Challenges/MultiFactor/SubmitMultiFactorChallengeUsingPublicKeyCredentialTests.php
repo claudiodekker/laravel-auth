@@ -13,6 +13,7 @@ use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Objects\CredentialAttributes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Session;
+use Mockery;
 
 trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
 {
@@ -364,6 +365,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->expectTimeboxWithEarlyReturn();
         $this->preAuthenticate($userA, [$this->usernameField() => $userA->{$this->usernameField()}]);
         $this->mockPublicKeyRequestOptions([$credentialA]);
+        Mockery::close();
 
         // Next, instead of completing the challenge, the attacker will take their session id / CSRF tokens etc., and crafts
         // a manual 'login' attempt to that signs in the victim, which returns a redirect to the victim's MFA challenge.

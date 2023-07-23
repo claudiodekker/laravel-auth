@@ -34,6 +34,7 @@ trait AccountRecoveryRequestRateLimitingTests
     {
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertSame(0, $this->getRateLimitAttempts(''));
+        $this->expectTimebox();
 
         $this->post(route('recover-account'), [
             'email' => 'foo@example.com',

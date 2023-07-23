@@ -20,6 +20,7 @@ trait AccountRecoveryChallengeWithoutRateLimitingTests
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -37,6 +38,7 @@ trait AccountRecoveryChallengeWithoutRateLimitingTests
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
         $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => 'nonexistent-user@example.com',
@@ -56,6 +58,7 @@ trait AccountRecoveryChallengeWithoutRateLimitingTests
         $userB = $this->generateUser(['id' => 2, 'email' => 'another@example.com', $this->usernameField() => $this->anotherUsername()]);
         $token = Password::getRepository()->create($userA);
         $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $userB->getEmailForPasswordReset(),
@@ -73,6 +76,7 @@ trait AccountRecoveryChallengeWithoutRateLimitingTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => 'invalid-token']), [
             'email' => $user->getEmailForPasswordReset(),
@@ -91,6 +95,7 @@ trait AccountRecoveryChallengeWithoutRateLimitingTests
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
         $this->assertSame(0, RateLimiter::attempts($throttlingKey = 'account-recovery-challenge|127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),

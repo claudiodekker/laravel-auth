@@ -23,6 +23,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
         $mock = RateLimiter::spy();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -56,6 +57,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
+        $this->expectTimebox();
         $mock = RateLimiter::spy();
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
@@ -80,6 +82,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         ]);
         $this->preAuthenticate($user);
         $this->mockPublicKeyRequestOptions([$credential]);
+        $this->expectTimebox();
         $mock = RateLimiter::spy();
 
         $response = $this->postJson(route('login.challenge.multi_factor'), [
@@ -108,6 +111,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
+        $this->expectTimebox();
         $mock = RateLimiter::spy();
 
         $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);

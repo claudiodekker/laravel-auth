@@ -38,6 +38,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => 'nonexistent-user@example.com',
@@ -57,6 +58,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $userB = $this->generateUser(['id' => 2, 'email' => 'another@example.com', $this->usernameField() => $this->anotherUsername()]);
         $token = Password::getRepository()->create($userA);
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $userB->getEmailForPasswordReset(),
@@ -74,6 +76,7 @@ trait AccountRecoveryChallengeRateLimitingTests
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => 'invalid-token']), [
             'email' => $user->getEmailForPasswordReset(),
@@ -93,6 +96,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT']]);
         $token = Password::getRepository()->create($user);
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
@@ -115,6 +119,7 @@ trait AccountRecoveryChallengeRateLimitingTests
         $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
             'email' => $user->getEmailForPasswordReset(),
