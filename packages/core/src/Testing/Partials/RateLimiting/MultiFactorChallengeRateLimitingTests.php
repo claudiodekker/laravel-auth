@@ -28,7 +28,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -61,7 +61,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->preAuthenticate($user);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
-        $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
@@ -88,7 +88,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -122,7 +122,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->preAuthenticate($user);
         $this->expectTimebox();
 
-        $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
 
         $this->assertSame(2, $this->getRateLimitAttempts($ipKey));
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
@@ -151,7 +151,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -189,7 +189,7 @@ trait MultiFactorChallengeRateLimitingTests
         $this->preAuthenticate($user);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), [
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 

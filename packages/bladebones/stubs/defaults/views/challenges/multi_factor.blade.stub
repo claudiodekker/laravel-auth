@@ -171,7 +171,7 @@
         showUserInterfaceState("submitting");
 
         // Then, we'll actually submit the asserted credential to the server.
-        const response = await fetch("{{ route("login.challenge.multi_factor") }}", {
+        const response = await fetch("{{ route("login.challenge") }}", {
           method: "POST",
           headers: {
             "Accept": "application/json",
@@ -216,7 +216,7 @@
 @if ($availableMethods->contains(\ClaudioDekker\LaravelAuth\CredentialType::TOTP))
   <h2>Authentication code</h2>
 
-  <form method="POST" action="{{ route('login.challenge.multi_factor') }}">
+  <form method="POST" action="{{ route('login.challenge') }}">
     <input type="hidden" name="_token" value="{{ csrf_token() }}" />
     <label>
       <span>Authentication Token</span>

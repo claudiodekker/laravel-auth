@@ -22,7 +22,7 @@ trait MultiFactorChallengeViewTests
         $this->preAuthenticate($user);
         $this->assertNull(Session::get('url.intended'));
 
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         /** @var PublicKeyCredentialRequestOptions $options */
         $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options = unserialize(Session::get('laravel-auth::public_key_challenge_request_options'), [PublicKeyCredentialRequestOptions::class]));

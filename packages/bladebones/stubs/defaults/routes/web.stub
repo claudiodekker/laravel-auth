@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/auth/login', [LoginController::class, 'store']);
 
     Route::middleware(EnsurePreAuthenticated::class)->group(function () {
-        Route::get('/auth/login/challenge', [MultiFactorChallengeController::class, 'create'])->name('login.challenge.multi_factor');
+        Route::get('/auth/login/challenge', [MultiFactorChallengeController::class, 'create'])->name('login.challenge');
         Route::post('/auth/login/challenge', [MultiFactorChallengeController::class, 'store']);
     });
 
