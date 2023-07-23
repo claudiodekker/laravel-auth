@@ -12,7 +12,7 @@ trait SubmitMultiFactorChallengeTests
     /** @test */
     public function it_cannot_complete_a_multi_factor_challenge_when_not_pre_authenticated(): void
     {
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -35,7 +35,7 @@ trait SubmitMultiFactorChallengeTests
     {
         $this->actingAs($this->generateUser());
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => 'foo',
         ]);
 

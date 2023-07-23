@@ -20,13 +20,13 @@ trait ViewMultiFactorChallengePageTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $response = $this->preAuthenticate($user);
-        $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
+        $response->assertExactJson(['redirect_url' => route('login.challenge')]);
         Config::set('laravel-auth.webauthn.relying_party.id', $rpId = 'configured.rpid');
         Config::set('laravel-auth.webauthn.timeout', $timeout = 12345);
         $this->mockWebauthnChallenge($challenge = 'cPMfYjCIb804eqvknNWAqA');
         $this->expectTimebox();
 
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         $response->assertOk();
         $this->assertInstanceOf(PublicKeyCredentialRequestOptions::class, $options = unserialize(Session::get('laravel-auth::public_key_challenge_request_options'), [PublicKeyCredentialRequestOptions::class]));
@@ -51,11 +51,11 @@ trait ViewMultiFactorChallengePageTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->forUser($user)->totp()->create();
         $response = $this->preAuthenticate($user);
-        $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
+        $response->assertExactJson(['redirect_url' => route('login.challenge')]);
         $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
         $this->expectTimebox();
 
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         $response->assertOk();
         $response->assertSessionMissing('laravel-auth::public_key_challenge_request_options');
@@ -69,11 +69,11 @@ trait ViewMultiFactorChallengePageTests
         $credential = LaravelAuth::multiFactorCredentialModel()::factory()->forUser($user)->totp()->create();
         $response = $this->preAuthenticate($user);
         $intendedLocation = session()->get('auth.mfa.intended_location');
-        $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
+        $response->assertExactJson(['redirect_url' => route('login.challenge')]);
         $credential->delete();
         $this->expectTimebox();
 
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         $response->assertRedirect($intendedLocation);
         $this->assertFullyAuthenticatedAs($response, $user);
@@ -86,7 +86,7 @@ trait ViewMultiFactorChallengePageTests
     /** @test */
     public function the_multi_factor_challenge_page_cannot_be_viewed_when_not_pre_authenticated(): void
     {
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         $response->assertRedirect(route('login'));
         $this->assertGuest();
@@ -97,7 +97,7 @@ trait ViewMultiFactorChallengePageTests
     {
         $this->actingAs($this->generateUser());
 
-        $response = $this->get(route('login.challenge.multi_factor'));
+        $response = $this->get(route('login.challenge'));
 
         $response->assertRedirect(RouteServiceProvider::HOME);
     }

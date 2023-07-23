@@ -32,73 +32,59 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/auth/login', [LoginController::class, 'store']);
+
+    Route::middleware(EnsurePreAuthenticated::class)->group(function () {
+        Route::get('/auth/login/challenge', [MultiFactorChallengeController::class, 'create'])->name('login.challenge');
+        Route::post('/auth/login/challenge', [MultiFactorChallengeController::class, 'store']);
+    });
+
+    Route::get('/auth/recover-account', [AccountRecoveryRequestController::class, 'create'])->name('recover-account');
+    Route::post('/auth/recover-account', [AccountRecoveryRequestController::class, 'store']);
+    Route::get('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'create'])->name('recover-account.challenge');
+    Route::post('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'store']);
+
+    Route::get('/auth/register', [RegisterController::class, 'create'])->name('register');
+    Route::post('/auth/register', [RegisterController::class, 'store']);
+    Route::delete('/auth/register', [RegisterController::class, 'destroy']);
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/home', fn () => view('home'));
-});
 
-Route::prefix('/auth')->group(function () {
-    Route::middleware('guest')->group(function () {
-        Route::get('/register', [RegisterController::class, 'create'])->name('register');
-        Route::post('/register', [RegisterController::class, 'store']);
-        Route::delete('/register', [RegisterController::class, 'destroy']);
+    Route::delete('/logout', [LoginController::class, 'destroy'])->name('logout');
 
-        Route::get('/login', [LoginController::class, 'create'])->name('login');
-        Route::post('/login', [LoginController::class, 'store']);
+    Route::middleware(EnsureSudoMode::class)->group(function () {
+        Route::get('/settings/security', [CredentialsController::class, 'index'])->name('auth.settings');
 
-        Route::prefix('/recover-account')->group(function () {
-            Route::get('/', [AccountRecoveryRequestController::class, 'create'])->name('recover-account');
-            Route::post('/', [AccountRecoveryRequestController::class, 'store']);
+        Route::post('/settings/security/generate-recovery-codes', [GenerateRecoveryCodesController::class, 'create'])->name('auth.settings.generate_recovery');
+        Route::get('/settings/security/generate-recovery-codes/confirm', [GenerateRecoveryCodesController::class, 'confirm'])->name('auth.settings.generate_recovery.confirm');
+        Route::post('/settings/security/generate-recovery-codes/confirm', [GenerateRecoveryCodesController::class, 'store']);
 
-            Route::get('/{token}', [AccountRecoveryChallengeController::class, 'create'])->name('recover-account.challenge');
-            Route::post('/{token}', [AccountRecoveryChallengeController::class, 'store']);
-        });
+        Route::middleware(EnsurePasswordBasedUser::class)->group(function () {
+            Route::put('/settings/security/password', [ChangePasswordController::class, 'update'])->name('auth.settings.password');
 
-        Route::prefix('/login/challenge')->middleware(EnsurePreAuthenticated::class)->group(function () {
-            Route::get('/', [MultiFactorChallengeController::class, 'create'])->name('login.challenge.multi_factor');
-            Route::post('/', [MultiFactorChallengeController::class, 'store']);
-        });
-    });
-
-    Route::middleware('auth')->group(function () {
-        Route::delete('/logout', [LoginController::class, 'destroy'])->name('logout');
-
-        Route::prefix('/sudo-mode')->group(function () {
-            Route::get('/', [SudoModeChallengeController::class, 'create'])->name('auth.sudo_mode');
-            Route::post('/', [SudoModeChallengeController::class, 'store']);
-        });
-    });
-});
-
-Route::prefix('/settings/security')->middleware(['auth', EnsureSudoMode::class])->group(function () {
-    Route::get('/', [CredentialsController::class, 'index'])->name('auth.settings');
-
-    Route::prefix('/generate-recovery-codes')->group(function () {
-        Route::post('/', [GenerateRecoveryCodesController::class, 'create'])->name('auth.settings.generate_recovery');
-        Route::get('/confirm', [GenerateRecoveryCodesController::class, 'confirm'])->name('auth.settings.generate_recovery.confirm');
-        Route::post('/confirm', [GenerateRecoveryCodesController::class, 'store'])->name('auth.settings.generate_recovery.store');
-    });
-
-    Route::middleware(EnsurePasswordBasedUser::class)->group(function () {
-        Route::put('/password', [ChangePasswordController::class, 'update'])->name('auth.settings.password');
-
-        Route::prefix('/credentials')->middleware(EnsurePasswordBasedUser::class)->group(function () {
             // TOTP / Authenticator
-            Route::post('/register-authenticator', [RegisterTotpCredentialController::class, 'initialize'])->name('auth.credentials.register_totp');
-            Route::delete('/register-authenticator', [RegisterTotpCredentialController::class, 'cancel'])->name('auth.credentials.register_totp.cancel');
-            Route::get('/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'confirm'])->name('auth.credentials.register_totp.confirm');
-            Route::post('/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'store'])->name('auth.credentials.register_totp.store');
+            Route::post('/settings/security/credentials/register-authenticator', [RegisterTotpCredentialController::class, 'initialize'])->name('auth.credentials.register_totp');
+            Route::delete('/settings/security/credentials/register-authenticator', [RegisterTotpCredentialController::class, 'cancel']);
+            Route::get('/settings/security/credentials/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'confirm'])->name('auth.credentials.register_totp.confirm');
+            Route::post('/settings/security/credentials/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'store']);
 
             // Public Key / Security Keys
-            Route::get('/register-security-key', [RegisterPublicKeyCredentialController::class, 'create'])->name('auth.credentials.register_public_key');
-            Route::post('/register-security-key', [RegisterPublicKeyCredentialController::class, 'store'])->name('auth.credentials.register_public_key.store');
+            Route::get('/settings/security/credentials/register-security-key', [RegisterPublicKeyCredentialController::class, 'create'])->name('auth.credentials.register_public_key');
+            Route::post('/settings/security/credentials/register-security-key', [RegisterPublicKeyCredentialController::class, 'store']);
 
             // Credential Deletion
-            Route::delete('/{id}', [CredentialsController::class, 'destroy'])->name('auth.credentials.destroy');
+            Route::delete('/settings/security/credentials/{id}', [CredentialsController::class, 'destroy'])->name('auth.credentials.destroy');
         });
-    });
-});
 
-Route::prefix('/settings/verify-email')->middleware('auth')->group(function () {
-    Route::post('/', [VerifyEmailController::class, 'store'])->middleware([EnsureSudoMode::class, 'throttle:1'])->name('verification.send');
-    Route::get('/{id}/{hash}', [VerifyEmailController::class, 'update'])->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+        Route::post('/settings/verify-email', [VerifyEmailController::class, 'store'])->name('verification.send');
+    });
+
+    Route::get('/settings/verify-email/{id}/{hash}', [VerifyEmailController::class, 'update'])->middleware('signed')->name('verification.verify');
+
+    Route::get('/sudo-mode', [SudoModeChallengeController::class, 'create'])->name('auth.sudo_mode');
+    Route::post('/sudo-mode', [SudoModeChallengeController::class, 'store']);
 });

@@ -30,7 +30,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -66,7 +66,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->preAuthenticate($user);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -101,7 +101,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -137,7 +137,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -173,7 +173,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -209,7 +209,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -246,7 +246,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -285,7 +285,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -323,7 +323,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         $this->mockPublicKeyRequestOptions([$credential]);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -371,7 +371,7 @@ trait SubmitMultiFactorChallengeUsingPublicKeyCredentialTests
         // a manual 'login' attempt to that signs in the victim, which returns a redirect to the victim's MFA challenge.
         $this->expectTimeboxWithEarlyReturn();
         $craftedLogin = $this->preAuthenticate($userB, [$this->usernameField() => $userB->{$this->usernameField()}]);
-        $craftedLogin->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
+        $craftedLogin->assertExactJson(['redirect_url' => route('login.challenge')]);
 
         // However, since we haven't actually followed the redirect, this user's MFA challenge options haven't been initialized yet.
         // The result is a state in which the victim is being authenticated, with the attacker's MFA challenge details still set.

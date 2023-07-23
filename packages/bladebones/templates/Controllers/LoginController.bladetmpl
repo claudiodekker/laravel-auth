@@ -114,7 +114,7 @@ class LoginController extends BaseController
     protected function sendMultiFactorChallengeResponse(Request $request, CredentialType $preferredMethod): JsonResponse
     {
         return new JsonResponse([
-            'redirect_url' => route('login.challenge.multi_factor'),
+            'redirect_url' => route('login.challenge'),
         ], 200);
     }
 

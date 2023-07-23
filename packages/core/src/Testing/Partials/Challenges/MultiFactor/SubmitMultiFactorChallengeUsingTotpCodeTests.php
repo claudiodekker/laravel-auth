@@ -26,7 +26,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'));
+        $response = $this->postJson(route('login.challenge'));
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
@@ -42,7 +42,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), ['code' => true]);
+        $response = $this->postJson(route('login.challenge'), ['code' => true]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
@@ -59,7 +59,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -81,7 +81,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -102,7 +102,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -123,7 +123,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         Cache::put('auth.mfa.totp_timestamps.'.$user->getAuthIdentifier(), (int) floor(microtime(true) / 30));
         $this->expectTimebox();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -143,7 +143,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user, ['remember' => 'on']);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -165,7 +165,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->preAuthenticate($user);
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 
@@ -189,7 +189,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->assertNotEmpty($previousId = session()->getId());
         $this->expectTimeboxWithEarlyReturn();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
         ]);
 

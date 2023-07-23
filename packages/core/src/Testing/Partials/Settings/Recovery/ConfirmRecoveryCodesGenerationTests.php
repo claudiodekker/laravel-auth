@@ -19,7 +19,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $this->actingAs($user)->post(route('auth.settings.generate_recovery'));
         $codes = Session::get('auth.mfa_setup.pending_recovery_codes')->toArray();
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'), [
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'), [
             'code' => $codes[3],
         ]);
 
@@ -38,7 +38,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $this->actingAs($user)->post(route('auth.settings.generate_recovery'));
         $this->assertNotNull(Session::get('auth.mfa_setup.pending_recovery_codes'));
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'));
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'));
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
@@ -55,7 +55,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $this->actingAs($user)->post(route('auth.settings.generate_recovery'));
         $this->assertNotNull(Session::get('auth.mfa_setup.pending_recovery_codes'));
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'), [
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'), [
             'code' => 123456,
         ]);
 
@@ -73,7 +73,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $this->enableSudoMode();
         Session::put('auth.mfa_setup.pending_recovery_codes', RecoveryCodeManager::from(['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']));
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'), [
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'), [
             'code' => 'ENVZV-GPP13',
         ]);
 
@@ -90,7 +90,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $user = $this->generateUser();
         $this->enableSudoMode();
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'), [
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'), [
             'code' => 'H4PFK-ENVZV',
         ]);
 
@@ -106,7 +106,7 @@ trait ConfirmRecoveryCodesGenerationTests
         $user = $this->generateUser();
         Session::put('auth.mfa_setup.pending_recovery_codes', $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']);
 
-        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.store'), [
+        $response = $this->actingAs($user)->post(route('auth.settings.generate_recovery.confirm'), [
             'code' => $codes[3],
         ]);
 

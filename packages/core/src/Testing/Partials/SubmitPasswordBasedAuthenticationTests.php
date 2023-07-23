@@ -231,7 +231,7 @@ trait SubmitPasswordBasedAuthenticationTests
         $response = $this->submitPasswordBasedLoginAttempt();
 
         $response->assertOk();
-        $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
+        $response->assertExactJson(['redirect_url' => route('login.challenge')]);
         $this->assertPartlyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
         $response->assertSessionHas('auth.mfa.remember', false);

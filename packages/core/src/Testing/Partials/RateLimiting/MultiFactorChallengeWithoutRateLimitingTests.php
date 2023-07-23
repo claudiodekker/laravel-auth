@@ -26,7 +26,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $this->expectTimebox();
         $mock = RateLimiter::spy();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -60,7 +60,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $this->expectTimebox();
         $mock = RateLimiter::spy();
 
-        $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
 
         $mock->shouldNotHaveReceived('tooManyAttempts');
         $mock->shouldNotHaveReceived('availableIn');
@@ -85,7 +85,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $this->expectTimebox();
         $mock = RateLimiter::spy();
 
-        $response = $this->postJson(route('login.challenge.multi_factor'), [
+        $response = $this->postJson(route('login.challenge'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -114,7 +114,7 @@ trait MultiFactorChallengeWithoutRateLimitingTests
         $this->expectTimebox();
         $mock = RateLimiter::spy();
 
-        $response = $this->from(route('login.challenge.multi_factor'))->post(route('login.challenge.multi_factor'), ['code' => '123456']);
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
 
         $mock->shouldNotHaveReceived('tooManyAttempts');
         $mock->shouldNotHaveReceived('hit');

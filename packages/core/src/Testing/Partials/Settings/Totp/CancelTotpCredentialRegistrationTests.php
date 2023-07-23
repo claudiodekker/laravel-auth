@@ -15,7 +15,7 @@ trait CancelTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', App::make(Authenticator::class)->generateSecret());
 
         $response = $this->actingAs($this->generateUser())
-            ->delete(route('auth.credentials.register_totp.cancel'));
+            ->delete(route('auth.credentials.register_totp'));
 
         $response->assertRedirect(route('auth.settings'));
         $this->assertFalse(Session::has('auth.mfa_setup.pending_totp_secret'));
@@ -27,7 +27,7 @@ trait CancelTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', App::make(Authenticator::class)->generateSecret());
 
         $response = $this->actingAs($this->generateUser())
-            ->delete(route('auth.credentials.register_totp.cancel'));
+            ->delete(route('auth.credentials.register_totp'));
 
         $response->assertRedirect(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('auth.mfa_setup.pending_totp_secret'));

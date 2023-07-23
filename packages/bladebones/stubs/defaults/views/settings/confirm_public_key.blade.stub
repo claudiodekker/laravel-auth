@@ -188,7 +188,7 @@
       showUserInterfaceState("submitting");
 
       // Then, we'll actually submit the credential (and it's name) to the server.
-      const response = await fetch("{{ route("auth.credentials.register_public_key.store") }}", {
+      const response = await fetch("{{ route("auth.credentials.register_public_key") }}", {
         method: "POST",
         headers: {
           "Accept": "application/json",
