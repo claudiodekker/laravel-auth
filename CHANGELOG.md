@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve Rate Limiting ([#32](https://github.com/claudiodekker/laravel-auth/pull/32))
 - Added Larastan & improved violations ([#36](https://github.com/claudiodekker/laravel-auth/pull/36))
 - Split up HTTP Traits into Mixins and Modifiers ([#54](https://github.com/claudiodekker/laravel-auth/pull/54))
+- Bladebones: Clean up routes file & de-duplicate named routes ([#56](https://github.com/claudiodekker/laravel-auth/pull/56))
 
 ### Removed
 
