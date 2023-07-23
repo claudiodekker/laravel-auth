@@ -18,6 +18,7 @@ trait SubmitPasswordBasedRegistrationTests
     {
         Event::fake(Registered::class);
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 
@@ -47,6 +48,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_is_required_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -57,6 +60,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_is_a_string_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => 123]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -67,6 +72,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_name_does_not_exceed_255_characters_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['name' => str_repeat('a', 256)]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -77,6 +84,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_username_is_required_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => '']);
 
         $this->assertUsernameRequiredValidationError($response);
@@ -86,6 +95,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_username_does_not_exceed_255_characters_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => $this->tooLongUsername()]);
 
         $this->assertUsernameTooLongValidationError($response);
@@ -95,6 +106,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_is_required_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -105,6 +118,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_does_not_exceed_255_characters_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => str_repeat('a', 256).'@example.com']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -115,6 +130,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_email_is_valid_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['email' => 'foo']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -125,6 +142,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_user_does_not_already_exist_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $this->generateUser([$this->usernameField() => $this->defaultUsername()]);
 
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => $this->defaultUsername()]);
@@ -136,6 +155,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_password_is_required_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['password' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -146,6 +167,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_password_confirmation_is_required_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['password_confirmation' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -156,6 +179,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_password_is_confirmed_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt(['password_confirmation' => 'invalid-password-confirmation']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -166,6 +191,8 @@ trait SubmitPasswordBasedRegistrationTests
     /** @test */
     public function it_validates_that_the_password_default_rules_are_applied_during_password_based_registration(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedRegisterAttempt([
             'password' => 'foo',
             'password_confirmation' => 'foo',
@@ -181,6 +208,7 @@ trait SubmitPasswordBasedRegistrationTests
     {
         Carbon::setTestNow(now());
         Event::fake([Registered::class, SudoModeEnabled::class]);
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 

@@ -21,6 +21,7 @@ trait SudoModeWithoutRateLimitingTests
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
+        $this->expectTimebox();
 
         $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'invalid-password',
@@ -36,6 +37,7 @@ trait SudoModeWithoutRateLimitingTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
         $mock = RateLimiter::spy();
+        $this->expectTimebox();
 
         $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'invalid-password',
@@ -58,6 +60,7 @@ trait SudoModeWithoutRateLimitingTests
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
+        $this->expectTimebox();
 
         $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -86,6 +89,7 @@ trait SudoModeWithoutRateLimitingTests
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $mock = RateLimiter::spy();
+        $this->expectTimebox();
 
         $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [

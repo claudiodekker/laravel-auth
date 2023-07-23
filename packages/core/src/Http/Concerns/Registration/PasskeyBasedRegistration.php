@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Timebox;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -69,14 +70,16 @@ trait PasskeyBasedRegistration
      */
     protected function handlePasskeyBasedRegistrationCancellationRequest(Request $request)
     {
-        if (! $options = $this->getPasskeyCreationOptions($request)) {
-            return $this->sendInvalidPasskeyRegistrationStateResponse($request);
-        }
+        return App::make(Timebox::class)->call(function () use ($request) {
+            if (! $options = $this->getPasskeyCreationOptions($request)) {
+                return $this->sendInvalidPasskeyRegistrationStateResponse($request);
+            }
 
-        $this->clearPasskeyCreationOptions($request);
-        $this->releaseClaimedPasswordlessUser($request, $options->user()->id());
+            $this->clearPasskeyCreationOptions($request);
+            $this->releaseClaimedPasswordlessUser($request, $options->user()->id());
 
-        return $this->sendPasskeyRegistrationCancelledResponse($request);
+            return $this->sendPasskeyRegistrationCancelledResponse($request);
+        }, 300 * 1000);
     }
 
     /**
@@ -86,14 +89,16 @@ trait PasskeyBasedRegistration
      */
     protected function initializePasskeyBasedRegistration(Request $request)
     {
-        $this->validatePasskeyBasedRegistrationInitialization($request);
+        return App::make(Timebox::class)->call(function () use ($request) {
+            $this->validatePasskeyBasedRegistrationInitialization($request);
 
-        $user = $this->claimPasswordlessUser($request);
+            $user = $this->claimPasswordlessUser($request);
 
-        $options = $this->generatePasskeyCreationOptions($request, $user);
-        $this->setPasskeyCreationOptions($request, $options);
+            $options = $this->generatePasskeyCreationOptions($request, $user);
+            $this->setPasskeyCreationOptions($request, $options);
 
-        return $this->sendPasskeyBasedRegistrationInitializedResponse($request, $options);
+            return $this->sendPasskeyBasedRegistrationInitializedResponse($request, $options);
+        }, 300 * 1000);
     }
 
     /**
@@ -103,27 +108,30 @@ trait PasskeyBasedRegistration
      */
     protected function confirmPasskeyBasedRegistration(Request $request)
     {
-        if (! $options = $this->getPasskeyCreationOptions($request)) {
-            return $this->sendInvalidPasskeyRegistrationStateResponse($request);
-        }
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            if (! $options = $this->getPasskeyCreationOptions($request)) {
+                return $this->sendInvalidPasskeyRegistrationStateResponse($request);
+            }
 
-        try {
-            $attributes = $this->validateAndPrepareCredentialAttributes($request, $options);
-        } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
-            return $this->sendInvalidPasskeyResponse($request);
-        }
+            try {
+                $attributes = $this->validateAndPrepareCredentialAttributes($request, $options);
+            } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
+                return $this->sendInvalidPasskeyResponse($request);
+            }
 
-        $user = $this->resolveUserFromPasskeyCreationOptions($options);
+            $user = $this->resolveUserFromPasskeyCreationOptions($options);
 
-        $this->createPasskey($request, $user, $attributes);
+            $this->createPasskey($request, $user, $attributes);
 
-        $this->clearPasskeyCreationOptions($request);
-        $this->emitRegisteredEvent($user);
-        $this->sendEmailVerificationNotification($user);
-        $this->authenticate($user);
-        $this->enableSudoMode($request);
+            $this->clearPasskeyCreationOptions($request);
+            $this->emitRegisteredEvent($user);
+            $this->sendEmailVerificationNotification($user);
+            $this->authenticate($user);
+            $this->enableSudoMode($request);
+            $timebox->returnEarly();
 
-        return $this->sendRegisteredResponse($request, $user);
+            return $this->sendRegisteredResponse($request, $user);
+        }, 300 * 1000);
     }
 
     /**

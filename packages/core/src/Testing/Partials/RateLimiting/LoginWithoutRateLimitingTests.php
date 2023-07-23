@@ -17,6 +17,7 @@ trait LoginWithoutRateLimitingTests
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
+        $this->expectTimebox();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -31,6 +32,7 @@ trait LoginWithoutRateLimitingTests
     {
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
+        $this->expectTimebox();
 
         $this->submitPasswordBasedLoginAttempt();
     }
@@ -42,6 +44,7 @@ trait LoginWithoutRateLimitingTests
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
         $mock->shouldNotReceive('availableIn');
+        $this->expectTimebox();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -69,6 +72,7 @@ trait LoginWithoutRateLimitingTests
     {
         $mock = RateLimiter::partialMock();
         $mock->shouldNotReceive('tooManyAttempts');
+        $this->expectTimebox();
 
         $this->postJson(route('login'), [
             'type' => 'passkey',

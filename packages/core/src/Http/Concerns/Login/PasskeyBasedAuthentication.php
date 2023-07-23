@@ -14,6 +14,7 @@ use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCred
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Timebox;
 use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -46,37 +47,40 @@ trait PasskeyBasedAuthentication
      */
     protected function handlePasskeyBasedAuthenticationRequest(Request $request)
     {
-        $this->validatePasskeyBasedRequest($request);
-
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
-        if (! $options = $this->getPasskeyAuthenticationOptions($request)) {
-            return $this->sendInvalidPasskeyAuthenticationStateResponse($request);
-        }
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validatePasskeyBasedRequest($request);
 
-        try {
-            $credential = $this->validatePasskey($request, $options);
-        } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
-            $this->incrementRateLimitingCounter($request);
-            $this->emitAuthenticationFailedEvent($request);
+            if (! $options = $this->getPasskeyAuthenticationOptions($request)) {
+                return $this->sendInvalidPasskeyAuthenticationStateResponse($request);
+            }
 
-            return $this->sendAuthenticationFailedResponse($request);
-        }
+            try {
+                $credential = $this->validatePasskey($request, $options);
+            } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
+                $this->incrementRateLimitingCounter($request);
+                $this->emitAuthenticationFailedEvent($request);
 
-        $user = $this->resolveUserFromPasskey($request, $credential);
+                return $this->sendAuthenticationFailedResponse($request);
+            }
 
-        $this->clearPasskeyAuthenticationOptions($request);
-        $this->resetRateLimitingCounter($request);
-        $this->updatePasskeyCredential($request, $credential);
-        $this->authenticate($user, $this->isRememberingUser($request));
-        $this->enableSudoMode($request);
-        $this->emitAuthenticatedEvent($request, $user);
+            $user = $this->resolveUserFromPasskey($request, $credential);
 
-        return $this->sendAuthenticatedResponse($request, $user);
+            $this->clearPasskeyAuthenticationOptions($request);
+            $this->resetRateLimitingCounter($request);
+            $this->updatePasskeyCredential($request, $credential);
+            $this->authenticate($user, $this->isRememberingUser($request));
+            $this->enableSudoMode($request);
+            $this->emitAuthenticatedEvent($request, $user);
+            $timebox->returnEarly();
+
+            return $this->sendAuthenticatedResponse($request, $user);
+        }, 300 * 1000);
     }
 
     /**

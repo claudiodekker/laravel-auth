@@ -13,6 +13,7 @@ trait AccountRecoveryRequestWithoutRateLimitingTests
     {
         Event::fake(Lockout::class);
         $mock = RateLimiter::spy();
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => 'foo@example.com',
@@ -29,6 +30,7 @@ trait AccountRecoveryRequestWithoutRateLimitingTests
     public function account_recovery_requests_do_not_increment_the_rate_limiting_attempts(): void
     {
         $mock = RateLimiter::spy();
+        $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
             'email' => 'foo@example.com',

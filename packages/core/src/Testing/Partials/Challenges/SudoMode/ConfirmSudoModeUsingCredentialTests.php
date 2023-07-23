@@ -32,6 +32,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -72,6 +73,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -111,6 +113,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -155,6 +158,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
         $this->actingAs($userA)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->actingAs($userA)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -195,6 +199,7 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->mockWebauthnChallenge('R9KnmyTxs6zHJB75bhLKgw');
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -232,6 +237,7 @@ trait ConfirmSudoModeUsingCredentialTests
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -263,6 +269,7 @@ trait ConfirmSudoModeUsingCredentialTests
         Carbon::setTestNow(now());
         $user = $this->generateUser();
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)
             ->from(route('auth.sudo_mode'))

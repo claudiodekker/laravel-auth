@@ -24,6 +24,7 @@ trait ViewMultiFactorChallengePageTests
         Config::set('laravel-auth.webauthn.relying_party.id', $rpId = 'configured.rpid');
         Config::set('laravel-auth.webauthn.timeout', $timeout = 12345);
         $this->mockWebauthnChallenge($challenge = 'cPMfYjCIb804eqvknNWAqA');
+        $this->expectTimebox();
 
         $response = $this->get(route('login.challenge.multi_factor'));
 
@@ -52,6 +53,7 @@ trait ViewMultiFactorChallengePageTests
         $response = $this->preAuthenticate($user);
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
         $this->assertFalse(Session::has('laravel-auth::public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->get(route('login.challenge.multi_factor'));
 
@@ -69,6 +71,7 @@ trait ViewMultiFactorChallengePageTests
         $intendedLocation = session()->get('auth.mfa.intended_location');
         $response->assertExactJson(['redirect_url' => route('login.challenge.multi_factor')]);
         $credential->delete();
+        $this->expectTimebox();
 
         $response = $this->get(route('login.challenge.multi_factor'));
 

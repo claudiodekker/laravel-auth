@@ -74,6 +74,8 @@ trait LoginRateLimitingTests
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
 
+        $this->expectTimebox();
+
         $responseB = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => $this->nonExistentUsername()]);
         $this->assertInstanceOf(ValidationException::class, $responseB->exception);
         $this->assertSame([$this->usernameField() => ['These credentials do not match our records.']], $responseB->exception->errors());
@@ -87,6 +89,7 @@ trait LoginRateLimitingTests
         $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts($usernameKey = 'username::'.$this->defaultUsername()));
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
+        $this->expectTimebox();
 
         $this->submitPasswordBasedLoginAttempt(['password' => 'invalid']);
 
@@ -108,6 +111,7 @@ trait LoginRateLimitingTests
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($usernameKey));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -188,6 +192,7 @@ trait LoginRateLimitingTests
         $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
         Session::put('auth.login.passkey_authentication_options', serialize($this->mockPasskeyRequestOptions()));
+        $this->expectTimebox();
 
         $this->postJson(route('login'), [
             'type' => 'passkey',
@@ -223,6 +228,7 @@ trait LoginRateLimitingTests
         $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->postJson(route('login'), [
             'type' => 'passkey',

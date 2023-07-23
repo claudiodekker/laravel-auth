@@ -10,6 +10,7 @@ use ClaudioDekker\LaravelAuth\Methods\WebAuthn\SpomkyWebAuthn;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialCreationOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialUserEntity;
+use ClaudioDekker\LaravelAuth\Testing\Support\InstantlyResolvingTimebox;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Illuminate\Support\Timebox;
 use Illuminate\Testing\TestResponse;
 use Mockery\MockInterface;
 
@@ -247,5 +249,28 @@ trait Helpers
             ],
             'type' => 'public-key',
         ];
+    }
+
+    protected function useInstantlyResolvingTimebox()
+    {
+        App::bind(Timebox::class, fn () => new InstantlyResolvingTimebox());
+    }
+
+    protected function expectTimebox(): void
+    {
+        $this->partialMock(Timebox::class, function (MockInterface $timebox) {
+            $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
+                return $callback($timebox->shouldReceive('returnEarly')->never()->getMock());
+            });
+        });
+    }
+
+    protected function expectTimeboxWithEarlyReturn(): void
+    {
+        $this->partialMock(Timebox::class, function (MockInterface $timebox) {
+            $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
+                return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
+            });
+        });
     }
 }

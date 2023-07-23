@@ -15,6 +15,7 @@ trait ViewSudoModeChallengePageTests
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->assertFalse(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)->get(route('auth.sudo_mode'));
 
@@ -28,6 +29,7 @@ trait ViewSudoModeChallengePageTests
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser();
         $this->assertFalse(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->expectTimebox();
 
         $response = $this->actingAs($user)->get(route('auth.sudo_mode'));
 

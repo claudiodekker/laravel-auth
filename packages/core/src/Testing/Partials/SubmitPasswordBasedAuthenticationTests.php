@@ -21,6 +21,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -47,6 +48,8 @@ trait SubmitPasswordBasedAuthenticationTests
     /** @test */
     public function it_validates_that_the_username_is_required_during_password_based_authentication(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => '']);
 
         $this->assertUsernameRequiredValidationError($response);
@@ -56,6 +59,8 @@ trait SubmitPasswordBasedAuthenticationTests
     /** @test */
     public function it_validates_that_the_username_is_valid_during_password_based_authentication(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => $this->invalidUsername()]);
 
         $this->assertUsernameMustBeValidValidationError($response);
@@ -65,6 +70,8 @@ trait SubmitPasswordBasedAuthenticationTests
     /** @test */
     public function it_validates_that_the_password_is_required_during_password_based_authentication(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedLoginAttempt(['password' => '']);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -75,6 +82,8 @@ trait SubmitPasswordBasedAuthenticationTests
     /** @test */
     public function it_validates_that_the_password_is_a_string_during_password_based_authentication(): void
     {
+        $this->expectTimebox();
+
         $response = $this->submitPasswordBasedLoginAttempt(['password' => 123]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
@@ -87,6 +96,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->generateUser();
+        $this->expectTimebox();
 
         $response = $this->submitPasswordBasedLoginAttempt(['password' => 'invalid']);
 
@@ -103,6 +113,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->generateUser();
+        $this->expectTimebox();
 
         $response = $this->submitPasswordBasedLoginAttempt([
             $this->usernameField() => $this->nonExistentUsername(),
@@ -122,6 +133,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->generateUser(['has_password' => false]);
+        $this->expectTimebox();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -138,6 +150,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt(['remember' => 'on']);
 
@@ -157,6 +170,7 @@ trait SubmitPasswordBasedAuthenticationTests
 
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -174,6 +188,7 @@ trait SubmitPasswordBasedAuthenticationTests
         Carbon::setTestNow(now());
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class, SudoModeEnabled::class]);
         $user = $this->generateUser();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -194,6 +209,7 @@ trait SubmitPasswordBasedAuthenticationTests
     {
         $user = $this->generateUser();
         $this->assertNotEmpty($previousId = session()->getId());
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -210,6 +226,7 @@ trait SubmitPasswordBasedAuthenticationTests
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class, SudoModeEnabled::class]);
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
+        $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->submitPasswordBasedLoginAttempt();
 

@@ -123,6 +123,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -221,6 +228,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -309,6 +323,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -398,6 +419,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -484,6 +512,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -572,6 +607,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -661,6 +703,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -747,6 +796,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;
@@ -850,6 +906,13 @@ class AuthenticationTest extends TestCase
     use RegisterPublicKeyCredentialTests;
     use RegisterTotpCredentialTests;
     use RemoveCredentialTests;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        \$this->useInstantlyResolvingTimebox();
+    }
 }
 
 EOF;

@@ -14,6 +14,7 @@ trait RegisterWithVerificationEmailTests
     {
         Notification::fake();
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->expectTimeboxWithEarlyReturn();
 
         $this->submitPasswordBasedRegisterAttempt();
 
@@ -27,6 +28,7 @@ trait RegisterWithVerificationEmailTests
         $user = $this->generateUser(['id' => 1, 'has_password' => false]);
         $options = $this->mockPasskeyCreationOptions($user);
         Session::put('auth.register.passkey_creation_options', serialize($options));
+        $this->expectTimeboxWithEarlyReturn();
 
         $this->submitPasskeyBasedRegisterAttempt();
 

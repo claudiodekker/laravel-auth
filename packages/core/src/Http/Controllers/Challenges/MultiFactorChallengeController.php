@@ -17,8 +17,10 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Timebox;
 
 abstract class MultiFactorChallengeController
 {
@@ -78,17 +80,19 @@ abstract class MultiFactorChallengeController
      */
     public function create(Request $request)
     {
-        $credentials = $this->getMultiFactorCredentials($request);
+        return App::make(Timebox::class)->call(function () use ($request) {
+            $credentials = $this->getMultiFactorCredentials($request);
 
-        if ($credentials->isEmpty()) {
-            return $this->handleChallengeSuccessfulResponse($request);
-        }
+            if ($credentials->isEmpty()) {
+                return $this->handleChallengeSuccessfulResponse($request);
+            }
 
-        $availableTypes = $this->filterAvailableCredentialTypes($credentials);
-        $publicKeyCredentials = $this->filterPublicKeyCredentials($credentials);
-        $options = $this->handlePublicKeyChallengeInitialization($request, $publicKeyCredentials);
+            $availableTypes = $this->filterAvailableCredentialTypes($credentials);
+            $publicKeyCredentials = $this->filterPublicKeyCredentials($credentials);
+            $options = $this->handlePublicKeyChallengeInitialization($request, $publicKeyCredentials);
 
-        return $this->sendChallengePageResponse($request, $options, $availableTypes);
+            return $this->sendChallengePageResponse($request, $options, $availableTypes);
+        }, 300 * 1000);
     }
 
     /**

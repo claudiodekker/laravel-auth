@@ -10,8 +10,10 @@ use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Timebox;
 
 trait PasswordBasedAuthentication
 {
@@ -32,38 +34,41 @@ trait PasswordBasedAuthentication
      */
     protected function handlePasswordBasedAuthenticationRequest(Request $request)
     {
-        $this->validatePasswordBasedRequest($request);
-
         if ($this->isCurrentlyRateLimited($request)) {
             $this->emitLockoutEvent($request);
 
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
-        if (! $user = $this->validatePasswordBasedCredentials($request)) {
-            $this->incrementRateLimitingCounter($request);
-            $this->emitAuthenticationFailedEvent($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
+            $this->validatePasswordBasedRequest($request);
 
-            return $this->sendAuthenticationFailedResponse($request);
-        }
+            if (! $user = $this->validatePasswordBasedCredentials($request)) {
+                $this->incrementRateLimitingCounter($request);
+                $this->emitAuthenticationFailedEvent($request);
 
-        $this->sanitizeMultiFactorSessionState($request);
+                return $this->sendAuthenticationFailedResponse($request);
+            }
 
-        $credentials = $this->fetchMultiFactorCredentials($user);
-        if ($credentials->isEmpty()) {
-            $this->resetRateLimitingCounter($request);
-            $this->authenticate($user, $this->isRememberingUser($request));
-            $this->enableSudoMode($request);
-            $this->emitAuthenticatedEvent($request, $user);
+            $this->sanitizeMultiFactorSessionState($request);
+            $timebox->returnEarly();
 
-            return $this->sendAuthenticatedResponse($request, $user);
-        }
+            $credentials = $this->fetchMultiFactorCredentials($user);
+            if ($credentials->isEmpty()) {
+                $this->resetRateLimitingCounter($request);
+                $this->authenticate($user, $this->isRememberingUser($request));
+                $this->enableSudoMode($request);
+                $this->emitAuthenticatedEvent($request, $user);
 
-        $preferredMethod = $this->determinePreferredMultiFactorMethod($user, $credentials);
-        $this->prepareMultiFactorAuthenticationDetails($request, $user);
-        $this->emitMultiFactorChallengedEvent($request, $user);
+                return $this->sendAuthenticatedResponse($request, $user);
+            }
 
-        return $this->sendMultiFactorChallengeResponse($request, $preferredMethod);
+            $preferredMethod = $this->determinePreferredMultiFactorMethod($user, $credentials);
+            $this->prepareMultiFactorAuthenticationDetails($request, $user);
+            $this->emitMultiFactorChallengedEvent($request, $user);
+
+            return $this->sendMultiFactorChallengeResponse($request, $preferredMethod);
+        }, 300 * 1000);
     }
 
     /**

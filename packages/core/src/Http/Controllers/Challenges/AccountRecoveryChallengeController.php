@@ -11,9 +11,11 @@ use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Timebox;
 
 abstract class AccountRecoveryChallengeController
 {
@@ -63,21 +65,25 @@ abstract class AccountRecoveryChallengeController
      */
     public function create(Request $request, string $token)
     {
-        if (! $user = $this->resolveUser($request)) {
-            return $this->sendInvalidRecoveryLinkResponse($request);
-        }
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request, $token) {
+            if (! $user = $this->resolveUser($request)) {
+                return $this->sendInvalidRecoveryLinkResponse($request);
+            }
 
-        if (! $this->isValidRecoveryLink($user, $token)) {
-            return $this->sendInvalidRecoveryLinkResponse($request);
-        }
+            if (! $this->isValidRecoveryLink($user, $token)) {
+                return $this->sendInvalidRecoveryLinkResponse($request);
+            }
 
-        if (! $this->hasRecoveryCodes($request, $user)) {
-            $this->invalidateRecoveryLink($request, $user);
+            $timebox->returnEarly();
 
-            return $this->handleAccountRecoveredResponse($request, $user);
-        }
+            if (! $this->hasRecoveryCodes($request, $user)) {
+                $this->invalidateRecoveryLink($request, $user);
 
-        return $this->sendChallengePageResponse($request, $token);
+                return $this->handleAccountRecoveredResponse($request, $user);
+            }
+
+            return $this->sendChallengePageResponse($request, $token);
+        }, 300 * 1000);
     }
 
     /**
@@ -98,36 +104,40 @@ abstract class AccountRecoveryChallengeController
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
-        if (! $user = $this->resolveUser($request)) {
-            $this->incrementRateLimitingCounter($request);
+        return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request, $token) {
+            if (! $user = $this->resolveUser($request)) {
+                $this->incrementRateLimitingCounter($request);
 
-            return $this->sendInvalidRecoveryLinkResponse($request);
-        }
+                return $this->sendInvalidRecoveryLinkResponse($request);
+            }
 
-        if (! $this->isValidRecoveryLink($user, $token)) {
-            $this->incrementRateLimitingCounter($request);
+            if (! $this->isValidRecoveryLink($user, $token)) {
+                $this->incrementRateLimitingCounter($request);
 
-            return $this->sendInvalidRecoveryLinkResponse($request);
-        }
+                return $this->sendInvalidRecoveryLinkResponse($request);
+            }
 
-        if (! $this->hasRecoveryCodes($request, $user)) {
+            if (! $this->hasRecoveryCodes($request, $user)) {
+                $this->invalidateRecoveryLink($request, $user);
+                $timebox->returnEarly();
+
+                return $this->handleAccountRecoveredResponse($request, $user);
+            }
+
+            if (! $this->hasValidRecoveryCode($request, $user)) {
+                $this->incrementRateLimitingCounter($request);
+                $this->emitAccountRecoveryFailedEvent($request, $user);
+
+                return $this->sendInvalidRecoveryCodeResponse($request);
+            }
+
+            $this->resetRateLimitingCounter($request);
+            $this->invalidateRecoveryCode($request, $user);
             $this->invalidateRecoveryLink($request, $user);
+            $timebox->returnEarly();
 
             return $this->handleAccountRecoveredResponse($request, $user);
-        }
-
-        if (! $this->hasValidRecoveryCode($request, $user)) {
-            $this->incrementRateLimitingCounter($request);
-            $this->emitAccountRecoveryFailedEvent($request, $user);
-
-            return $this->sendInvalidRecoveryCodeResponse($request);
-        }
-
-        $this->resetRateLimitingCounter($request);
-        $this->invalidateRecoveryCode($request, $user);
-        $this->invalidateRecoveryLink($request, $user);
-
-        return $this->handleAccountRecoveredResponse($request, $user);
+        }, 300 * 1000);
     }
 
     /**
