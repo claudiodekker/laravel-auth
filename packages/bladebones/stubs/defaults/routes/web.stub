@@ -39,7 +39,7 @@ Route::middleware('guest')->group(function () {
     Route::middleware(EnsurePreAuthenticated::class)->group(function () {
         Route::get('/auth/login/challenge', [MultiFactorChallengeController::class, 'create'])->name('login.challenge.multi_factor');
         Route::post('/auth/login/challenge', [MultiFactorChallengeController::class, 'store']);
-    })
+    });
 
     Route::get('/auth/recover-account', [AccountRecoveryRequestController::class, 'create'])->name('recover-account');
     Route::post('/auth/recover-account', [AccountRecoveryRequestController::class, 'store']);
