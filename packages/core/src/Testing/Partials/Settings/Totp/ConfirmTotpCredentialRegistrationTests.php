@@ -21,7 +21,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E');
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
             ]);
@@ -44,7 +44,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', App::make(Authenticator::class)->generateSecret());
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
             ]);
 
@@ -60,7 +60,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', App::make(Authenticator::class)->generateSecret());
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => 123456,
             ]);
@@ -77,7 +77,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', App::make(Authenticator::class)->generateSecret());
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => '12345',
             ]);
@@ -94,7 +94,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E');
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => '123456',
             ]);
@@ -109,7 +109,7 @@ trait ConfirmTotpCredentialRegistrationTests
     {
         $this->enableSudoMode();
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => '123456',
             ]);
@@ -124,7 +124,7 @@ trait ConfirmTotpCredentialRegistrationTests
         Session::put('auth.mfa_setup.pending_totp_secret', $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E');
 
         $response = $this->actingAs($this->generateUser())
-            ->post(route('auth.credentials.register_totp.store'), [
+            ->post(route('auth.credentials.register_totp.confirm'), [
                 'name' => 'Test Authenticator',
                 'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
             ]);

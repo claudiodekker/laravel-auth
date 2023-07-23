@@ -232,7 +232,7 @@ trait Helpers
 
     protected function submitRegisterPublicKeyCredentialAttempt()
     {
-        return $this->postJson(route('auth.credentials.register_public_key.store'), [
+        return $this->postJson(route('auth.credentials.register_public_key'), [
             'name' => 'Example Credential',
             'credential' => $this->publicKeyCredential(),
         ]);

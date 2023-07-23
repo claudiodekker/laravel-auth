@@ -42,7 +42,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         $options = $this->mockPublicKeyCreationOptions($user);
         Session::put('auth.mfa_setup.public_key_credential_creation_options', serialize($options));
 
-        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key.store'), [
+        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key'), [
             'credential' => $this->publicKeyCredential(),
         ]);
 
@@ -62,7 +62,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         $options = $this->mockPublicKeyCreationOptions($user);
         Session::put('auth.mfa_setup.public_key_credential_creation_options', serialize($options));
 
-        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key.store'), [
+        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key'), [
             'name' => 'Example Credential',
         ]);
 
@@ -122,7 +122,7 @@ trait ConfirmPublicKeyCredentialRegistrationTests
         $options = $this->mockPublicKeyCreationOptions($user);
         Session::put('auth.mfa_setup.public_key_credential_creation_options', serialize($options));
 
-        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key.store'), [
+        $response = $this->actingAs($user)->postJson(route('auth.credentials.register_public_key'), [
             'name' => 'Malformed Credential',
             'credential' => [
                 'id' => 'mMihuIx9LukswxBOMjMHDf6EAONOy7qdWhaQQ7dOtViR2cVB_MNbZxURi2cvgSvKSILb3mISe9lPNG9sYgojuY5iNinYOg6hRVxmm0VssuNG2pm1-RIuTF9DUtEJZEEK',
