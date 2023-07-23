@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
 
             // TOTP / Authenticator
             Route::post('/settings/security/credentials/register-authenticator', [RegisterTotpCredentialController::class, 'initialize'])->name('auth.credentials.register_totp');
-            Route::delete('/settings/security/credentials/register-authenticator', [RegisterTotpCredentialController::class, 'cancel'])
+            Route::delete('/settings/security/credentials/register-authenticator', [RegisterTotpCredentialController::class, 'cancel']);
             Route::get('/settings/security/credentials/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'confirm'])->name('auth.credentials.register_totp.confirm');
             Route::post('/settings/security/credentials/register-authenticator/confirm', [RegisterTotpCredentialController::class, 'store']);
 
@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::post('/settings/verify-email', [VerifyEmailController::class, 'store'])->name('verification.send');
-    })
+    });
 
     Route::get('/settings/verify-email/{id}/{hash}', [VerifyEmailController::class, 'update'])->middleware('signed')->name('verification.verify');
 
