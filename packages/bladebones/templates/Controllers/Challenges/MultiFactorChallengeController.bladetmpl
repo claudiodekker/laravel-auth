@@ -8,9 +8,6 @@ use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\MultiFactorChallengeCo
 @if ($flavor !== 'email-based')
 use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
 @endif
-@if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
-@endif
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
@@ -25,10 +22,6 @@ class MultiFactorChallengeController extends BaseController
 {
 @php
     $uses = [];
-    if ($withoutRateLimiting) {
-        $uses[] = "WithoutRateLimiting";
-    }
-
     if ($flavor !== 'email-based') {
         $uses[] = $flavorTrait;
     }
@@ -55,9 +48,7 @@ class MultiFactorChallengeController extends BaseController
     /**
      * Handle an incoming multi-factor challenge confirmation request.
      *
-@if (!$withoutRateLimiting)
      * {!! '@' !!}see static::sendRateLimitedResponse()
-@endif
      * {!! '@' !!}see static::sendChallengeFailedResponse()
      * {!! '@' !!}see static::sendAuthenticatedResponse()
      * {!! '@' !!}see static::sendInvalidPublicKeyChallengeStateResponse()
@@ -125,7 +116,6 @@ class MultiFactorChallengeController extends BaseController
             'credential' => __('laravel-auth::auth.challenge.public-key'),
         ]);
     }
-@if (!$withoutRateLimiting)
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
@@ -143,5 +133,4 @@ class MultiFactorChallengeController extends BaseController
             ]),
         ]);
     }
-@endif
 }

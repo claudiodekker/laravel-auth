@@ -21,9 +21,7 @@ jobs:
         stability: [ 'prefer-lowest', 'prefer-stable' ]
         variants: [
           '',
-          '--without-rate-limiting',
-          '--kind username-based',
-          '--kind username-based --without-rate-limiting'
+          '--kind username-based'
         ]
 
     name: PHP ${{ matrix.php }} L${{ matrix.laravel }} ${{ matrix.variants }} (w/ ${{ matrix.stability }})

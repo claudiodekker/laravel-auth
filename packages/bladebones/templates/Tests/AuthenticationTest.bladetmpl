@@ -1,5 +1,4 @@
 @php
-    $rateLimitingTrait = $withoutRateLimiting ? "WithoutRateLimitingTests" : "RateLimitingTests";
     $verificationTrait = $withoutEmailVerification ? "RegisterWithoutVerificationEmailTests" : "RegisterWithVerificationEmailTests";
     $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
 @endphp
@@ -14,7 +13,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\{{ $rateLimitingTrait }};
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -36,7 +34,6 @@ class AuthenticationTest extends TestCase
 @php
     $mixins = [
         $flavorTrait,
-        $rateLimitingTrait,
         $verificationTrait
     ];
 

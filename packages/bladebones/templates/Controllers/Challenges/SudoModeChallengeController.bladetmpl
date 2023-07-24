@@ -8,9 +8,6 @@ use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\SudoModeChallengeContr
 @if ($flavor !== 'email-based')
 use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
 @endif
-@if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
-@endif
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -21,10 +18,6 @@ class SudoModeChallengeController extends BaseController
 {
 @php
     $uses = [];
-    if ($withoutRateLimiting) {
-        $uses[] = "WithoutRateLimiting";
-    }
-
     if ($flavor !== 'email-based') {
         $uses[] = $flavorTrait;
     }
@@ -52,9 +45,7 @@ class SudoModeChallengeController extends BaseController
      * Verify the sudo-mode confirmation request.
      *
      * {!! '@' !!}see static::sendConfirmationNotRequiredResponse()
-@if (!$withoutRateLimiting)
      * {!! '@' !!}see static::sendRateLimitedResponse()
-@endif
      * {!! '@' !!}see static::sendPasswordChallengeFailedResponse()
      * {!! '@' !!}see static::sendInvalidPublicKeyChallengeStateResponse()
      * {!! '@' !!}see static::sendPublicKeyChallengeFailedResponse()
@@ -129,7 +120,6 @@ class SudoModeChallengeController extends BaseController
             'credential' => __('laravel-auth::auth.challenge.public-key'),
         ]);
     }
-@if (!$withoutRateLimiting)
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
@@ -145,5 +135,4 @@ class SudoModeChallengeController extends BaseController
             ]),
         ]);
     }
-@endif
 }
