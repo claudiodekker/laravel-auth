@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Revert model DB connection customization ([#38](https://github.com/claudiodekker/laravel-auth/pull/38))
+- Core: Remove ability to disable Rate Limiting ([#57](https://github.com/claudiodekker/laravel-auth/pull/57))
 
 
 ## [v0.2.0](https://github.com/claudiodekker/laravel-auth/compare/v0.1.2...v0.2.0) - 2023-04-03
