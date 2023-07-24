@@ -17,9 +17,7 @@ jobs:
       matrix:
         variants: [
           '',
-          '--without-rate-limiting',
-          '--kind username-based',
-          '--kind username-based --without-rate-limiting'
+          '--kind username-based'
         ]
 
     name: Variant - ${{ matrix.variants }}

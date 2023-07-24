@@ -2,9 +2,6 @@
 namespace App\Http\Controllers\Auth\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\AccountRecoveryChallengeController as BaseController;
-@if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
-@endif
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -13,20 +10,6 @@ use Illuminate\Validation\ValidationException;
 
 class AccountRecoveryChallengeController extends BaseController
 {
-@php
-    $uses = [];
-    if ($withoutRateLimiting) {
-        $uses[] = "WithoutRateLimiting";
-    }
-
-    asort($uses);
-@endphp
-@if (count($uses) > 0)
-@foreach($uses as $use)
-    use {{ $use }};
-@endforeach
-
-@endif
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
@@ -42,9 +25,7 @@ class AccountRecoveryChallengeController extends BaseController
     /**
      * Handle an incoming account recovery challenge response.
      *
-@if (!$withoutRateLimiting)
      * {!! '@' !!}see static::sendRateLimitedResponse()
-@endif
      * {!! '@' !!}see static::sendAccountRecoveredResponse()
      * {!! '@' !!}see static::sendInvalidRecoveryCodeResponse()
      * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
@@ -96,7 +77,6 @@ class AccountRecoveryChallengeController extends BaseController
     {
         return redirect()->route('auth.settings');
     }
-@if (!$withoutRateLimiting)
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
@@ -112,5 +92,4 @@ class AccountRecoveryChallengeController extends BaseController
             ]),
         ]);
     }
-@endif
 }

@@ -14,7 +14,7 @@ abstract class GenerateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'auth:generate {--y|yes} {--t|without-rate-limiting} {--e|register-without-email-verification} {--b|without-views} {--k|kind=}';
+    protected $signature = 'auth:generate {--y|yes} {--e|register-without-email-verification} {--b|without-views} {--k|kind=}';
 
     /**
      * The console command description.
@@ -66,7 +66,6 @@ abstract class GenerateCommand extends Command
         $flavors = ['email-based', 'username-based'];
 
         $this->determinedOptions = [
-            'withoutRateLimiting' => $this->option('without-rate-limiting') || ! ($this->option('yes') || $this->confirm('Do you want authentication attempts to be rate-limited? (Strongly recommended)', true)),
             'withoutEmailVerification' => $this->option('register-without-email-verification') || ! ($this->option('yes') || $this->confirm('Do you want to send a verification email when users register?', true)),
             'withoutViews' => $this->option('without-views'),
             'flavor' => $this->option('kind') && in_array($this->option('kind'), $flavors, true) ? $this->option('kind') : ($this->option('yes') ? 'email-based' : $this->choice('What flavor of user accounts do you want to use?', $flavors, 0)),

@@ -2,10 +2,6 @@
     $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
 
     $traits = [];
-    if ($withoutRateLimiting) {
-        $traits[] = "ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting";
-    }
-
     if ($withoutEmailVerification) {
         $traits[] = "ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail";
     }
@@ -29,18 +25,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-@if (!$withoutRateLimiting)
 use Illuminate\Validation\ValidationException;
-@endif
 
 class AccountRecoveryRequestController extends BaseController
 {
 @php
     $uses = [];
-    if ($withoutRateLimiting) {
-        $uses[] = "WithoutRateLimiting";
-    }
-
     if ($withoutEmailVerification) {
         $uses[] = "WithoutVerificationEmail";
     }
@@ -68,9 +58,7 @@ class AccountRecoveryRequestController extends BaseController
     /**
      * Handle an incoming request to receive an account recovery link.
      *
-@if (!$withoutRateLimiting)
      * {!! '@' !!}see static::sendRateLimitedResponse()
-@endif
      * {!! '@' !!}see static::sendNoSuchUserResponse()
      * {!! '@' !!}see static::sendRecoveryAlreadyRequestedResponse()
      * {!! '@' !!}see static::sendRecoveryLinkSentResponse()
@@ -115,7 +103,6 @@ class AccountRecoveryRequestController extends BaseController
     {
         return $this->sendRecoveryLinkSentResponse($request);
     }
-@if (!$withoutRateLimiting)
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
@@ -131,5 +118,4 @@ class AccountRecoveryRequestController extends BaseController
             ]),
         ]);
     }
-@endif
 }

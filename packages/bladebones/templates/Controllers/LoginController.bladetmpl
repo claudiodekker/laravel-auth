@@ -9,9 +9,6 @@ use ClaudioDekker\LaravelAuth\Http\Controllers\LoginController as BaseController
 @if ($flavor !== 'email-based')
 use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
 @endif
-@if ($withoutRateLimiting)
-use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;
-@endif
 use ClaudioDekker\LaravelAuth\Specifications\WebAuthn\Dictionaries\PublicKeyCredentialRequestOptions;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
@@ -24,10 +21,6 @@ class LoginController extends BaseController
 {
 @php
     $uses = [];
-    if ($withoutRateLimiting) {
-        $uses[] = "WithoutRateLimiting";
-    }
-
     if ($flavor !== 'email-based') {
         $uses[] = $flavorTrait;
     }
@@ -53,9 +46,7 @@ class LoginController extends BaseController
     /**
      * Handle an incoming authentication request.
      *
-@if (!$withoutRateLimiting)
      * {!! '@' !!}see static::sendRateLimitedResponse()
-@endif
      * {!! '@' !!}see static::sendInvalidPasskeyAuthenticationStateResponse()
      * {!! '@' !!}see static::sendMultiFactorChallengeResponse()
      * {!! '@' !!}see static::sendAuthenticationFailedResponse()
@@ -135,7 +126,6 @@ class LoginController extends BaseController
     {
         return redirect()->route('login');
     }
-@if (!$withoutRateLimiting)
 
     /**
      * Sends a response indicating that the user's requests have been rate limited.
@@ -151,5 +141,4 @@ class LoginController extends BaseController
             ]),
         ]);
     }
-@endif
 }

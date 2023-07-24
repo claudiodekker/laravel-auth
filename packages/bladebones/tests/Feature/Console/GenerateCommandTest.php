@@ -56,12 +56,12 @@ class GenerateCommandTest extends TestCase
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController');
+        $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
@@ -82,7 +82,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\RateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -101,7 +100,6 @@ class AuthenticationTest extends TestCase
     // Configuration Mixins
     use BladeViewTests;
     use EmailBased;
-    use RateLimitingTests;
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
@@ -156,290 +154,6 @@ EOF;
     }
 
     /** @test */
-    public function it_asks_whether_you_want_to_use_rate_limiting(): void
-    {
-        $this->assertMockShouldReceiveController('Settings/ChangePasswordController');
-        $this->assertMockShouldReceiveController('Settings/CredentialsController');
-        $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
-        $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
-        $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
-            $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
-        });
-        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
-        $this->assertMockShouldReceiveTest('Unit/UserTest');
-        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
-            $expected = <<<EOF
-<?php
-
-namespace Tests\Feature;
-
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
-use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
-use ClaudioDekker\LaravelAuth\Testing\LoginTests;
-use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
-use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\RateLimitingTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
-use ClaudioDekker\LaravelAuth\Testing\RemoveCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\SubmitChangePasswordTests;
-use ClaudioDekker\LaravelAuth\Testing\SudoModeChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\ViewCredentialsOverviewPageTests;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class AuthenticationTest extends TestCase
-{
-    use RefreshDatabase;
-
-    // Configuration Mixins
-    use EmailBased;
-    use RateLimitingTests;
-    use RegisterWithoutVerificationEmailTests;
-
-    // Basic Auth
-    use AccountRecoveryRequestTests;
-    use RegistrationTests;
-    use LoginTests;
-    use LogoutTests;
-
-    // Challenges
-    use AccountRecoveryChallengeTests;
-    use MultiFactorChallengeTests;
-    use SudoModeChallengeTests;
-
-    // Settings
-    use ViewCredentialsOverviewPageTests;
-    use EmailVerificationTests;
-    use GenerateRecoveryCodesTests;
-    use SubmitChangePasswordTests;
-    use RegisterPublicKeyCredentialTests;
-    use RegisterTotpCredentialTests;
-    use RemoveCredentialTests;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        \$this->useInstantlyResolvingTimebox();
-    }
-}
-
-EOF;
-
-            $this->assertSame($contents, $expected);
-
-            return true;
-        });
-
-        $this->mock->shouldIgnoreMissing();
-
-        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--register-without-email-verification' => true, '--kind' => 'email-based'])
-            ->expectsConfirmation('Do you want authentication attempts to be rate-limited? (Strongly recommended)', 'yes');
-    }
-
-    /** @test */
-    public function it_disables_rate_limiting_when_you_answer_the_rate_limiting_question_with_no(): void
-    {
-        $this->assertMockShouldReceiveController('Settings/ChangePasswordController');
-        $this->assertMockShouldReceiveController('Settings/CredentialsController');
-        $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
-        $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
-        $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
-        $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
-            $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
-        });
-        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
-        $this->assertMockShouldReceiveTest('Unit/UserTest');
-        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
-            $expected = <<<EOF
-<?php
-
-namespace Tests\Feature;
-
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
-use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
-use ClaudioDekker\LaravelAuth\Testing\LoginTests;
-use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
-use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
-use ClaudioDekker\LaravelAuth\Testing\RemoveCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\SubmitChangePasswordTests;
-use ClaudioDekker\LaravelAuth\Testing\SudoModeChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\ViewCredentialsOverviewPageTests;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class AuthenticationTest extends TestCase
-{
-    use RefreshDatabase;
-
-    // Configuration Mixins
-    use EmailBased;
-    use RegisterWithoutVerificationEmailTests;
-    use WithoutRateLimitingTests;
-
-    // Basic Auth
-    use AccountRecoveryRequestTests;
-    use RegistrationTests;
-    use LoginTests;
-    use LogoutTests;
-
-    // Challenges
-    use AccountRecoveryChallengeTests;
-    use MultiFactorChallengeTests;
-    use SudoModeChallengeTests;
-
-    // Settings
-    use ViewCredentialsOverviewPageTests;
-    use EmailVerificationTests;
-    use GenerateRecoveryCodesTests;
-    use SubmitChangePasswordTests;
-    use RegisterPublicKeyCredentialTests;
-    use RegisterTotpCredentialTests;
-    use RemoveCredentialTests;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        \$this->useInstantlyResolvingTimebox();
-    }
-}
-
-EOF;
-
-            $this->assertSame($contents, $expected);
-
-            return true;
-        });
-        $this->mock->shouldIgnoreMissing();
-
-        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--register-without-email-verification' => true, '--kind' => 'email-based'])
-            ->expectsConfirmation('Do you want authentication attempts to be rate-limited? (Strongly recommended)', 'no');
-    }
-
-    /** @test */
-    public function it_disables_rate_limiting_when_the_without_rate_limiting_flag_was_passed(): void
-    {
-        $this->assertMockShouldReceiveController('Settings/ChangePasswordController');
-        $this->assertMockShouldReceiveController('Settings/CredentialsController');
-        $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
-        $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
-        $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
-        $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
-            $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
-        });
-        $this->assertMockShouldReceiveTest('Unit/PruneUnclaimedUsersTest');
-        $this->assertMockShouldReceiveTest('Unit/UserTest');
-        $this->assertMockShouldReceiveTest('Feature/AuthenticationTest', function ($contents) {
-            $expected = <<<EOF
-<?php
-
-namespace Tests\Feature;
-
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
-use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
-use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
-use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
-use ClaudioDekker\LaravelAuth\Testing\LoginTests;
-use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
-use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
-use ClaudioDekker\LaravelAuth\Testing\RemoveCredentialTests;
-use ClaudioDekker\LaravelAuth\Testing\SubmitChangePasswordTests;
-use ClaudioDekker\LaravelAuth\Testing\SudoModeChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\ViewCredentialsOverviewPageTests;
-use ClaudioDekker\LaravelAuthBladebones\Testing\BladeViewTests;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class AuthenticationTest extends TestCase
-{
-    use RefreshDatabase;
-
-    // Configuration Mixins
-    use BladeViewTests;
-    use EmailBased;
-    use RegisterWithVerificationEmailTests;
-    use WithoutRateLimitingTests;
-
-    // Basic Auth
-    use AccountRecoveryRequestTests;
-    use RegistrationTests;
-    use LoginTests;
-    use LogoutTests;
-
-    // Challenges
-    use AccountRecoveryChallengeTests;
-    use MultiFactorChallengeTests;
-    use SudoModeChallengeTests;
-
-    // Settings
-    use ViewCredentialsOverviewPageTests;
-    use EmailVerificationTests;
-    use GenerateRecoveryCodesTests;
-    use SubmitChangePasswordTests;
-    use RegisterPublicKeyCredentialTests;
-    use RegisterTotpCredentialTests;
-    use RemoveCredentialTests;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        \$this->useInstantlyResolvingTimebox();
-    }
-}
-
-EOF;
-
-            $this->assertSame($contents, $expected);
-
-            return true;
-        });
-        $this->mock->shouldIgnoreMissing();
-
-        $this->artisan(GenerateCommand::class, ['--yes' => true, '--without-rate-limiting' => true]);
-    }
-
-    /** @test */
     public function it_asks_whether_you_want_to_send_verification_emails_on_registration(): void
     {
         $this->assertMockShouldReceiveController('Settings/ChangePasswordController');
@@ -447,11 +161,11 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
@@ -473,7 +187,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -491,7 +204,6 @@ class AuthenticationTest extends TestCase
     // Configuration Mixins
     use EmailBased;
     use RegisterWithVerificationEmailTests;
-    use WithoutRateLimitingTests;
 
     // Basic Auth
     use AccountRecoveryRequestTests;
@@ -530,7 +242,7 @@ EOF;
 
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--without-rate-limiting' => true, '--kind' => 'email-based'])
+        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--kind' => 'email-based'])
             ->expectsConfirmation('Do you want to send a verification email when users register?', 'yes');
     }
 
@@ -542,11 +254,11 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
@@ -568,7 +280,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -586,7 +297,6 @@ class AuthenticationTest extends TestCase
     // Configuration Mixins
     use EmailBased;
     use RegisterWithoutVerificationEmailTests;
-    use WithoutRateLimitingTests;
 
     // Basic Auth
     use AccountRecoveryRequestTests;
@@ -624,7 +334,7 @@ EOF;
         });
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--without-rate-limiting' => true, '--kind' => 'email-based'])
+        $this->artisan(GenerateCommand::class, ['--without-views' => true,  '--kind' => 'email-based'])
             ->expectsConfirmation('Do you want to send a verification email when users register?', 'no');
     }
 
@@ -636,11 +346,11 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController');
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController');
         $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringContainsString("use WithoutVerificationEmail;\n", $contents);
@@ -662,7 +372,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -682,7 +391,6 @@ class AuthenticationTest extends TestCase
     use BladeViewTests;
     use EmailBased;
     use RegisterWithoutVerificationEmailTests;
-    use WithoutRateLimitingTests;
 
     // Basic Auth
     use AccountRecoveryRequestTests;
@@ -720,7 +428,7 @@ EOF;
         });
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--yes' => true, '--register-without-email-verification' => true, '--without-rate-limiting' => true]);
+        $this->artisan(GenerateCommand::class, ['--yes' => true, '--register-without-email-verification' => true]);
     }
 
     /** @test */
@@ -731,12 +439,12 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('LoginController');
-        $this->assertMockShouldReceiveControllerWithRateLimiting('RegisterController', function ($contents) {
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController');
+        $this->assertMockShouldReceiveController('RegisterController', function ($contents) {
             $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutVerificationEmail;\n", $contents);
             $this->assertStringNotContainsString("use WithoutVerificationEmail;\n", $contents);
         });
@@ -757,7 +465,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\RateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -774,7 +481,6 @@ class AuthenticationTest extends TestCase
 
     // Configuration Mixins
     use EmailBased;
-    use RateLimitingTests;
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
@@ -836,11 +542,11 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/AccountRecoveryChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/MultiFactorChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('Challenges/SudoModeChallengeController');
-        $this->assertMockShouldReceiveControllerWithoutRateLimiting('LoginController', function ($contents) {
+        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
+        $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
+        $this->assertMockShouldReceiveController('LoginController', function ($contents) {
             $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\UsernameBased;\n", $contents);
             $this->assertStringContainsString("use UsernameBased;\n", $contents);
         });
@@ -867,7 +573,6 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\RateLimiting\WithoutRateLimitingTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -885,7 +590,6 @@ class AuthenticationTest extends TestCase
     // Configuration Mixins
     use RegisterWithoutVerificationEmailTests;
     use UsernameBased;
-    use WithoutRateLimitingTests;
 
     // Basic Auth
     use AccountRecoveryRequestTests;
@@ -924,50 +628,8 @@ EOF;
 
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--register-without-email-verification' => true, '--without-rate-limiting' => true])
+        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--register-without-email-verification' => true])
             ->expectsChoice('What flavor of user accounts do you want to use?', 'username-based', ['email-based', 'username-based']);
-    }
-
-    protected function assertMockShouldReceiveControllerWithRateLimiting(string $filename, callable $callback = null): void
-    {
-        $this->assertMockShouldReceiveController($filename, function ($contents) use ($filename, $callback) {
-            $className = Str::replace('/', '\\', $filename);
-            $relativeClassName = Str::afterLast($className, '\\');
-
-            $this->assertStringContainsString("use Illuminate\Http\Request;\n", $contents);
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Controllers\\$className as BaseController;\n", $contents);
-
-            $this->assertStringContainsString("\n\nclass $relativeClassName extends BaseController\n{\n", $contents);
-            $this->assertStringNotContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;\n", $contents);
-            $this->assertStringNotContainsString("use WithoutRateLimiting;\n", $contents);
-
-            if ($callback) {
-                $callback($contents);
-            }
-
-            return true;
-        });
-    }
-
-    protected function assertMockShouldReceiveControllerWithoutRateLimiting(string $filename, callable $callback = null): void
-    {
-        $this->assertMockShouldReceiveController($filename, function ($contents) use ($filename, $callback) {
-            $className = Str::replace('/', '\\', $filename);
-            $relativeClassName = Str::afterLast($className, '\\');
-
-            $this->assertStringContainsString("use Illuminate\Http\Request;\n", $contents);
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Controllers\\$className as BaseController;\n", $contents);
-
-            $this->assertStringContainsString("\n\nclass $relativeClassName extends BaseController\n{\n", $contents);
-            $this->assertStringContainsString("use ClaudioDekker\LaravelAuth\Http\Modifiers\WithoutRateLimiting;\n", $contents);
-            $this->assertStringContainsString("use WithoutRateLimiting;\n", $contents);
-
-            if ($callback) {
-                $callback($contents);
-            }
-
-            return true;
-        });
     }
 
     protected function assertMockShouldReceiveController(string $filename, callable $callback = null): void
