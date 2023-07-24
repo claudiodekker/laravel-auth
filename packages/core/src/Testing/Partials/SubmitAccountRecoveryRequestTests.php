@@ -4,8 +4,10 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
 use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
@@ -107,5 +109,39 @@ trait SubmitAccountRecoveryRequestTests
         $this->assertTrue($repository->recentlyCreatedToken($user));
         Notification::assertNothingSent();
         Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function account_recovery_requests_are_rate_limited_after_too_many_requests(): void
+    {
+        Carbon::setTestNow(now());
+        Notification::fake();
+        Event::fake([Lockout::class]);
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
+
+        $response = $this->post(route('recover-account'), [
+            'email' => 'foo@example.com',
+        ]);
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame(['email' => [__('laravel-auth::auth.recovery.throttle', ['seconds' => 60])]], $response->exception->errors());
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Notification::assertNothingSent();
+        Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function it_increments_the_rate_limiter_when_an_account_recovery_request_is_made(): void
+    {
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
+        $this->expectTimebox();
+
+        $this->post(route('recover-account'), [
+            'email' => 'foo@example.com',
+        ]);
+
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 }
