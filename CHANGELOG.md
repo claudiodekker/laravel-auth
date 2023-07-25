@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove ext-json requirement ([#41](https://github.com/claudiodekker/laravel-auth/pull/41))
 - Refactor public key credential for tests ([#42](https://github.com/claudiodekker/laravel-auth/pull/42))
 - Core: More predictable/consistent Trait methods ([#50](https://github.com/claudiodekker/laravel-auth/pull/50))
+- UserFactory: Use `fake()` helper instead of `$this->faker` ([#59](https://github.com/claudiodekker/laravel-auth/pull/59))
 
 ### Fixed
 
