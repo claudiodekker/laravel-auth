@@ -1,6 +1,6 @@
 {
     "name": "claudiodekker/laravel-auth-core",
-    "description": "The Laravel Auth Core Package.",
+    "description": "Rich authentication logic for your Laravel applications.",
     "license": "MIT",
     "homepage": "https://github.com/claudiodekker/laravel-auth",
     "support": {

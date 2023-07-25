@@ -1,5 +1,5 @@
 # Laravel Auth
-Rich authentication scaffolding for any blade-based Laravel application.
+Rich authentication logic and scaffoldings for your Laravel applications.
 
 <p>
     <a href="https://github.com/claudiodekker/laravel-auth/actions"><img src="https://github.com/claudiodekker/laravel-auth/actions/workflows/app-tests.yml/badge.svg" alt="Build Status"></a>

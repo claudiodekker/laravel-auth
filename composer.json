@@ -1,5 +1,6 @@
 {
     "name": "claudiodekker/laravel-auth",
+    "description": "Rich authentication logic and scaffoldings for your Laravel applications.",
     "authors": [
         {
             "name": "Claudio Dekker",
