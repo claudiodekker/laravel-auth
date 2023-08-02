@@ -34,6 +34,9 @@ trait ConfirmSudoModeUsingPasswordTests
         $response->assertExactJson(['redirect_url' => $redirectsTo]);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(SudoModeChallenged::class);
         Event::assertDispatched(SudoModeEnabled::class, fn (SudoModeEnabled $event) => $event->request === request() && $event->user->is($user));
         Carbon::setTestNow();
@@ -58,8 +61,11 @@ trait ConfirmSudoModeUsingPasswordTests
         $this->assertSame(['password' => [__('laravel-auth::auth.password')]], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
-        Carbon::setTestNow();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
+        Carbon::setTestNow();
     }
 
     /** @test */
@@ -78,6 +84,9 @@ trait ConfirmSudoModeUsingPasswordTests
         $response->assertStatus(400);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
     }
 
@@ -99,7 +108,30 @@ trait ConfirmSudoModeUsingPasswordTests
         $this->assertSame(['credential' => [__('validation.required', ['attribute' => 'credential'])]], $response->exception->errors());
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
+        Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function password_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_global_requests_to_sensitive_endpoints(): void
+    {
+        Carbon::setTestNow(now());
+        Event::fake([Lockout::class, SudoModeEnabled::class]);
+        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
+        $user = $this->generateUser(['id' => 1]);
+        $this->hitRateLimiter(250, '');
+
+        $response = $this->actingAs($user)->post(route('auth.sudo_mode'), [
+            'password' => 'password',
+        ]);
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame(['password' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
+        Event::assertNotDispatched(SudoModeEnabled::class);
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Carbon::setTestNow();
     }
 
@@ -124,13 +156,13 @@ trait ConfirmSudoModeUsingPasswordTests
     }
 
     /** @test */
-    public function password_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts_from_one_account(): void
+    public function password_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts_from_one_user_id(): void
     {
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $user = $this->generateUser(['id' => 1]);
-        $this->hitRateLimiter(5, 'user_id::1');
+        $this->hitRateLimiter(5, 'user_id::'.$user->id);
 
         $response = $this->actingAs($user)->post(route('auth.sudo_mode'), [
             'password' => 'password',
@@ -141,44 +173,5 @@ trait ConfirmSudoModeUsingPasswordTests
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Carbon::setTestNow();
-    }
-
-    /** @test */
-    public function it_increments_the_rate_limiting_attempts_when_password_based_sudo_mode_confirmation_fails(): void
-    {
-        Event::fake([Lockout::class, SudoModeEnabled::class]);
-        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
-        $user = $this->generateUser(['id' => 1]);
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts($userKey = 'user_id::1'));
-        $this->expectTimebox();
-
-        $this->actingAs($user)->post(route('auth.sudo_mode'), [
-            'password' => 'invalid-password',
-        ]);
-
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $this->assertSame(1, $this->getRateLimitAttempts($userKey));
-        Event::assertNothingDispatched();
-    }
-
-    /** @test */
-    public function it_resets_the_rate_limiting_attempts_when_password_based_sudo_mode_confirmation_succeeds(): void
-    {
-        Event::fake([Lockout::class, SudoModeEnabled::class]);
-        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
-        $user = $this->generateUser(['id' => 1]);
-        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
-        $this->hitRateLimiter(1, $userKey = 'user_id::1');
-        $this->expectTimeboxWithEarlyReturn();
-
-        $this->actingAs($user)->post(route('auth.sudo_mode'), [
-            'password' => 'password',
-        ]);
-
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
-        $this->assertSame(0, $this->getRateLimitAttempts($userKey));
-        Event::assertDispatched(SudoModeEnabled::class);
-        Event::assertNotDispatched(Lockout::class);
     }
 }

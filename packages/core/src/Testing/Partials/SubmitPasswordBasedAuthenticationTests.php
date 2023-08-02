@@ -23,6 +23,9 @@ trait SubmitPasswordBasedAuthenticationTests
         Event::fake([Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $user = $this->generateUser();
         $this->expectTimeboxWithEarlyReturn();
+        $this->hitRateLimiter(1, '');
+        $this->hitRateLimiter(1, $userKey = 'username::'.$this->defaultUsername());
+        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
 
         $response = $this->submitPasswordBasedLoginAttempt();
 
@@ -30,6 +33,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts($userKey));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
@@ -55,6 +61,8 @@ trait SubmitPasswordBasedAuthenticationTests
 
         $this->assertUsernameRequiredValidationError($response);
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -66,6 +74,9 @@ trait SubmitPasswordBasedAuthenticationTests
 
         $this->assertUsernameMustBeValidValidationError($response);
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->invalidUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -78,6 +89,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.required', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -90,6 +104,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.string', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -104,6 +121,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.failed')]], $response->exception->errors());
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertDispatched(AuthenticationFailed::class, fn (AuthenticationFailed $event) => $event->username === $this->defaultUsername());
@@ -124,6 +144,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.failed')]], $response->exception->errors());
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->nonExistentUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertDispatched(AuthenticationFailed::class, fn (AuthenticationFailed $event) => $event->username === $this->nonExistentUsername());
@@ -141,6 +164,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.failed')]], $response->exception->errors());
         $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertDispatched(AuthenticationFailed::class, fn (AuthenticationFailed $event) => $event->username === $this->defaultUsername());
@@ -159,6 +185,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertHasRememberCookie($response, $user);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
@@ -177,6 +206,9 @@ trait SubmitPasswordBasedAuthenticationTests
 
         $response->assertOk();
         $response->assertExactJson(['redirect_url' => $redirectsTo]);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertFullyAuthenticatedAs($response, $user);
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
@@ -198,6 +230,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
@@ -216,6 +251,9 @@ trait SubmitPasswordBasedAuthenticationTests
 
         $response->assertOk();
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
         $this->assertNotSame($previousId, session()->getId());
@@ -238,6 +276,9 @@ trait SubmitPasswordBasedAuthenticationTests
         $response->assertSessionHas('auth.mfa.remember', false);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$this->defaultUsername()));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
@@ -245,7 +286,7 @@ trait SubmitPasswordBasedAuthenticationTests
     }
 
     /** @test */
-    public function password_based_authentication_requests_are_rate_limited_after_too_many_globally_failed_attempts(): void
+    public function password_based_authentication_requests_are_rate_limited_after_too_many_global_requests_to_sensitive_endpoints(): void
     {
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
@@ -254,7 +295,7 @@ trait SubmitPasswordBasedAuthenticationTests
         $response = $this->submitPasswordBasedLoginAttempt();
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => [__('auth.throttle', ['seconds' => 60])]], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertGuest();
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
@@ -270,20 +311,15 @@ trait SubmitPasswordBasedAuthenticationTests
         Event::fake([Lockout::class, Authenticated::class, AuthenticationFailed::class, MultiFactorChallenged::class]);
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
-        $responseA = $this->submitPasswordBasedLoginAttempt();
+        $response = $this->submitPasswordBasedLoginAttempt();
 
-        $this->assertInstanceOf(ValidationException::class, $responseA->exception);
-        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $responseA->exception->errors());
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertGuest();
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
         Event::assertNotDispatched(AuthenticationFailed::class);
         Event::assertNotDispatched(MultiFactorChallenged::class);
-
-        $responseB = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => $this->nonExistentUsername()]);
-        $this->assertInstanceOf(ValidationException::class, $responseB->exception);
-        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $responseB->exception->errors());
-        Carbon::setTestNow();
     }
 
     /** @test */
@@ -309,46 +345,5 @@ trait SubmitPasswordBasedAuthenticationTests
         $this->assertInstanceOf(ValidationException::class, $responseB->exception);
         $this->assertSame([$this->usernameField() => ['These credentials do not match our records.']], $responseB->exception->errors());
         Carbon::setTestNow();
-    }
-
-    /** @test */
-    public function it_increments_the_rate_limits_when_password_based_authentication_fails(): void
-    {
-        Event::fake([Lockout::class, AuthenticationFailed::class]);
-        $this->assertSame(0, $this->getRateLimitAttempts(''));
-        $this->assertSame(0, $this->getRateLimitAttempts($usernameKey = 'username::'.$this->defaultUsername()));
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
-        $this->expectTimebox();
-
-        $this->submitPasswordBasedLoginAttempt(['password' => 'invalid']);
-
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(1, $this->getRateLimitAttempts($usernameKey));
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        Event::assertDispatched(AuthenticationFailed::class);
-        Event::assertNotDispatched(Lockout::class);
-    }
-
-    /** @test */
-    public function it_resets_the_rate_limiting_attempts_when_password_based_authentication_succeeds(): void
-    {
-        Event::fake([Lockout::class, AuthenticationFailed::class]);
-        $user = $this->generateUser();
-        $this->hitRateLimiter(1, '');
-        $this->hitRateLimiter(1, $usernameKey = 'username::'.$this->defaultUsername());
-        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(1, $this->getRateLimitAttempts($usernameKey));
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $this->expectTimeboxWithEarlyReturn();
-
-        $response = $this->submitPasswordBasedLoginAttempt();
-
-        $response->assertOk();
-        $this->assertFullyAuthenticatedAs($response, $user);
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(0, $this->getRateLimitAttempts($usernameKey));
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
-        Event::assertNothingDispatched();
     }
 }

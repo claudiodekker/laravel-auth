@@ -61,10 +61,7 @@ abstract class RegisterPublicKeyCredentialController
      */
     public function create(Request $request)
     {
-        $options = $this->generatePublicKeyRegistrationOptions($request);
-        $this->setPublicKeyRegistrationOptions($request, $options);
-
-        return $this->sendRegistrationPageResponse($request, $options);
+        return $this->sendRegistrationPageResponse($request, $this->handlePublicKeyCreationInitialization($request));
     }
 
     /**
@@ -94,6 +91,16 @@ abstract class RegisterPublicKeyCredentialController
         $this->clearPublicKeyRegistrationOptions($request);
 
         return $this->sendCredentialRegisteredResponse($request, $credential);
+    }
+
+    /**
+     * Handle the generation and initialization of fresh public key credential registration challenge details.
+     */
+    protected function handlePublicKeyCreationInitialization(Request $request): ?PublicKeyCredentialCreationOptions
+    {
+        return tap($this->generatePublicKeyRegistrationOptions($request), function ($options) use ($request) {
+            $this->setPublicKeyRegistrationOptions($request, $options);
+        });
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
+use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -12,6 +14,9 @@ use Illuminate\Validation\Rules\Password;
 
 trait PasswordBasedRegistration
 {
+    use InteractsWithRateLimiting;
+    use EmitsLockoutEvent;
+
     /**
      * Handle a password based registration request.
      *
@@ -19,6 +24,14 @@ trait PasswordBasedRegistration
      */
     protected function handlePasswordBasedRegistrationRequest(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePasswordBasedRequest($request);
 
@@ -28,6 +41,7 @@ trait PasswordBasedRegistration
             $this->sendEmailVerificationNotification($user);
             $this->authenticate($user);
             $this->enableSudoMode($request);
+            $this->resetRateLimitingCounter($request);
             $timebox->returnEarly();
 
             return $this->sendRegisteredResponse($request, $user);

@@ -22,6 +22,7 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     /** @test */
     public function the_code_field_is_required_when_completing_the_multi_factor_challenge_using_a_time_based_one_time_password(): void
     {
+        Event::fake([Authenticated::class, MultiFactorChallengeFailed::class]);
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
@@ -32,6 +33,10 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.required', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(2, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
+        Event::assertNothingDispatched();
     }
 
     /** @test */
@@ -48,6 +53,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('validation.string', ['attribute' => 'code'])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(2, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
     }
 
@@ -68,6 +76,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertMissingRememberCookie($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
     }
@@ -89,6 +100,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response->assertStatus(200);
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
     }
@@ -110,6 +124,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(2, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::TOTP);
     }
@@ -131,6 +148,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(2, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(Authenticated::class);
         Event::assertDispatched(MultiFactorChallengeFailed::class, fn (MultiFactorChallengeFailed $event) => $event->user->is($user) && $event->type === CredentialType::TOTP);
     }
@@ -152,6 +172,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         $this->assertFullyAuthenticatedAs($response, $user);
         $this->assertHasRememberCookie($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
     }
@@ -175,6 +198,9 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
         $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Authenticated::class, fn (Authenticated $event) => $event->user->is($user));
@@ -182,7 +208,50 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     }
 
     /** @test */
-    public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts(): void
+    public function it_regenerates_the_session_identifier_to_prevent_session_fixation_attacks_when_the_user_completes_the_multi_factor_challenge_using_a_time_based_one_time_password(): void
+    {
+        $user = $this->generateUser();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
+        $this->preAuthenticate($user);
+        $this->expectTimeboxWithEarlyReturn();
+        $this->assertNotEmpty($previousId = session()->getId());
+
+        $response = $this->postJson(route('login.challenge'), [
+            'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
+        $this->assertNotSame($previousId, session()->getId());
+        $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
+    }
+
+    /** @test */
+    public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_global_requests_to_sensitive_endpoints(): void
+    {
+        Carbon::setTestNow(now());
+        Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
+        $user = $this->generateUser();
+        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
+        $this->preAuthenticate($user);
+        $this->hitRateLimiter(250, '');
+
+        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
+        $this->assertPartlyAuthenticatedAs($response, $user);
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Event::assertNotDispatched(Authenticated::class);
+        Event::assertNotDispatched(MultiFactorChallengeFailed::class);
+        Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts_from_one_ip_address(): void
     {
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
@@ -203,71 +272,23 @@ trait SubmitMultiFactorChallengeUsingTotpCodeTests
     }
 
     /** @test */
-    public function the_time_based_one_time_password_multi_factor_challenge_retains_the_rate_limiting_attempts_from_the_login(): void
+    public function the_time_based_one_time_password_multi_factor_challenge_is_rate_limited_after_too_many_failed_attempts_for_one_user_id(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
-        $this->submitPasswordBasedLoginAttempt();
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
         $user = $this->generateUser();
         LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create();
         $this->preAuthenticate($user);
-        $this->expectTimebox();
+        $this->hitRateLimiter(5, 'user_id::'.$user->id);
 
         $response = $this->from(route('login.challenge'))->post(route('login.challenge'), ['code' => '123456']);
 
-        $this->assertSame(2, $this->getRateLimitAttempts($ipKey));
-        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.totp')]], $response->exception->errors());
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame(['code' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
         $this->assertPartlyAuthenticatedAs($response, $user);
-        Event::assertDispatched(MultiFactorChallengeFailed::class);
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Event::assertNotDispatched(Authenticated::class);
-        Event::assertNotDispatched(Lockout::class);
-    }
-
-    /** @test */
-    public function it_resets_the_rate_limiting_attempts_when_the_time_based_one_time_password_multi_factor_challenge_succeeds(): void
-    {
-        Event::fake([Lockout::class, Authenticated::class, MultiFactorChallengeFailed::class]);
-        $user = $this->generateUser(['id' => 1]);
-        $this->hitRateLimiter(1, '');
-        $this->hitRateLimiter(1, $userIdKey = 'user_id::1');
-        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(1, $this->getRateLimitAttempts($userIdKey));
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
-        $this->preAuthenticate($user);
-        $this->expectTimeboxWithEarlyReturn();
-
-        $response = $this->from(route('login.challenge'))->post(route('login.challenge'), [
-            'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
-        ]);
-
-        $this->assertFullyAuthenticatedAs($response, $user);
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(0, $this->getRateLimitAttempts($userIdKey));
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
-        Event::assertDispatched(Authenticated::class);
-        Event::assertNotDispatched(Lockout::class);
         Event::assertNotDispatched(MultiFactorChallengeFailed::class);
-    }
-
-    /** @test */
-    public function it_regenerates_the_session_identifier_to_prevent_session_fixation_attacks_when_the_user_completes_the_multi_factor_challenge_using_a_time_based_one_time_password(): void
-    {
-        $user = $this->generateUser();
-        LaravelAuth::multiFactorCredentialModel()::factory()->totp()->forUser($user)->create(['secret' => $secret = '4DDDT7XUWA6QPM2ZXHAMPXFEOHSNYN5E']);
-        $this->preAuthenticate($user);
-        $this->assertNotEmpty($previousId = session()->getId());
-        $this->expectTimeboxWithEarlyReturn();
-
-        $response = $this->postJson(route('login.challenge'), [
-            'code' => App::make(GoogleTwoFactorAuthenticator::class)->testCode($secret),
-        ]);
-
-        $response->assertStatus(200);
-        $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
-        $this->assertNotSame($previousId, session()->getId());
-        $this->assertFullyAuthenticatedAs($response, $user);
+        Carbon::setTestNow();
     }
 }
