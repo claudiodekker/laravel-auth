@@ -104,20 +104,19 @@ abstract class AccountRecoveryChallengeController
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request, $token) {
             if (! $user = $this->resolveUser($request)) {
-                $this->incrementRateLimitingCounter($request);
-
                 return $this->sendInvalidRecoveryLinkResponse($request);
             }
 
             if (! $this->isValidRecoveryLink($user, $token)) {
-                $this->incrementRateLimitingCounter($request);
-
                 return $this->sendInvalidRecoveryLinkResponse($request);
             }
 
             if (! $this->hasRecoveryCodes($request, $user)) {
+                $this->resetRateLimitingCounter($request);
                 $this->invalidateRecoveryLink($request, $user);
                 $timebox->returnEarly();
 
@@ -125,7 +124,6 @@ abstract class AccountRecoveryChallengeController
             }
 
             if (! $this->hasValidRecoveryCode($request, $user)) {
-                $this->incrementRateLimitingCounter($request);
                 $this->emitAccountRecoveryFailedEvent($request, $user);
 
                 return $this->sendInvalidRecoveryCodeResponse($request);

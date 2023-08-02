@@ -43,12 +43,12 @@ trait TotpChallenge
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validateTotpChallengeRequest($request);
 
             if (! $this->hasValidTotpCode($request)) {
-                $this->incrementRateLimitingCounter($request);
-
                 return $this->sendTotpChallengeFailedResponse($request);
             }
 

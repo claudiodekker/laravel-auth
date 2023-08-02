@@ -53,6 +53,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertExactJson(['redirect_url' => $redirectsTo]);
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
         Event::assertNotDispatched(SudoModeChallenged::class);
         Event::assertDispatched(SudoModeEnabled::class, fn (SudoModeEnabled $event) => $event->request === request() && $event->user->is($user));
@@ -95,6 +98,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -135,6 +141,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -145,23 +154,23 @@ trait ConfirmSudoModeUsingCredentialTests
         Carbon::setTestNow(now());
         Event::fake([SudoModeChallenged::class, SudoModeEnabled::class]);
         Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
-        $userA = $this->generateUser(['id' => 1]);
-        $userB = $this->generateUser(['id' => 2, $this->usernameField() => $this->anotherUsername()]);
-        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($userB)->create([
+        $user = $this->generateUser(['id' => 1]);
+        $anotherUser = $this->generateUser(['id' => 2, $this->usernameField() => $this->anotherUsername()]);
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($anotherUser)->create([
             'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
             'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
         ]);
-        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($userA)->create([
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
             'id' => 'public-key-J4lAqPXhefDrUD7oh5LQMbBH5TE',
             'secret' => '{"id":"J4lAqPXhefDrUD7oh5LQMbBH5TE=","publicKey":"pQECAyYgASFYIGICVDXVg9tymObAz3eI55\/K7TSHz7gEAs0qcEMHkj2fIlggXvAPnA2o\/SFi5rfjR4HvlnUv9XojtHiqtqrvvrfOP2Y=","signCount":0,"userHandle":"1","transports":[]}',
         ]);
         Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
         $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
-        $this->actingAs($userA)->get(route('auth.sudo_mode'));
+        $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
         $this->expectTimebox();
 
-        $response = $this->actingAs($userA)->postJson(route('auth.sudo_mode'), [
+        $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
                 'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
                 'type' => 'public-key',
@@ -180,6 +189,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionHas('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -221,6 +233,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
         $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNotDispatched(SudoModeChallenged::class);
         Event::assertDispatched(SudoModeEnabled::class, fn (SudoModeEnabled $event) => $event->request === request() && $event->user->is($user));
         Carbon::setTestNow();
@@ -259,6 +274,9 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -281,8 +299,44 @@ trait ConfirmSudoModeUsingCredentialTests
         $response->assertSessionHas(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
         $response->assertSessionMissing(EnsureSudoMode::CONFIRMED_AT_KEY);
         $response->assertSessionMissing('laravel-auth::sudo_mode.public_key_challenge_request_options');
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(1, $this->getRateLimitAttempts('user_id::'.$user->id));
         Carbon::setTestNow();
         Event::assertNothingDispatched();
+    }
+
+    /** @test */
+    public function credential_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_global_requests_to_sensitive_endpoints(): void
+    {
+        Carbon::setTestNow(now());
+        Event::fake([Lockout::class, SudoModeEnabled::class]);
+        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
+        $user = $this->generateUser(['id' => 1]);
+        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
+        $this->actingAs($user)->get(route('auth.sudo_mode'));
+        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
+        $this->hitRateLimiter(250, '');
+
+        $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
+            'credential' => [
+                'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
+                'type' => 'public-key',
+                'rawId' => 'eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==',
+                'response' => [
+                    'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJHMEpiTExuZGVmM2EwSXkzUzJzU1FBOHVPNFNPX3plNkZaTUF1UEk2LXhJIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0MyIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ',
+                    'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAew',
+                    'signature' => 'MEUCIEY/vcNkbo/LdMTfLa24ZYLlMMVMRd8zXguHBvqud9AJAiEAwCwpZpvcMaqCrwv85w/8RGiZzE+gOM61ffxmgEDeyhM=',
+                    'userHandle' => null,
+                ],
+            ],
+        ]);
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame(['password' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
+        Event::assertNotDispatched(SudoModeEnabled::class);
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Carbon::setTestNow();
     }
 
     /** @test */
@@ -319,7 +373,7 @@ trait ConfirmSudoModeUsingCredentialTests
     }
 
     /** @test */
-    public function credential_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts_from_one_account(): void
+    public function credential_based_sudo_mode_confirmation_requests_are_rate_limited_after_too_many_failed_attempts_for_one_user_id(): void
     {
         Carbon::setTestNow(now());
         Event::fake([Lockout::class, SudoModeEnabled::class]);
@@ -328,7 +382,7 @@ trait ConfirmSudoModeUsingCredentialTests
         LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
         $this->actingAs($user)->get(route('auth.sudo_mode'));
         $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
-        $this->hitRateLimiter(5, 'user_id::1');
+        $this->hitRateLimiter(5, 'user_id::'.$user->id);
 
         $response = $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
             'credential' => [
@@ -348,80 +402,6 @@ trait ConfirmSudoModeUsingCredentialTests
         $this->assertSame(['password' => [__('laravel-auth::auth.challenge.throttle', ['seconds' => 60])]], $response->exception->errors());
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
-        Carbon::setTestNow();
-    }
-
-    /** @test */
-    public function it_increments_the_rate_limiting_attempts_when_credential_based_sudo_mode_confirmation_fails(): void
-    {
-        Carbon::setTestNow(now());
-        Event::fake([Lockout::class, SudoModeEnabled::class]);
-        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
-        $user = $this->generateUser(['id' => 1]);
-        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create();
-        $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey = 'ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts($userKey = 'user_id::1'));
-        $this->expectTimebox();
-
-        $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
-            'credential' => [
-                'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-                'type' => 'public-key',
-                'rawId' => 'eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==',
-                'response' => [
-                    'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJHMEpiTExuZGVmM2EwSXkzUzJzU1FBOHVPNFNPX3plNkZaTUF1UEk2LXhJIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0MyIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ',
-                    'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAew',
-                    'signature' => 'MEUCIEY/vcNkbo/LdMTfLa24ZYLlMMVMRd8zXguHBvqud9AJAiEAwCwpZpvcMaqCrwv85w/8RGiZzE+gOM61ffxmgEDeyhM=',
-                    'userHandle' => null,
-                ],
-            ],
-        ]);
-
-        $this->assertSame(1, $this->getRateLimitAttempts($ipKey));
-        $this->assertSame(1, $this->getRateLimitAttempts($userKey));
-        Event::assertNothingDispatched();
-        Carbon::setTestNow();
-    }
-
-    /** @test */
-    public function it_resets_the_rate_limiting_attempts_when_credential_based_sudo_mode_confirmation_succeeds(): void
-    {
-        Carbon::setTestNow(now());
-        Event::fake([Lockout::class, SudoModeEnabled::class]);
-        Session::put(EnsureSudoMode::REQUIRED_AT_KEY, now()->unix());
-        $user = $this->generateUser(['id' => 1]);
-        LaravelAuth::multiFactorCredentialModel()::factory()->publicKey()->forUser($user)->create([
-            'id' => 'public-key-eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-            'secret' => '{"id":"eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==","publicKey":"pQECAyYgASFYIJV56vRrFusoDf9hm3iDmllcxxXzzKyO9WruKw4kWx7zIlgg/nq63l8IMJcIdKDJcXRh9hoz0L+nVwP1Oxil3/oNQYs=","signCount":117,"userHandle":"1","transports":[]}',
-        ]);
-        Config::set('laravel-auth.webauthn.relying_party.id', 'localhost');
-        $this->mockWebauthnChallenge('G0JbLLndef3a0Iy3S2sSQA8uO4SO/ze6FZMAuPI6+xI=');
-        $this->actingAs($user)->get(route('auth.sudo_mode'));
-        $this->assertTrue(Session::has('laravel-auth::sudo_mode.public_key_challenge_request_options'));
-        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
-        $this->hitRateLimiter(1, $userKey = 'user_id::1');
-        $this->expectTimeboxWithEarlyReturn();
-
-        $this->actingAs($user)->postJson(route('auth.sudo_mode'), [
-            'credential' => [
-                'id' => 'eHouz_Zi7-BmByHjJ_tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp_B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB-w',
-                'type' => 'public-key',
-                'rawId' => 'eHouz/Zi7+BmByHjJ/tx9h4a1WZsK4IzUmgGjkhyOodPGAyUqUp/B9yUkflXY3yHWsNtsrgCXQ3HjAIFUeZB+w==',
-                'response' => [
-                    'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJHMEpiTExuZGVmM2EwSXkzUzJzU1FBOHVPNFNPX3plNkZaTUF1UEk2LXhJIiwiY2xpZW50RXh0ZW5zaW9ucyI6e30sImhhc2hBbGdvcml0aG0iOiJTSEEtMjU2Iiwib3JpZ2luIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0MyIsInR5cGUiOiJ3ZWJhdXRobi5nZXQifQ',
-                    'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MBAAAAew',
-                    'signature' => 'MEUCIEY/vcNkbo/LdMTfLa24ZYLlMMVMRd8zXguHBvqud9AJAiEAwCwpZpvcMaqCrwv85w/8RGiZzE+gOM61ffxmgEDeyhM=',
-                    'userHandle' => null,
-                ],
-            ],
-        ]);
-
-        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
-        $this->assertSame(0, $this->getRateLimitAttempts($userKey));
-        Event::assertDispatched(SudoModeEnabled::class);
-        Event::assertNotDispatched(Lockout::class);
         Carbon::setTestNow();
     }
 }

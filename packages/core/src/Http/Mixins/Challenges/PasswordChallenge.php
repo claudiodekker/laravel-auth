@@ -39,12 +39,12 @@ trait PasswordChallenge
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePasswordChallengeRequest($request);
 
             if (! $this->hasValidPassword($request)) {
-                $this->incrementRateLimitingCounter($request);
-
                 return $this->sendPasswordChallengeFailedResponse($request);
             }
 

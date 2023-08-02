@@ -90,6 +90,8 @@ trait PublicKeyChallenge
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePublicKeyChallengeRequest($request);
 
@@ -100,13 +102,11 @@ trait PublicKeyChallenge
             try {
                 $credential = $this->validatePublicKeyCredential($request, $options);
             } catch (InvalidPublicKeyCredentialException|UnexpectedActionException) {
-                $this->incrementRateLimitingCounter($request);
-
                 return $this->sendPublicKeyChallengeFailedResponse($request);
             }
 
-            $this->handlePublicKeyChallengeInvalidation($request);
             $this->resetRateLimitingCounter($request);
+            $this->handlePublicKeyChallengeInvalidation($request);
             $this->updatePublicKeyCredential($request, $credential);
             $timebox->returnEarly();
 

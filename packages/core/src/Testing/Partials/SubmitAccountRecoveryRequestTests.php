@@ -21,6 +21,8 @@ trait SubmitAccountRecoveryRequestTests
         Notification::fake();
         $repository = Password::getRepository();
         $user = $this->generateUser();
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
@@ -30,6 +32,8 @@ trait SubmitAccountRecoveryRequestTests
         $response->assertRedirect('/foo');
         $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
         $this->assertTrue($repository->recentlyCreatedToken($user));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Notification::assertSentTo($user, AccountRecoveryNotification::class, function (AccountRecoveryNotification $notification) use ($repository, $user) {
             $action = Request::create($notification->toMail($user)->actionUrl);
             $route = Route::getRoutes()->match($action);
@@ -61,6 +65,8 @@ trait SubmitAccountRecoveryRequestTests
     public function it_validates_that_the_email_is_required_when_requesting_an_account_recovery_link(): void
     {
         Notification::fake();
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
@@ -69,6 +75,8 @@ trait SubmitAccountRecoveryRequestTests
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $response->assertSessionMissing('status');
         Notification::assertNothingSent();
     }
@@ -77,6 +85,8 @@ trait SubmitAccountRecoveryRequestTests
     public function it_cannot_send_an_account_recovery_link_to_an_user_that_does_not_exist(): void
     {
         Notification::fake();
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
@@ -85,6 +95,8 @@ trait SubmitAccountRecoveryRequestTests
 
         $response->assertRedirect('/foo');
         $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Notification::assertNothingSent();
     }
 
@@ -98,6 +110,8 @@ trait SubmitAccountRecoveryRequestTests
         $repository->create($user);
         Carbon::setTestNow(now()->addSeconds(59));
         $this->assertTrue($repository->recentlyCreatedToken($user));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts(''));
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
@@ -107,6 +121,8 @@ trait SubmitAccountRecoveryRequestTests
         $response->assertRedirect('/foo');
         $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
         $this->assertTrue($repository->recentlyCreatedToken($user));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Notification::assertNothingSent();
         Carbon::setTestNow();
     }
@@ -128,20 +144,5 @@ trait SubmitAccountRecoveryRequestTests
         Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
         Notification::assertNothingSent();
         Carbon::setTestNow();
-    }
-
-    /** @test */
-    public function it_increments_the_rate_limiter_when_an_account_recovery_request_is_made(): void
-    {
-        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts(''));
-        $this->expectTimebox();
-
-        $this->post(route('recover-account'), [
-            'email' => 'foo@example.com',
-        ]);
-
-        $this->assertSame(1, $this->getRateLimitAttempts(''));
-        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 }

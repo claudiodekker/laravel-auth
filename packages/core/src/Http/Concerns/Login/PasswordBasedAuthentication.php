@@ -40,11 +40,12 @@ trait PasswordBasedAuthentication
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             $this->validatePasswordBasedRequest($request);
 
             if (! $user = $this->validatePasswordBasedCredentials($request)) {
-                $this->incrementRateLimitingCounter($request);
                 $this->emitAuthenticationFailedEvent($request);
 
                 return $this->sendAuthenticationFailedResponse($request);

@@ -6,6 +6,7 @@ use App\Providers\RouteServiceProvider;
 use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -19,6 +20,8 @@ trait SubmitPasswordBasedRegistrationTests
         Event::fake(Registered::class);
         $this->assertCount(0, LaravelAuth::userModel()::all());
         $this->expectTimeboxWithEarlyReturn();
+        $this->hitRateLimiter(1, '');
+        $this->hitRateLimiter(1, $ipKey = 'ip::127.0.0.1');
 
         $response = $this->submitPasswordBasedRegisterAttempt();
 
@@ -32,6 +35,8 @@ trait SubmitPasswordBasedRegistrationTests
         });
         $response->assertExactJson(['redirect_url' => RouteServiceProvider::HOME]);
         Event::assertDispatched(Registered::class, fn (Registered $event) => $event->user->is($user));
+        $this->assertSame(2, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts($ipKey));
     }
 
     /** @test */
@@ -55,6 +60,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.required', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -67,6 +74,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.string', ['attribute' => 'name'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -79,6 +88,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['name' => [__('validation.max.string', ['attribute' => 'name', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -90,6 +101,8 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertUsernameRequiredValidationError($response);
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -101,6 +114,8 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertUsernameTooLongValidationError($response);
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -113,6 +128,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -125,6 +142,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.max.string', ['attribute' => 'email', 'max' => 255])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -137,6 +156,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['email' => [__('validation.email', ['attribute' => 'email'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -150,6 +171,8 @@ trait SubmitPasswordBasedRegistrationTests
 
         $this->assertUsernameAlreadyExistsValidationError($response);
         $this->assertCount(1, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -162,6 +185,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.required', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -174,6 +199,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -186,6 +213,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.confirmed', ['attribute' => 'password'])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -201,6 +230,8 @@ trait SubmitPasswordBasedRegistrationTests
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['password' => [__('validation.min.string', ['attribute' => 'password', 'min' => 8])]], $response->exception->errors());
         $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
     }
 
     /** @test */
@@ -226,6 +257,43 @@ trait SubmitPasswordBasedRegistrationTests
         $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
         Event::assertNotDispatched(SudoModeEnabled::class);
         Event::assertDispatched(Registered::class, fn (Registered $event) => $event->user->is($user));
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function password_based_registration_requests_are_rate_limited_after_too_many_global_requests_to_sensitive_endpoints(): void
+    {
+        Carbon::setTestNow(now());
+        Event::fake([Lockout::class, Registered::class, SudoModeEnabled::class]);
+        $this->hitRateLimiter(250, '');
+
+        $response = $this->submitPasswordBasedRegisterAttempt();
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $response->exception->errors());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Event::assertNotDispatched(Registered::class);
+        Event::assertNotDispatched(SudoModeEnabled::class);
+        Carbon::setTestNow();
+    }
+
+    /** @test */
+    public function password_based_registration_requests_are_rate_limited_after_too_many_failed_attempts_from_one_ip_address(): void
+    {
+        Carbon::setTestNow(now());
+        Event::fake([Lockout::class, Registered::class, SudoModeEnabled::class]);
+        $this->hitRateLimiter(5, 'ip::127.0.0.1');
+
+        $response = $this->submitPasswordBasedRegisterAttempt();
+
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.throttle', ['seconds' => 60])]], $response->exception->errors());
+        $this->assertCount(0, LaravelAuth::userModel()::all());
+        Event::assertDispatched(Lockout::class, fn (Lockout $event) => $event->request === request());
+        Event::assertNotDispatched(Registered::class);
+        Event::assertNotDispatched(SudoModeEnabled::class);
     }
 }

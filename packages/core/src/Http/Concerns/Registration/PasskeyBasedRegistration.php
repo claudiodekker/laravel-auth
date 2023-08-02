@@ -3,6 +3,8 @@
 namespace ClaudioDekker\LaravelAuth\Http\Concerns\Registration;
 
 use ClaudioDekker\LaravelAuth\CredentialType;
+use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
+use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Contracts\WebAuthnContract as WebAuthn;
 use ClaudioDekker\LaravelAuth\Methods\WebAuthn\Exceptions\InvalidPublicKeyCredentialException;
@@ -21,6 +23,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 trait PasskeyBasedRegistration
 {
+    use InteractsWithRateLimiting;
+    use EmitsLockoutEvent;
+
     /**
      * Sends a response indicating that the passkey-based registration process has been initialized.
      *
@@ -56,6 +61,12 @@ trait PasskeyBasedRegistration
      */
     protected function handlePasskeyBasedRegistrationRequest(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         if (! $this->isPasskeyConfirmationRequest($request)) {
             return $this->initializePasskeyBasedRegistration($request);
         }
@@ -70,8 +81,16 @@ trait PasskeyBasedRegistration
      */
     protected function handlePasskeyBasedRegistrationCancellationRequest(Request $request)
     {
+        if ($this->isCurrentlyRateLimited($request)) {
+            $this->emitLockoutEvent($request);
+
+            return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
+        }
+
         return App::make(Timebox::class)->call(function () use ($request) {
             if (! $options = $this->getPasskeyCreationOptions($request)) {
+                $this->incrementRateLimitingCounter($request);
+
                 return $this->sendInvalidPasskeyRegistrationStateResponse($request);
             }
 
@@ -89,6 +108,8 @@ trait PasskeyBasedRegistration
      */
     protected function initializePasskeyBasedRegistration(Request $request)
     {
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function () use ($request) {
             $this->validatePasskeyBasedRegistrationInitialization($request);
 
@@ -108,6 +129,8 @@ trait PasskeyBasedRegistration
      */
     protected function confirmPasskeyBasedRegistration(Request $request)
     {
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request) {
             if (! $options = $this->getPasskeyCreationOptions($request)) {
                 return $this->sendInvalidPasskeyRegistrationStateResponse($request);
@@ -124,6 +147,7 @@ trait PasskeyBasedRegistration
             $this->createPasskey($request, $user, $attributes);
 
             $this->clearPasskeyCreationOptions($request);
+            $this->resetRateLimitingCounter($request);
             $this->emitRegisteredEvent($user);
             $this->sendEmailVerificationNotification($user);
             $this->authenticate($user);

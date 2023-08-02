@@ -178,6 +178,7 @@ abstract class SudoModeChallengeController
     protected function rateLimits(Request $request): array
     {
         return [
+            Limit::perMinute(250),
             Limit::perMinute(5)->by('ip::'.$request->ip()),
             Limit::perMinute(5)->by('user_id::'.Auth::id()),
         ];
