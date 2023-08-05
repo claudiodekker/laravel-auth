@@ -16,6 +16,7 @@ trait SubmitAccountRecoveryChallengeTests
     /** @test */
     public function the_user_can_begin_to_recover_the_account(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, AccountRecoveryFailed::class]);
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $repository = Password::getRepository();
@@ -31,17 +32,20 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertGuest();
         $response->assertRedirect(route('recover-account.reset'));
         $response->assertSessionHas('auth.recovery_mode.user_id', $user->id);
+        $response->assertSessionHas('auth.recovery_mode.enabled_at', now());
         $this->assertFalse($repository->exists($user, $token));
         $this->assertSame(['H4PFK-ENVZV', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P'], $user->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
         Event::assertNothingDispatched();
+        Carbon::setTestNow();
     }
 
     /** @test */
     public function the_account_recovery_challenge_code_verification_request_accepts_any_code_when_the_users_recovery_codes_have_been_cleared(): void
     {
+        Carbon::setTestNow(now());
         Event::fake([Lockout::class, AccountRecoveryFailed::class]);
         $user = $this->generateUser(['recovery_codes' => null]);
         $repository = Password::getRepository();
@@ -57,11 +61,13 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertGuest();
         $response->assertRedirect(route('recover-account.reset'));
         $response->assertSessionHas('auth.recovery_mode.user_id', $user->id);
+        $response->assertSessionHas('auth.recovery_mode.enabled_at', now());
         $this->assertFalse($repository->exists($user, $token));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
         Event::assertNothingDispatched();
+        Carbon::setTestNow();
     }
 
     /** @test */
@@ -80,6 +86,7 @@ trait SubmitAccountRecoveryChallengeTests
 
         $response->assertRedirect(RouteServiceProvider::HOME);
         $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertAuthenticatedAs($userA);
         $this->assertTrue($repository->exists($userB, $token));
         $this->assertSame($codes, $userB->fresh()->recovery_codes);
@@ -103,6 +110,7 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertGuest();
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
         $this->assertTrue($repository->exists($user, $token));
@@ -131,6 +139,7 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertGuest();
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
         $this->assertTrue($repository->exists($userA, $token));
@@ -156,6 +165,7 @@ trait SubmitAccountRecoveryChallengeTests
         $this->assertGuest();
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
         $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
         $this->assertSame($codes, $user->fresh()->recovery_codes);
@@ -182,6 +192,7 @@ trait SubmitAccountRecoveryChallengeTests
 
         $this->assertGuest();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame(['code' => [__('laravel-auth::auth.challenge.recovery')]], $response->exception->errors());
         $this->assertTrue($repository->exists($user, $token));
