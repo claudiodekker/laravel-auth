@@ -2,7 +2,6 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 
-use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
@@ -12,7 +11,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -56,8 +54,8 @@ abstract class AccountRecoveryChallengeController
      *
      * @return mixed
      *
-     * @see static::sendChallengePageResponse()
      * @see static::sendInvalidRecoveryLinkResponse()
+     * @see static::sendChallengePageResponse()
      * @see static::sendRecoveryModeEnabledResponse()
      */
     public function create(Request $request, string $token)
@@ -92,10 +90,10 @@ abstract class AccountRecoveryChallengeController
      *
      * @return mixed
      *
-     * @see static::sendRecoveryModeEnabledResponse()
-     * @see static::sendInvalidRecoveryCodeResponse()
-     * @see static::sendInvalidRecoveryLinkResponse()
      * @see static::sendRateLimitedResponse()
+     * @see static::sendInvalidRecoveryLinkResponse()
+     * @see static::sendInvalidRecoveryCodeResponse()
+     * @see static::sendRecoveryModeEnabledResponse()
      */
     public function store(Request $request, string $token)
     {
@@ -162,15 +160,6 @@ abstract class AccountRecoveryChallengeController
             ->first();
     }
 
-    //
-    //    /**
-    //     * Authenticate the user into the application.
-    //     */
-    //    protected function authenticate(Request $request, Authenticatable $user): void
-    //    {
-    //        Auth::login($user);
-    //    }
-    //
     /**
      * Determine whether the user has recovery codes.
      */
@@ -206,14 +195,6 @@ abstract class AccountRecoveryChallengeController
     {
         Password::getRepository()->delete($user);
     }
-    //
-    //    /**
-    //     * Emits an event indicating that the user's account has been recovered.
-    //     */
-    //    protected function emitAccountRecoveredEvent(Request $request, Authenticatable $user): void
-    //    {
-    //        Event::dispatch(new AccountRecovered($request, $user));
-    //    }
 
     /**
      * Emits an event indicating that an account recovery attempt has failed.
