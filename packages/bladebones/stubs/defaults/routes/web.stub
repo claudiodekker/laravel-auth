@@ -46,6 +46,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'create'])->name('recover-account.challenge');
     Route::post('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'store']);
 
+    Route::middleware([])->group(function () {
+        Route::get('/auth/reset', ['foo', 'bar'])->name('recover-account.reset');
+    });
+
     Route::get('/auth/register', [RegisterController::class, 'create'])->name('register');
     Route::post('/auth/register', [RegisterController::class, 'store']);
     Route::delete('/auth/register', [RegisterController::class, 'destroy']);

@@ -6,21 +6,21 @@ use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
-use ClaudioDekker\LaravelAuth\Http\Mixins\EnablesSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 
 abstract class AccountRecoveryChallengeController
 {
     use EmitsLockoutEvent;
-    use EnablesSudoMode;
     use InteractsWithRateLimiting;
 
     /**
@@ -45,26 +45,25 @@ abstract class AccountRecoveryChallengeController
     abstract protected function sendInvalidRecoveryCodeResponse(Request $request);
 
     /**
-     * Sends a response indicating that the user's account has been recovered.
-     *
-     * Typically, you'd want this response to redirect the user to their account's security settings page,
-     * where they can adjust whatever is causing them to be unable to authenticate using normal means.
+     * Sends a response indicating that recovery mode has been enabled for the given user.
      *
      * @return mixed
      */
-    abstract protected function sendAccountRecoveredResponse(Request $request, Authenticatable $user);
+    abstract protected function sendRecoveryModeEnabledResponse(Request $request, Authenticatable $user);
 
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
-     * @see static::sendAccountRecoveredResponse()
+     * @return mixed
+     *
      * @see static::sendChallengePageResponse()
      * @see static::sendInvalidRecoveryLinkResponse()
-     *
-     * @return mixed
+     * @see static::sendRecoveryModeEnabledResponse()
      */
     public function create(Request $request, string $token)
     {
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function (Timebox $timebox) use ($request, $token) {
             if (! $user = $this->resolveUser($request)) {
                 return $this->sendInvalidRecoveryLinkResponse($request);
@@ -78,8 +77,10 @@ abstract class AccountRecoveryChallengeController
 
             if (! $this->hasRecoveryCodes($request, $user)) {
                 $this->invalidateRecoveryLink($request, $user);
+                $this->enableRecoveryMode($request, $user);
+                $this->resetRateLimitingCounter($request);
 
-                return $this->handleAccountRecoveredResponse($request, $user);
+                return $this->sendRecoveryModeEnabledResponse($request, $user);
             }
 
             return $this->sendChallengePageResponse($request, $token);
@@ -89,12 +90,12 @@ abstract class AccountRecoveryChallengeController
     /**
      * Handle an incoming account recovery challenge response.
      *
-     * @see static::sendRateLimitedResponse()
-     * @see static::sendAccountRecoveredResponse()
+     * @return mixed
+     *
+     * @see static::sendRecoveryModeEnabledResponse()
      * @see static::sendInvalidRecoveryCodeResponse()
      * @see static::sendInvalidRecoveryLinkResponse()
-     *
-     * @return mixed
+     * @see static::sendRateLimitedResponse()
      */
     public function store(Request $request, string $token)
     {
@@ -116,11 +117,12 @@ abstract class AccountRecoveryChallengeController
             }
 
             if (! $this->hasRecoveryCodes($request, $user)) {
-                $this->resetRateLimitingCounter($request);
                 $this->invalidateRecoveryLink($request, $user);
+                $this->enableRecoveryMode($request, $user);
+                $this->resetRateLimitingCounter($request);
                 $timebox->returnEarly();
 
-                return $this->handleAccountRecoveredResponse($request, $user);
+                return $this->sendRecoveryModeEnabledResponse($request, $user);
             }
 
             if (! $this->hasValidRecoveryCode($request, $user)) {
@@ -129,12 +131,13 @@ abstract class AccountRecoveryChallengeController
                 return $this->sendInvalidRecoveryCodeResponse($request);
             }
 
-            $this->resetRateLimitingCounter($request);
             $this->invalidateRecoveryCode($request, $user);
             $this->invalidateRecoveryLink($request, $user);
+            $this->enableRecoveryMode($request, $user);
+            $this->resetRateLimitingCounter($request);
             $timebox->returnEarly();
 
-            return $this->handleAccountRecoveredResponse($request, $user);
+            return $this->sendRecoveryModeEnabledResponse($request, $user);
         }, 300 * 1000);
     }
 
@@ -159,28 +162,15 @@ abstract class AccountRecoveryChallengeController
             ->first();
     }
 
-    /**
-     * Handles the situation where the user has successfully recovered their account.
-     *
-     * @return mixed
-     */
-    protected function handleAccountRecoveredResponse(Request $request, Authenticatable $user)
-    {
-        $this->authenticate($request, $user);
-        $this->enableSudoMode($request);
-        $this->emitAccountRecoveredEvent($request, $user);
-
-        return $this->sendAccountRecoveredResponse($request, $user);
-    }
-
-    /**
-     * Authenticate the user into the application.
-     */
-    protected function authenticate(Request $request, Authenticatable $user): void
-    {
-        Auth::login($user);
-    }
-
+    //
+    //    /**
+    //     * Authenticate the user into the application.
+    //     */
+    //    protected function authenticate(Request $request, Authenticatable $user): void
+    //    {
+    //        Auth::login($user);
+    //    }
+    //
     /**
      * Determine whether the user has recovery codes.
      */
@@ -216,14 +206,14 @@ abstract class AccountRecoveryChallengeController
     {
         Password::getRepository()->delete($user);
     }
-
-    /**
-     * Emits an event indicating that the user's account has been recovered.
-     */
-    protected function emitAccountRecoveredEvent(Request $request, Authenticatable $user): void
-    {
-        Event::dispatch(new AccountRecovered($request, $user));
-    }
+    //
+    //    /**
+    //     * Emits an event indicating that the user's account has been recovered.
+    //     */
+    //    protected function emitAccountRecoveredEvent(Request $request, Authenticatable $user): void
+    //    {
+    //        Event::dispatch(new AccountRecovered($request, $user));
+    //    }
 
     /**
      * Emits an event indicating that an account recovery attempt has failed.
@@ -236,5 +226,31 @@ abstract class AccountRecoveryChallengeController
     protected function emitAccountRecoveryFailedEvent(Request $request, Authenticatable $user): void
     {
         Event::dispatch(new AccountRecoveryFailed($request, $user));
+    }
+
+    /**
+     * Enables recovery mode for the given user.
+     */
+    protected function enableRecoveryMode(Request $request, Authenticatable $user): void
+    {
+        $request->session()->put('auth.recovery_mode.user_id', $user->getAuthIdentifier());
+        $request->session()->put('auth.recovery_mode.enabled_at', now());
+    }
+
+    /**
+     * Determine the rate limits that apply to the request.
+     */
+    protected function rateLimits(Request $request): array
+    {
+        $limits = [
+            Limit::perMinute(250),
+            Limit::perMinute(5)->by('ip::'.$request->ip()),
+        ];
+
+        if ($request->has('email')) {
+            $limits[] = Limit::perMinute(5)->by('email::'.Str::transliterate(Str::lower($request->input('email'))));
+        }
+
+        return $limits;
     }
 }

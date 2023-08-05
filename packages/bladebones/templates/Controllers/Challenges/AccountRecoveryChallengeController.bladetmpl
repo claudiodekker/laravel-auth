@@ -13,9 +13,9 @@ class AccountRecoveryChallengeController extends BaseController
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
-     * {!! '@' !!}see static::sendAccountRecoveredResponse()
      * {!! '@' !!}see static::sendChallengePageResponse()
      * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
+     * {!! '@' !!}see static::sendRecoveryModeEnabledResponse()
      */
     public function create(Request $request, string $token): RedirectResponse|View
     {
@@ -52,7 +52,7 @@ class AccountRecoveryChallengeController extends BaseController
      */
     protected function sendInvalidRecoveryLinkResponse(Request $request): void
     {
-        abort(403, 'The given email and recovery token combination are invalid.');
+        abort(403, __('laravel-auth::auth.recovery.invalid'));
     }
 
     /**
@@ -68,14 +68,11 @@ class AccountRecoveryChallengeController extends BaseController
     }
 
     /**
-     * Sends a response indicating that the user's account has been recovered.
-     *
-     * Typically, you'd want this response to redirect the user to their account's security settings page,
-     * where they can adjust whatever is causing them to be unable to authenticate using normal means.
+     * Sends a response indicating that recovery mode has been enabled for the given user.
      */
-    protected function sendAccountRecoveredResponse(Request $request, Authenticatable $user): RedirectResponse
+    protected function sendRecoveryModeEnabledResponse(Request $request, Authenticatable $user): RedirectResponse
     {
-        return redirect()->route('auth.settings');
+        return redirect()->route('recover-account.reset');
     }
 
     /**
