@@ -3,9 +3,8 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Challenges\Recovery;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
-use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
@@ -32,7 +31,7 @@ trait ViewAccountRecoveryChallengePageTests
     public function the_account_recovery_challenge_page_is_skipped_when_the_user_does_not_have_any_recovery_codes(): void
     {
         Carbon::setTestNow(now());
-        Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
+        Event::fake([Lockout::class, AccountRecoveryFailed::class]);
         $user = $this->generateUser(['recovery_codes' => null]);
         $repository = Password::getRepository();
         $token = $repository->create($user);
@@ -52,6 +51,7 @@ trait ViewAccountRecoveryChallengePageTests
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
+        Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
 
