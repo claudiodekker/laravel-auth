@@ -21,7 +21,7 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertOk();
@@ -40,7 +40,7 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $email = $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
         ]));
 
         $this->assertGuest();
@@ -50,7 +50,7 @@ trait ViewRecoveryChallengePageTests
         $this->assertFalse($repository->exists($user, $token));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -67,7 +67,7 @@ trait ViewRecoveryChallengePageTests
     }
 
     /** @test */
-    public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_provided_email_does_not_resolve_to_an_existing_user(): void
+    public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_provided_username_does_not_resolve_to_an_existing_user(): void
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
@@ -75,14 +75,14 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => 'nonexistent-user@example.com',
+            $this->usernameField() => $this->nonExistentUsername(),
         ]));
 
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -95,14 +95,14 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $userB->getEmailForPasswordReset(),
+            $this->usernameField() => $userB->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -113,14 +113,14 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => 'invalid-token',
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -134,14 +134,14 @@ trait ViewRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
         Carbon::setTestNow();
     }
 }

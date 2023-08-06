@@ -79,7 +79,11 @@ class RecoveryRequestController extends BaseController
      */
     public function sendRecoveryLinkSentResponse(Request $request): RedirectResponse
     {
-        return redirect()->back()->with('status', __('laravel-auth::auth.recovery.sent'));
+@if ($flavor === 'username-based')
+        return redirect()->back()->with('status', __('laravel-auth::auth.recovery.sent', ['field' => 'username']));
+@else
+        return redirect()->back()->with('status', __('laravel-auth::auth.recovery.sent', ['field' => 'email']));
+@endif
     }
 
     /**

@@ -32,8 +32,8 @@ return [
         'totp-registered' => 'Time-based one-time-password credential successfully registered.',
     ],
     'recovery' => [
-        'sent' => 'If the provided email address is associated with an account, you will receive a recovery link shortly.',
-        'invalid' => 'The provided email and recovery token combination are invalid.',
+        'sent' => 'If the provided :field is associated with an account, you will receive a recovery link shortly.',
+        'invalid' => 'The provided :field and recovery token combination are invalid.',
         'throttle' => 'Too many recovery requests. Please try again in :seconds seconds.',
     ],
     'verification' => [

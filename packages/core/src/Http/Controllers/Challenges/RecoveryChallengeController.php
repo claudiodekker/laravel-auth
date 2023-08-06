@@ -5,6 +5,7 @@ namespace ClaudioDekker\LaravelAuth\Http\Controllers\Challenges;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\EmailBased;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use ClaudioDekker\LaravelAuth\RecoveryCodeManager;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -18,6 +19,7 @@ use Illuminate\Support\Timebox;
 
 abstract class RecoveryChallengeController
 {
+    use EmailBased;
     use EmitsLockoutEvent;
     use InteractsWithRateLimiting;
 
@@ -52,11 +54,11 @@ abstract class RecoveryChallengeController
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
-     * @return mixed
-     *
      * @see static::sendInvalidRecoveryLinkResponse()
      * @see static::sendChallengePageResponse()
      * @see static::sendRecoveryModeEnabledResponse()
+     *
+     * @return mixed
      */
     public function create(Request $request, string $token)
     {
@@ -88,12 +90,12 @@ abstract class RecoveryChallengeController
     /**
      * Handle an incoming account recovery challenge response.
      *
-     * @return mixed
-     *
      * @see static::sendRateLimitedResponse()
      * @see static::sendInvalidRecoveryLinkResponse()
      * @see static::sendInvalidRecoveryCodeResponse()
      * @see static::sendRecoveryModeEnabledResponse()
+     *
+     * @return mixed
      */
     public function store(Request $request, string $token)
     {
@@ -156,7 +158,7 @@ abstract class RecoveryChallengeController
         $query = LaravelAuth::userModel()::query();
 
         return $query
-            ->where('email', $request->input('email'))
+            ->where($this->usernameField(), $request->input($this->usernameField()))
             ->first();
     }
 
@@ -228,10 +230,17 @@ abstract class RecoveryChallengeController
             Limit::perMinute(5)->by('ip::'.$request->ip()),
         ];
 
-        if ($request->has('email')) {
-            $limits[] = Limit::perMinute(5)->by('email::'.Str::transliterate(Str::lower($request->input('email'))));
+        if (! $request->has($this->usernameField())) {
+            return $limits;
         }
 
-        return $limits;
+        if (! is_string($username = $request->input($this->usernameField()))) {
+            return $limits;
+        }
+
+        return [
+            ...$limits,
+            Limit::perMinute(5)->by('username::'.Str::transliterate(Str::lower($username))),
+        ];
     }
 }

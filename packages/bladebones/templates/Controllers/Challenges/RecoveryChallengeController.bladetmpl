@@ -1,7 +1,13 @@
+@php
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+@endphp
 
 namespace App\Http\Controllers\Auth\Challenges;
 
 use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\RecoveryChallengeController as BaseController;
+@if ($flavor !== 'email-based')
+use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
+@endif
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -10,6 +16,20 @@ use Illuminate\Validation\ValidationException;
 
 class RecoveryChallengeController extends BaseController
 {
+@php
+    $uses = [];
+    if ($flavor !== 'email-based') {
+        $uses[] = $flavorTrait;
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
@@ -52,7 +72,11 @@ class RecoveryChallengeController extends BaseController
      */
     protected function sendInvalidRecoveryLinkResponse(Request $request): void
     {
-        abort(403, __('laravel-auth::auth.recovery.invalid'));
+@if ($flavor === 'username-based')
+        abort(403, __('laravel-auth::auth.recovery.invalid', ['field' => 'username']));
+@else
+        abort(403, __('laravel-auth::auth.recovery.invalid', ['field' => 'email']));
+@endif
     }
 
     /**

@@ -1,6 +1,4 @@
-<?php
-
-namespace ClaudioDekker\LaravelAuth\Notifications;
+namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Bus\Queueable;
@@ -14,8 +12,8 @@ class AccountRecoveryNotification extends ResetPasswordNotification
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * {!! '@' !!}param  mixed  $notifiable
+     * {!! '@' !!}return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
@@ -30,14 +28,18 @@ class AccountRecoveryNotification extends ResetPasswordNotification
     /**
      * Get the reset URL for the given notifiable.
      *
-     * @param  mixed  $notifiable
-     * @return string
+     * {!! '@' !!}param  mixed  $notifiable
+     * {!! '@' !!}return string
      */
     protected function resetUrl($notifiable)
     {
         return url(route('recover-account.challenge', [
             'token' => $this->token,
+@if ($flavor === 'username-based')
+            'username' => $notifiable->username,
+@else
             'email' => $notifiable->getEmailForPasswordReset(),
+@endif
         ], false));
     }
 }

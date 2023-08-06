@@ -152,10 +152,17 @@ abstract class LoginController
             Limit::perMinute(5)->by('ip::'.$request->ip()),
         ];
 
-        if ($this->isPasswordBasedAuthenticationAttempt($request)) {
-            $limits[] = Limit::perMinute(5)->by('username::'.Str::transliterate(Str::lower($request->input($this->usernameField()))));
+        if (! $this->isPasswordBasedAuthenticationAttempt($request)) {
+            return $limits;
         }
 
-        return $limits;
+        if (! is_string($username = $request->input($this->usernameField()))) {
+            return $limits;
+        }
+
+        return [
+            ...$limits,
+            Limit::perMinute(5)->by('username::'.Str::transliterate(Str::lower($username))),
+        ];
     }
 }

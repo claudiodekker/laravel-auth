@@ -334,7 +334,7 @@ EOF;
         });
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--without-views' => true,  '--kind' => 'email-based'])
+        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--kind' => 'email-based'])
             ->expectsConfirmation('Do you want to send a verification email when users register?', 'no');
     }
 

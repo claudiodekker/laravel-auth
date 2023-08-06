@@ -14,7 +14,7 @@ trait RecoveryChallengeViewTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertViewIs('auth.challenges.recovery');

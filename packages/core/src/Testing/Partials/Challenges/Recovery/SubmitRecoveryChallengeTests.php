@@ -25,7 +25,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email = $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -37,7 +37,7 @@ trait SubmitRecoveryChallengeTests
         $this->assertSame(['H4PFK-ENVZV', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P'], $user->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -54,7 +54,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimeboxWithEarlyReturn();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email = $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
             'code' => 'INVLD-CODES',
         ]);
 
@@ -65,7 +65,7 @@ trait SubmitRecoveryChallengeTests
         $this->assertFalse($repository->exists($user, $token));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(0, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
@@ -80,7 +80,7 @@ trait SubmitRecoveryChallengeTests
         $this->assertTrue($repository->exists($userB, $token));
 
         $response = $this->actingAs($userA)->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $userB->getEmailForPasswordReset(),
+            $this->usernameField() => $userB->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -93,7 +93,7 @@ trait SubmitRecoveryChallengeTests
     }
 
     /** @test */
-    public function the_user_cannot_begin_to_recover_the_account_when_the_provided_email_does_not_resolve_to_an_existing_user(): void
+    public function the_user_cannot_begin_to_recover_the_account_when_the_provided_username_does_not_resolve_to_an_existing_user(): void
     {
         Event::fake([Lockout::class, AccountRecoveryFailed::class]);
         $user = $this->generateUser(['recovery_codes' => $codes = ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
@@ -103,7 +103,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email = 'nonexistent-user@example.com',
+            $this->usernameField() => $username = $this->nonExistentUsername(),
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -112,12 +112,12 @@ trait SubmitRecoveryChallengeTests
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
         $this->assertTrue($repository->exists($user, $token));
         $this->assertSame($codes, $user->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(1, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
     }
 
@@ -132,7 +132,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email = $userB->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $userB->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -141,12 +141,12 @@ trait SubmitRecoveryChallengeTests
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
         $this->assertTrue($repository->exists($userA, $token));
         $this->assertSame($codes, $userA->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(1, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
     }
 
@@ -158,7 +158,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => 'invalid-token']), [
-            'email' => $email = $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -167,11 +167,11 @@ trait SubmitRecoveryChallengeTests
         $response->assertSessionMissing('auth.recovery_mode.user_id');
         $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame(__('laravel-auth::auth.recovery.invalid'), $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
         $this->assertSame($codes, $user->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(1, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$username));
         Event::assertNothingDispatched();
     }
 
@@ -186,7 +186,7 @@ trait SubmitRecoveryChallengeTests
         $this->expectTimebox();
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email = $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
             'code' => 'INV4L-1DCD3',
         ]);
 
@@ -199,7 +199,7 @@ trait SubmitRecoveryChallengeTests
         $this->assertSame($codes, $user->fresh()->recovery_codes);
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
-        $this->assertSame(1, $this->getRateLimitAttempts('email::'.$email));
+        $this->assertSame(1, $this->getRateLimitAttempts('username::'.$username));
         Event::assertDispatched(AccountRecoveryFailed::class, fn (AccountRecoveryFailed $event) => $event->user->is($user));
         Event::assertNotDispatched(Lockout::class);
     }
@@ -216,7 +216,7 @@ trait SubmitRecoveryChallengeTests
         $this->hitRateLimiter(250, '');
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -240,7 +240,7 @@ trait SubmitRecoveryChallengeTests
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
             'code' => 'PIPIM-7LTUT',
         ]);
 
@@ -253,7 +253,7 @@ trait SubmitRecoveryChallengeTests
     }
 
     /** @test */
-    public function account_recovery_challenge_requests_are_rate_limited_after_too_many_failed_requests_for_one_email_address(): void
+    public function account_recovery_challenge_requests_are_rate_limited_after_too_many_failed_requests_for_one_username(): void
     {
         Carbon::setTestNow(now());
         Event::fake([Lockout::class]);
@@ -261,11 +261,11 @@ trait SubmitRecoveryChallengeTests
         $repository = Password::getRepository();
         $token = $repository->create($user);
         $this->assertTrue($repository->exists($user, $token));
-        $email = $user->getEmailForPasswordReset();
-        $this->hitRateLimiter(5, 'email::'.$email);
+        $username = $user->{$this->usernameField()};
+        $this->hitRateLimiter(5, 'username::'.$username);
 
         $response = $this->post(route('recover-account.challenge', ['token' => $token]), [
-            'email' => $email,
+            $this->usernameField() => $username,
             'code' => 'PIPIM-7LTUT',
         ]);
 

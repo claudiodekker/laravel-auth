@@ -40,27 +40,9 @@ trait UsernameBased
         return str_repeat('a', 256);
     }
 
-    protected function assertUsernameRequiredValidationError(TestResponse $response): void
-    {
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => [__('validation.required', ['attribute' => 'username'])]], $response->exception->errors());
-    }
-
     protected function assertUsernameMustBeValidValidationError(TestResponse $response): void
     {
         $this->assertInstanceOf(ValidationException::class, $response->exception);
         $this->assertSame([$this->usernameField() => [__('laravel-auth::auth.failed')]], $response->exception->errors());
-    }
-
-    protected function assertUsernameTooLongValidationError(TestResponse $response): void
-    {
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => [__('validation.max.string', ['attribute' => 'username', 'max' => 255])]], $response->exception->errors());
-    }
-
-    protected function assertUsernameAlreadyExistsValidationError(TestResponse $response): void
-    {
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame([$this->usernameField() => [__('validation.unique', ['attribute' => 'username'])]], $response->exception->errors());
     }
 }

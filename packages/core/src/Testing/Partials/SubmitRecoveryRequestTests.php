@@ -2,8 +2,8 @@
 
 namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
+use App\Notifications\AccountRecoveryNotification;
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -26,11 +26,11 @@ trait SubmitRecoveryRequestTests
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
-            'email' => $user->email,
+            $this->usernameField() => $this->defaultUsername(),
         ]);
 
         $response->assertRedirect('/foo');
-        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
+        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent', ['field' => $this->usernameField()]));
         $this->assertTrue($repository->recentlyCreatedToken($user));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
@@ -39,7 +39,7 @@ trait SubmitRecoveryRequestTests
             $route = Route::getRoutes()->match($action);
 
             $this->assertSame('recover-account.challenge', $route->getName());
-            $this->assertSame($user->email, $action->query('email'));
+            $this->assertSame($user->{$this->usernameField()}, $action->query($this->usernameField()));
             $this->assertTrue($repository->exists($user, $route->parameter('token')));
 
             return true;
@@ -53,7 +53,7 @@ trait SubmitRecoveryRequestTests
         $this->actingAs($user = $this->generateUser());
 
         $response = $this->post(route('recover-account'), [
-            'email' => $user->email,
+            $this->usernameField() => $this->defaultUsername(),
         ]);
 
         $response->assertRedirect(RouteServiceProvider::HOME);
@@ -62,7 +62,7 @@ trait SubmitRecoveryRequestTests
     }
 
     /** @test */
-    public function it_validates_that_the_email_is_required_when_requesting_an_account_recovery_link(): void
+    public function it_validates_that_the_username_is_required_when_requesting_an_account_recovery_link(): void
     {
         Notification::fake();
         $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
@@ -70,11 +70,11 @@ trait SubmitRecoveryRequestTests
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
-            'email' => '',
+            $this->usernameField() => '',
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);
-        $this->assertSame(['email' => [__('validation.required', ['attribute' => 'email'])]], $response->exception->errors());
+        $this->assertSame([$this->usernameField() => [__('validation.required', ['attribute' => $this->usernameField()])]], $response->exception->errors());
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         $response->assertSessionMissing('status');
@@ -90,11 +90,11 @@ trait SubmitRecoveryRequestTests
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
-            'email' => 'foo@example.com',
+            $this->usernameField() => $this->nonExistentUsername(),
         ]);
 
         $response->assertRedirect('/foo');
-        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
+        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent', ['field' => $this->usernameField()]));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
         Notification::assertNothingSent();
@@ -115,11 +115,11 @@ trait SubmitRecoveryRequestTests
         $this->expectTimebox();
 
         $response = $this->from('/foo')->post(route('recover-account'), [
-            'email' => $user->email,
+            $this->usernameField() => $this->defaultUsername(),
         ]);
 
         $response->assertRedirect('/foo');
-        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent'));
+        $response->assertSessionHas('status', __('laravel-auth::auth.recovery.sent', ['field' => $this->usernameField()]));
         $this->assertTrue($repository->recentlyCreatedToken($user));
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
@@ -136,7 +136,7 @@ trait SubmitRecoveryRequestTests
         $this->hitRateLimiter(5, 'ip::127.0.0.1');
 
         $response = $this->post(route('recover-account'), [
-            'email' => 'foo@example.com',
+            $this->usernameField() => $this->defaultUsername(),
         ]);
 
         $this->assertInstanceOf(ValidationException::class, $response->exception);

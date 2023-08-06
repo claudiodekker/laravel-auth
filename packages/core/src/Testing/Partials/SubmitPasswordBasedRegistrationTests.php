@@ -8,6 +8,7 @@ use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
@@ -113,6 +114,19 @@ trait SubmitPasswordBasedRegistrationTests
         $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => $this->tooLongUsername()]);
 
         $this->assertUsernameTooLongValidationError($response);
+        $this->assertCount(0, LaravelAuth::userModel()::all());
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+    }
+
+    /** @test */
+    public function it_validates_that_the_username_is_a_string_during_password_based_registration(): void
+    {
+        $this->expectTimebox();
+
+        $response = $this->submitPasswordBasedRegisterAttempt([$this->usernameField() => UploadedFile::fake()->image('username.jpg')]);
+
+        $this->assertUsernameMustBeAStringValidationError($response);
         $this->assertCount(0, LaravelAuth::userModel()::all());
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
