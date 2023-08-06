@@ -2,11 +2,11 @@
 
 namespace ClaudioDekker\LaravelAuthBladebones\Testing;
 
-use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryChallengeViewTests;
-use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryRequestViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\CredentialsOverviewViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\LoginViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\MultiFactorChallengeViewTests;
+use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryChallengeViewTests;
+use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryRequestViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RegisterPublicKeyCredentialViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RegisterTotpCredentialViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RegisterViewTests;
