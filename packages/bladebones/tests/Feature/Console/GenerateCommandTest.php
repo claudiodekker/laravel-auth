@@ -103,13 +103,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
-    use RegistrationTests;
     use RecoveryRequestTests;
+    use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
