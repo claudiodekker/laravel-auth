@@ -56,7 +56,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/home', fn() => view('home'));
+    Route::get('/home', fn () => view('home'));
 
     Route::delete('/logout', [LoginController::class, 'destroy'])->name('logout');
 
