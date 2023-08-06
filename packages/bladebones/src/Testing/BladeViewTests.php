@@ -19,8 +19,8 @@ trait BladeViewTests
     use RecoveryRequestViewTests;
 
     // Challenges
-    use RecoveryChallengeViewTests;
     use MultiFactorChallengeViewTests;
+    use RecoveryChallengeViewTests;
     use SudoModeChallengeViewTests;
 
     // Settings

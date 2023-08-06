@@ -109,7 +109,6 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
     use SudoModeChallengeTests;
 
@@ -212,8 +211,8 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -305,8 +304,8 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -399,8 +398,8 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -490,8 +489,8 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -598,8 +597,8 @@ class AuthenticationTest extends TestCase
     use LogoutTests;
 
     // Challenges
-    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
