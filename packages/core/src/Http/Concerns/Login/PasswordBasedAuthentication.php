@@ -80,7 +80,7 @@ trait PasswordBasedAuthentication
     protected function validatePasswordBasedRequest(Request $request): void
     {
         $request->validate([
-            ...$this->authenticationValidationRules(),
+            $this->usernameField() => ['required', ...$this->usernameValidationRules()],
             'password' => 'required|string',
         ]);
     }

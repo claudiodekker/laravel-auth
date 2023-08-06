@@ -56,8 +56,8 @@ class GenerateCommandTest extends TestCase
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController');
@@ -73,8 +73,6 @@ class GenerateCommandTest extends TestCase
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
@@ -82,6 +80,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -103,14 +103,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -161,8 +161,8 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController');
@@ -178,8 +178,6 @@ EOF;
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
@@ -187,6 +185,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -206,14 +206,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -254,8 +254,8 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController');
@@ -271,8 +271,6 @@ EOF;
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
@@ -280,6 +278,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -299,14 +299,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithoutVerificationEmailTests;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -334,7 +334,7 @@ EOF;
         });
         $this->mock->shouldIgnoreMissing();
 
-        $this->artisan(GenerateCommand::class, ['--without-views' => true,  '--kind' => 'email-based'])
+        $this->artisan(GenerateCommand::class, ['--without-views' => true, '--kind' => 'email-based'])
             ->expectsConfirmation('Do you want to send a verification email when users register?', 'no');
     }
 
@@ -346,8 +346,8 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController');
@@ -363,8 +363,6 @@ EOF;
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
@@ -372,6 +370,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -393,14 +393,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithoutVerificationEmailTests;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -439,8 +439,8 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController');
@@ -456,8 +456,6 @@ EOF;
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\EmailBased;
@@ -465,6 +463,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -484,14 +484,14 @@ class AuthenticationTest extends TestCase
     use RegisterWithVerificationEmailTests;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings
@@ -542,8 +542,8 @@ EOF;
         $this->assertMockShouldReceiveController('Settings/RegisterPublicKeyCredentialController');
         $this->assertMockShouldReceiveController('Settings/RegisterTotpCredentialController');
         $this->assertMockShouldReceiveController('VerifyEmailController');
-        $this->assertMockShouldReceiveController('AccountRecoveryRequestController');
-        $this->assertMockShouldReceiveController('Challenges/AccountRecoveryChallengeController');
+        $this->assertMockShouldReceiveController('RecoveryRequestController');
+        $this->assertMockShouldReceiveController('Challenges/RecoveryChallengeController');
         $this->assertMockShouldReceiveController('Challenges/MultiFactorChallengeController');
         $this->assertMockShouldReceiveController('Challenges/SudoModeChallengeController');
         $this->assertMockShouldReceiveController('LoginController', function ($contents) {
@@ -564,8 +564,6 @@ EOF;
 
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\RegisterWithoutVerificationEmailTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\UsernameBased;
@@ -573,6 +571,8 @@ use ClaudioDekker\LaravelAuth\Testing\GenerateRecoveryCodesTests;
 use ClaudioDekker\LaravelAuth\Testing\LoginTests;
 use ClaudioDekker\LaravelAuth\Testing\LogoutTests;
 use ClaudioDekker\LaravelAuth\Testing\MultiFactorChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterPublicKeyCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegisterTotpCredentialTests;
 use ClaudioDekker\LaravelAuth\Testing\RegistrationTests;
@@ -592,14 +592,14 @@ class AuthenticationTest extends TestCase
     use UsernameBased;
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
     use MultiFactorChallengeTests;
+    use RecoveryChallengeTests;
     use SudoModeChallengeTests;
 
     // Settings

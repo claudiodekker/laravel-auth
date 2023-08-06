@@ -1,21 +1,41 @@
+@php
+    $flavorTrait = str_replace("-", "", \Illuminate\Support\Str::title($flavor));
+@endphp
 
 namespace App\Http\Controllers\Auth\Challenges;
 
-use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\AccountRecoveryChallengeController as BaseController;
+use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\RecoveryChallengeController as BaseController;
+@if ($flavor !== 'email-based')
+use ClaudioDekker\LaravelAuth\Http\Modifiers\{{ $flavorTrait }};
+@endif
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class AccountRecoveryChallengeController extends BaseController
+class RecoveryChallengeController extends BaseController
 {
+@php
+    $uses = [];
+    if ($flavor !== 'email-based') {
+        $uses[] = $flavorTrait;
+    }
+
+    asort($uses);
+@endphp
+@if (count($uses) > 0)
+@foreach($uses as $use)
+    use {{ $use }};
+@endforeach
+
+@endif
     /**
      * Handle an incoming request to view the account recovery challenge page.
      *
-     * {!! '@' !!}see static::sendAccountRecoveredResponse()
-     * {!! '@' !!}see static::sendChallengePageResponse()
      * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
+     * {!! '@' !!}see static::sendChallengePageResponse()
+     * {!! '@' !!}see static::sendRecoveryModeEnabledResponse()
      */
     public function create(Request $request, string $token): RedirectResponse|View
     {
@@ -26,9 +46,9 @@ class AccountRecoveryChallengeController extends BaseController
      * Handle an incoming account recovery challenge response.
      *
      * {!! '@' !!}see static::sendRateLimitedResponse()
-     * {!! '@' !!}see static::sendAccountRecoveredResponse()
-     * {!! '@' !!}see static::sendInvalidRecoveryCodeResponse()
      * {!! '@' !!}see static::sendInvalidRecoveryLinkResponse()
+     * {!! '@' !!}see static::sendInvalidRecoveryCodeResponse()
+     * {!! '@' !!}see static::sendRecoveryModeEnabledResponse()
      */
     public function store(Request $request, string $token): RedirectResponse
     {
@@ -52,7 +72,11 @@ class AccountRecoveryChallengeController extends BaseController
      */
     protected function sendInvalidRecoveryLinkResponse(Request $request): void
     {
-        abort(403, 'The given email and recovery token combination are invalid.');
+@if ($flavor === 'username-based')
+        abort(403, __('laravel-auth::auth.recovery.invalid', ['field' => 'username']));
+@else
+        abort(403, __('laravel-auth::auth.recovery.invalid', ['field' => 'email']));
+@endif
     }
 
     /**
@@ -68,14 +92,11 @@ class AccountRecoveryChallengeController extends BaseController
     }
 
     /**
-     * Sends a response indicating that the user's account has been recovered.
-     *
-     * Typically, you'd want this response to redirect the user to their account's security settings page,
-     * where they can adjust whatever is causing them to be unable to authenticate using normal means.
+     * Sends a response indicating that recovery mode has been enabled for the given user.
      */
-    protected function sendAccountRecoveredResponse(Request $request, Authenticatable $user): RedirectResponse
+    protected function sendRecoveryModeEnabledResponse(Request $request, Authenticatable $user): RedirectResponse
     {
-        return redirect()->route('auth.settings');
+        return redirect()->route('recover-account.reset');
     }
 
     /**

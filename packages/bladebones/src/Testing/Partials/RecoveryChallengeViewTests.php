@@ -4,7 +4,7 @@ namespace ClaudioDekker\LaravelAuthBladebones\Testing\Partials;
 
 use Illuminate\Support\Facades\Password;
 
-trait AccountRecoveryChallengeViewTests
+trait RecoveryChallengeViewTests
 {
     /** @test */
     public function the_account_recovery_challenge_page_uses_blade_views(): void
@@ -14,7 +14,7 @@ trait AccountRecoveryChallengeViewTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertViewIs('auth.challenges.recovery');

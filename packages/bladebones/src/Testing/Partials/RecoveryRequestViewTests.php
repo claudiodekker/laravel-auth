@@ -2,7 +2,7 @@
 
 namespace ClaudioDekker\LaravelAuthBladebones\Testing\Partials;
 
-trait AccountRecoveryRequestViewTests
+trait RecoveryRequestViewTests
 {
     /** @test */
     public function the_account_recovery_request_page_uses_blade_views(): void

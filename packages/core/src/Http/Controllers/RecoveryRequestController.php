@@ -2,10 +2,11 @@
 
 namespace ClaudioDekker\LaravelAuth\Http\Controllers;
 
+use App\Notifications\AccountRecoveryNotification;
 use ClaudioDekker\LaravelAuth\Events\Mixins\EmitsLockoutEvent;
 use ClaudioDekker\LaravelAuth\Http\Concerns\InteractsWithRateLimiting;
+use ClaudioDekker\LaravelAuth\Http\Modifiers\EmailBased;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
-use ClaudioDekker\LaravelAuth\Notifications\AccountRecoveryNotification;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Http\Request;
@@ -13,8 +14,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Timebox;
 
-abstract class AccountRecoveryRequestController
+abstract class RecoveryRequestController
 {
+    use EmailBased;
     use InteractsWithRateLimiting;
     use EmitsLockoutEvent;
 
@@ -79,8 +81,9 @@ abstract class AccountRecoveryRequestController
             return $this->sendRateLimitedResponse($request, $this->rateLimitExpiresInSeconds($request));
         }
 
+        $this->incrementRateLimitingCounter($request);
+
         return App::make(Timebox::class)->call(function () use ($request) {
-            $this->incrementRateLimitingCounter($request);
             $this->validateRecoveryRequest($request);
 
             if (! $user = $this->getUser($request)) {
@@ -106,7 +109,7 @@ abstract class AccountRecoveryRequestController
     protected function validateRecoveryRequest(Request $request): void
     {
         $request->validate([
-            'email' => 'required|email',
+            $this->usernameField() => ['required', ...$this->usernameValidationRules()],
         ]);
     }
 
@@ -119,7 +122,7 @@ abstract class AccountRecoveryRequestController
         $query = LaravelAuth::userModel()::query();
 
         return $query
-            ->where('email', $request->input('email'))
+            ->where($this->usernameField(), $request->input($this->usernameField()))
             ->first();
     }
 

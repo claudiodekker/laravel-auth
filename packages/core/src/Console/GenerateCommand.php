@@ -82,6 +82,7 @@ abstract class GenerateCommand extends Command
     {
         $this->installRoutes();
         $this->installControllers();
+        $this->installNotifications();
         $this->installTests();
 
         if (! $this->determinedOptions['withoutViews']) {
@@ -102,21 +103,12 @@ abstract class GenerateCommand extends Command
     abstract protected function installViews(): void;
 
     /**
-     * Installs the extending package's authentication tests.
-     */
-    protected function installTests(): void
-    {
-        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
-        $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
-    }
-
-    /**
      * Installs the extending package's authentication controllers.
      */
     protected function installControllers(): void
     {
-        $this->generate('Controllers.AccountRecoveryRequestController', app_path('Http/Controllers/Auth/AccountRecoveryRequestController.php'));
-        $this->generate('Controllers.Challenges.AccountRecoveryChallengeController', app_path('Http/Controllers/Auth/Challenges/AccountRecoveryChallengeController.php'));
+        $this->generate('Controllers.RecoveryRequestController', app_path('Http/Controllers/Auth/RecoveryRequestController.php'));
+        $this->generate('Controllers.Challenges.RecoveryChallengeController', app_path('Http/Controllers/Auth/Challenges/RecoveryChallengeController.php'));
         $this->generate('Controllers.Challenges.MultiFactorChallengeController', app_path('Http/Controllers/Auth/Challenges/MultiFactorChallengeController.php'));
         $this->generate('Controllers.Challenges.SudoModeChallengeController', app_path('Http/Controllers/Auth/Challenges/SudoModeChallengeController.php'));
         $this->generate('Controllers.LoginController', app_path('Http/Controllers/Auth/LoginController.php'));
@@ -127,6 +119,23 @@ abstract class GenerateCommand extends Command
         $this->generate('Controllers.Settings.GenerateRecoveryCodesController', app_path('Http/Controllers/Auth/Settings/GenerateRecoveryCodesController.php'));
         $this->generate('Controllers.Settings.RegisterPublicKeyCredentialController', app_path('Http/Controllers/Auth/Settings/RegisterPublicKeyCredentialController.php'));
         $this->generate('Controllers.Settings.RegisterTotpCredentialController', app_path('Http/Controllers/Auth/Settings/RegisterTotpCredentialController.php'));
+    }
+
+    /**
+     * Installs the extending package's authentication notifications.
+     */
+    protected function installNotifications(): void
+    {
+        $this->rawGenerate('Notifications.AccountRecoveryNotification', app_path('Notifications/AccountRecoveryNotification.php'));
+    }
+
+    /**
+     * Installs the extending package's authentication tests.
+     */
+    protected function installTests(): void
+    {
+        $this->rawGenerate('Tests.PruneUnclaimedUsersTest', base_path('tests/Unit/PruneUnclaimedUsersTest.php'));
+        $this->rawGenerate('Tests.UserTest', base_path('tests/Unit/UserTest.php'));
     }
 
     /**

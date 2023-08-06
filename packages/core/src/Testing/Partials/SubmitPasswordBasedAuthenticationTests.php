@@ -10,6 +10,7 @@ use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
 use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
 use ClaudioDekker\LaravelAuth\LaravelAuth;
 use Illuminate\Auth\Events\Lockout;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Redirect;
@@ -60,6 +61,19 @@ trait SubmitPasswordBasedAuthenticationTests
         $response = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => '']);
 
         $this->assertUsernameRequiredValidationError($response);
+        $this->assertGuest();
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));
+    }
+
+    /** @test */
+    public function it_validates_that_the_username_is_a_string_during_password_based_authentication(): void
+    {
+        $this->expectTimebox();
+
+        $response = $this->submitPasswordBasedLoginAttempt([$this->usernameField() => UploadedFile::fake()->image('username.jpg')]);
+
+        $this->assertUsernameMustBeAStringValidationError($response);
         $this->assertGuest();
         $this->assertSame(1, $this->getRateLimitAttempts(''));
         $this->assertSame(1, $this->getRateLimitAttempts('ip::127.0.0.1'));

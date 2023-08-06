@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
 
 trait Helpers
@@ -132,6 +133,30 @@ trait Helpers
         $this->assertFalse(Collection::make($response->headers->all()['set-cookie'] ?? [])->contains(function ($key) {
             return Str::startsWith($key, 'remember_web_');
         }), 'Remember cookie not found.');
+    }
+
+    protected function assertUsernameRequiredValidationError(TestResponse $response): void
+    {
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('validation.required', ['attribute' => $this->usernameField()])]], $response->exception->errors());
+    }
+
+    protected function assertUsernameMustBeAStringValidationError(TestResponse $response): void
+    {
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('validation.string', ['attribute' => $this->usernameField()])]], $response->exception->errors());
+    }
+
+    protected function assertUsernameTooLongValidationError(TestResponse $response): void
+    {
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('validation.max.string', ['attribute' => $this->usernameField(), 'max' => 255])]], $response->exception->errors());
+    }
+
+    protected function assertUsernameAlreadyExistsValidationError(TestResponse $response): void
+    {
+        $this->assertInstanceOf(ValidationException::class, $response->exception);
+        $this->assertSame([$this->usernameField() => [__('validation.unique', ['attribute' => $this->usernameField()])]], $response->exception->errors());
     }
 
     protected function mockWebauthnChallenge($challenge): void

@@ -3,16 +3,14 @@
 namespace ClaudioDekker\LaravelAuth\Testing\Partials\Challenges\Recovery;
 
 use App\Providers\RouteServiceProvider;
-use ClaudioDekker\LaravelAuth\Events\AccountRecovered;
 use ClaudioDekker\LaravelAuth\Events\AccountRecoveryFailed;
-use ClaudioDekker\LaravelAuth\Events\SudoModeEnabled;
-use ClaudioDekker\LaravelAuth\Http\Middleware\EnsureSudoMode;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-trait ViewAccountRecoveryChallengePageTests
+trait ViewRecoveryChallengePageTests
 {
     /** @test */
     public function the_account_recovery_challenge_page_can_be_viewed(): void
@@ -23,7 +21,7 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertOk();
@@ -33,7 +31,7 @@ trait ViewAccountRecoveryChallengePageTests
     public function the_account_recovery_challenge_page_is_skipped_when_the_user_does_not_have_any_recovery_codes(): void
     {
         Carbon::setTestNow(now());
-        Event::fake([AccountRecovered::class, AccountRecoveryFailed::class, SudoModeEnabled::class]);
+        Event::fake([Lockout::class, AccountRecoveryFailed::class]);
         $user = $this->generateUser(['recovery_codes' => null]);
         $repository = Password::getRepository();
         $token = $repository->create($user);
@@ -42,17 +40,18 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $username = $user->{$this->usernameField()},
         ]));
 
-        $response->assertRedirect(route('auth.settings'));
-        $response->assertSessionMissing(EnsureSudoMode::REQUIRED_AT_KEY);
-        $response->assertSessionHas(EnsureSudoMode::CONFIRMED_AT_KEY, now()->unix());
-        $this->assertFullyAuthenticatedAs($response, $user);
+        $this->assertGuest();
+        $response->assertRedirect(route('recover-account.reset'));
+        $response->assertSessionHas('auth.recovery_mode.user_id', $user->id);
+        $response->assertSessionHas('auth.recovery_mode.enabled_at', now());
         $this->assertFalse($repository->exists($user, $token));
-        Event::assertDispatched(AccountRecovered::class, fn ($event) => $event->user->is($user) && $event->request === request());
-        Event::assertNotDispatched(AccountRecoveryFailed::class);
-        Event::assertNotDispatched(SudoModeEnabled::class);
+        $this->assertSame(1, $this->getRateLimitAttempts(''));
+        $this->assertSame(0, $this->getRateLimitAttempts('ip::127.0.0.1'));
+        $this->assertSame(0, $this->getRateLimitAttempts('username::'.$username));
+        Event::assertNothingDispatched();
         Carbon::setTestNow();
     }
 
@@ -68,7 +67,7 @@ trait ViewAccountRecoveryChallengePageTests
     }
 
     /** @test */
-    public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_provided_email_does_not_resolve_to_an_existing_user(): void
+    public function the_account_recovery_challenge_page_cannot_be_viewed_when_the_provided_username_does_not_resolve_to_an_existing_user(): void
     {
         $user = $this->generateUser(['recovery_codes' => ['H4PFK-ENVZV', 'PIPIM-7LTUT', 'GPP13-AEXMR', 'WGAHD-95VNQ', 'BSFYG-VFG2N', 'AWOPQ-NWYJX', '2PVJM-QHPBM', 'STR7J-5ND0P']]);
         $token = Password::getRepository()->create($user);
@@ -76,12 +75,14 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => 'nonexistent-user@example.com',
+            $this->usernameField() => $this->nonExistentUsername(),
         ]));
 
         $response->assertForbidden();
+        $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -94,12 +95,14 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $userB->getEmailForPasswordReset(),
+            $this->usernameField() => $userB->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
+        $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -110,12 +113,14 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => 'invalid-token',
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
+        $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
     }
 
     /** @test */
@@ -129,12 +134,14 @@ trait ViewAccountRecoveryChallengePageTests
 
         $response = $this->get(route('recover-account.challenge', [
             'token' => $token,
-            'email' => $user->getEmailForPasswordReset(),
+            $this->usernameField() => $user->{$this->usernameField()},
         ]));
 
         $response->assertForbidden();
+        $response->assertSessionMissing('auth.recovery_mode.user_id');
+        $response->assertSessionMissing('auth.recovery_mode.enabled_at');
         $this->assertInstanceOf(HttpException::class, $response->exception);
-        $this->assertSame('The given email and recovery token combination are invalid.', $response->exception->getMessage());
+        $this->assertSame(__('laravel-auth::auth.recovery.invalid', ['field' => $this->usernameField()]), $response->exception->getMessage());
         Carbon::setTestNow();
     }
 }

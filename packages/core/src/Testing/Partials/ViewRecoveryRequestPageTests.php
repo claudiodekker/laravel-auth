@@ -4,7 +4,7 @@ namespace ClaudioDekker\LaravelAuth\Testing\Partials;
 
 use App\Providers\RouteServiceProvider;
 
-trait ViewAccountRecoveryRequestPageTests
+trait ViewRecoveryRequestPageTests
 {
     /** @test */
     public function the_account_recovery_request_page_can_be_viewed(): void

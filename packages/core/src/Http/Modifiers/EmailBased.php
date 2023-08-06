@@ -13,22 +13,20 @@ trait EmailBased
     }
 
     /**
+     * Any flavor-specific validation rules used to validate requests that require the username.
+     */
+    protected function usernameValidationRules(): array
+    {
+        return ['max:255', 'email'];
+    }
+
+    /**
      * Any flavor-specific validation rules used to validate a registration request.
      */
     protected function registrationValidationRules(): array
     {
         return [
-            $this->usernameField() => ['required', 'max:255', 'unique:users', 'email'],
-        ];
-    }
-
-    /**
-     * Any flavor-specific validation rules used to validate an authentication request.
-     */
-    protected function authenticationValidationRules(): array
-    {
-        return [
-            $this->usernameField() => ['required', 'email'],
+            $this->usernameField() => ['required', 'unique:users', ...$this->usernameValidationRules()],
         ];
     }
 }
