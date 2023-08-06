@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Auth\RecoveryRequestController;
-use App\Http\Controllers\Auth\Challenges\RecoveryChallengeController;
 use App\Http\Controllers\Auth\Challenges\MultiFactorChallengeController;
+use App\Http\Controllers\Auth\Challenges\RecoveryChallengeController;
 use App\Http\Controllers\Auth\Challenges\SudoModeChallengeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RecoveryRequestController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\Settings\ChangePasswordController;
 use App\Http\Controllers\Auth\Settings\CredentialsController;
@@ -56,7 +56,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/home', fn () => view('home'));
+    Route::get('/home', fn() => view('home'));
 
     Route::delete('/logout', [LoginController::class, 'destroy'])->name('logout');
 
