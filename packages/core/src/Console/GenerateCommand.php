@@ -115,8 +115,8 @@ abstract class GenerateCommand extends Command
      */
     protected function installControllers(): void
     {
-        $this->generate('Controllers.AccountRecoveryRequestController', app_path('Http/Controllers/Auth/AccountRecoveryRequestController.php'));
-        $this->generate('Controllers.Challenges.AccountRecoveryChallengeController', app_path('Http/Controllers/Auth/Challenges/AccountRecoveryChallengeController.php'));
+        $this->generate('Controllers.RecoveryRequestController', app_path('Http/Controllers/Auth/RecoveryRequestController.php'));
+        $this->generate('Controllers.Challenges.RecoveryChallengeController', app_path('Http/Controllers/Auth/Challenges/RecoveryChallengeController.php'));
         $this->generate('Controllers.Challenges.MultiFactorChallengeController', app_path('Http/Controllers/Auth/Challenges/MultiFactorChallengeController.php'));
         $this->generate('Controllers.Challenges.SudoModeChallengeController', app_path('Http/Controllers/Auth/Challenges/SudoModeChallengeController.php'));
         $this->generate('Controllers.LoginController', app_path('Http/Controllers/Auth/LoginController.php'));

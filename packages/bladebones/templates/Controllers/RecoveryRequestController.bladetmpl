@@ -15,7 +15,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use ClaudioDekker\LaravelAuth\Http\Controllers\AccountRecoveryRequestController as BaseController;
+use ClaudioDekker\LaravelAuth\Http\Controllers\RecoveryRequestController as BaseController;
 @if (count($traits) > 0)
 @foreach($traits as $trait)
 use {{ $trait }};
@@ -27,7 +27,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class AccountRecoveryRequestController extends BaseController
+class RecoveryRequestController extends BaseController
 {
 @php
     $uses = [];

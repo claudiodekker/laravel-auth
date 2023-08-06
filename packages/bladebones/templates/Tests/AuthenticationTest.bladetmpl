@@ -4,8 +4,8 @@
 @endphp
 namespace Tests\Feature;
 
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryChallengeTests;
-use ClaudioDekker\LaravelAuth\Testing\AccountRecoveryRequestTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryChallengeTests;
+use ClaudioDekker\LaravelAuth\Testing\RecoveryRequestTests;
 use ClaudioDekker\LaravelAuth\Testing\EmailVerification\{{ $verificationTrait }};
 use ClaudioDekker\LaravelAuth\Testing\EmailVerificationTests;
 use ClaudioDekker\LaravelAuth\Testing\Flavors\{{ $flavorTrait }};
@@ -48,13 +48,13 @@ class AuthenticationTest extends TestCase
 @endforeach
 
     // Basic Auth
-    use AccountRecoveryRequestTests;
+    use RecoveryRequestTests;
     use RegistrationTests;
     use LoginTests;
     use LogoutTests;
 
     // Challenges
-    use AccountRecoveryChallengeTests;
+    use RecoveryChallengeTests;
     use MultiFactorChallengeTests;
     use SudoModeChallengeTests;
 

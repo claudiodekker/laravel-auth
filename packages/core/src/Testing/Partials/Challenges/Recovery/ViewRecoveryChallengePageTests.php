@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-trait ViewAccountRecoveryChallengePageTests
+trait ViewRecoveryChallengePageTests
 {
     /** @test */
     public function the_account_recovery_challenge_page_can_be_viewed(): void

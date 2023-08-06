@@ -2,8 +2,8 @@
 
 namespace ClaudioDekker\LaravelAuthBladebones\Testing;
 
-use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\AccountRecoveryChallengeViewTests;
-use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\AccountRecoveryRequestViewTests;
+use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryChallengeViewTests;
+use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\RecoveryRequestViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\CredentialsOverviewViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\LoginViewTests;
 use ClaudioDekker\LaravelAuthBladebones\Testing\Partials\MultiFactorChallengeViewTests;
@@ -16,10 +16,10 @@ trait BladeViewTests
 {
     use RegisterViewTests;
     use LoginViewTests;
-    use AccountRecoveryRequestViewTests;
+    use RecoveryRequestViewTests;
 
     // Challenges
-    use AccountRecoveryChallengeViewTests;
+    use RecoveryChallengeViewTests;
     use MultiFactorChallengeViewTests;
     use SudoModeChallengeViewTests;
 

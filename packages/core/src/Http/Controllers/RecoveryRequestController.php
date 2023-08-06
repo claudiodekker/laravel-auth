@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Timebox;
 
-abstract class AccountRecoveryRequestController
+abstract class RecoveryRequestController
 {
     use InteractsWithRateLimiting;
     use EmitsLockoutEvent;

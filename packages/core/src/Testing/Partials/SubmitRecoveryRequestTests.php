@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
-trait SubmitAccountRecoveryRequestTests
+trait SubmitRecoveryRequestTests
 {
     /** @test */
     public function guests_can_request_an_account_recovery_link(): void

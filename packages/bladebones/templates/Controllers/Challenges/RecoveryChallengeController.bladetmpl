@@ -1,14 +1,14 @@
 
 namespace App\Http\Controllers\Auth\Challenges;
 
-use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\AccountRecoveryChallengeController as BaseController;
+use ClaudioDekker\LaravelAuth\Http\Controllers\Challenges\RecoveryChallengeController as BaseController;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class AccountRecoveryChallengeController extends BaseController
+class RecoveryChallengeController extends BaseController
 {
     /**
      * Handle an incoming request to view the account recovery challenge page.

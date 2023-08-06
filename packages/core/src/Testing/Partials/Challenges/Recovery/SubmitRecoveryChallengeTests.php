@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-trait SubmitAccountRecoveryChallengeTests
+trait SubmitRecoveryChallengeTests
 {
     /** @test */
     public function the_user_can_begin_to_recover_the_account(): void

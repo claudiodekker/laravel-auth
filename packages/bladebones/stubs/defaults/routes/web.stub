@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Auth\AccountRecoveryRequestController;
-use App\Http\Controllers\Auth\Challenges\AccountRecoveryChallengeController;
+use App\Http\Controllers\Auth\RecoveryRequestController;
+use App\Http\Controllers\Auth\Challenges\RecoveryChallengeController;
 use App\Http\Controllers\Auth\Challenges\MultiFactorChallengeController;
 use App\Http\Controllers\Auth\Challenges\SudoModeChallengeController;
 use App\Http\Controllers\Auth\LoginController;
@@ -41,10 +41,10 @@ Route::middleware('guest')->group(function () {
         Route::post('/auth/login/challenge', [MultiFactorChallengeController::class, 'store']);
     });
 
-    Route::get('/auth/recover-account', [AccountRecoveryRequestController::class, 'create'])->name('recover-account');
-    Route::post('/auth/recover-account', [AccountRecoveryRequestController::class, 'store']);
-    Route::get('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'create'])->name('recover-account.challenge');
-    Route::post('/auth/recover-account/{token}', [AccountRecoveryChallengeController::class, 'store']);
+    Route::get('/auth/recover-account', [RecoveryRequestController::class, 'create'])->name('recover-account');
+    Route::post('/auth/recover-account', [RecoveryRequestController::class, 'store']);
+    Route::get('/auth/recover-account/{token}', [RecoveryChallengeController::class, 'create'])->name('recover-account.challenge');
+    Route::post('/auth/recover-account/{token}', [RecoveryChallengeController::class, 'store']);
 
     Route::middleware([])->group(function () {
         Route::get('/auth/reset', ['foo', 'bar'])->name('recover-account.reset');

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Support\Timebox;
 
-abstract class AccountRecoveryChallengeController
+abstract class RecoveryChallengeController
 {
     use EmitsLockoutEvent;
     use InteractsWithRateLimiting;
